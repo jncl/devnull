@@ -1,0 +1,45 @@
+﻿## Interface: 30300
+## Title: /dev/null
+## Notes: Mutes various chat related annoyances while in capital cities and instances.
+## Notes-deDE: Unterdr\195\188ckt diverse st\195\182rende Meldungen - w\195\164hrend man sich in Hauptst\195\164dten oder Instanzen befindet.
+## Notes-zhTW: 當你在主城或是副本時，關掉各種惱人的聊天對話內容
+## Author: Zalkalin
+## X-Credits: Thanks to Jncl and Tekkub for various changes.
+## Version: @project-version@
+## X-Category: Chat/Communication
+## SavedVariables: devnullDB
+## OptionalDeps: Ace3, LibBabble-Zone-3.0, LibTourist-3.0
+#
+# LibStub & Callback Handler
+libs\LibStub\LibStub.lua
+libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
+#
+# LDB Library
+libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
+#
+#@no-lib-strip@
+#Ace3 Libraries
+libs\AceAddon-3.0\AceAddon-3.0.xml
+libs\AceConsole-3.0\AceConsole-3.0.xml
+libs\AceEvent-3.0\AceEvent-3.0.xml
+libs\AceDB-3.0\AceDB-3.0.xml
+libs\AceDBOptions-3.0\AceDBOptions-3.0.xml
+libs\AceLocale-3.0\AceLocale-3.0.xml
+libs\AceGUI-3.0\AceGUI-3.0.xml
+libs\AceConfig-3.0\AceConfig-3.0.xml
+#Other Libraries
+libs\LibBabble-Zone-3.0\lib.xml
+libs\LibTourist-3.0\lib.xml
+#@end-no-lib-strip@
+#
+# Locale files
+locales\Locale_enUS.lua
+locales\Locale_deDE.lua
+locales\Locale_frFR.lua
+locales\Locale_koKR.lua
+locales\Locale_ruRU.lua
+locales\Locale_zhCN.lua
+locales\Locale_zhTW.lua
+#
+# Main file
+devnull.lua
