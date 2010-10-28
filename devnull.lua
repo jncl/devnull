@@ -11,7 +11,7 @@ end
 LibStub("AceAddon-3.0"):NewAddon(devnull, aName, "AceConsole-3.0", "AceEvent-3.0")
 
 -- specify where debug messages go
-devnull.debugFrame = ChatFrame7
+devnull.debugFrame = ChatFrame10
 devnull.debugLevel = 5
 
 -- store player and pet names
@@ -178,7 +178,7 @@ local function msgFilter1(self, event, msg, charFrom, ...)
 	-- allow emotes/says to/from the player/pet
 	if (msg:find(devnull.player)
 	or charFrom == devnull.player
-	or (msg:find(L["You"])
+	or (msg:find(L["[Yy]ou"])
 	and charTo == devnull.player
 	or charTo == devnull.pet))
 	then
@@ -258,7 +258,7 @@ local function addMFltrs()
 	end
 	if prdb.noNPC then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", msgFilter1) end
 	if prdb.noPYell then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", msgFilter2) end
-	if prdb.noDuel then	_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter3) end
+--	if prdb.noDuel then	_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter3) end
 	if prdb.noDrunk	then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter4)	end
 	if prdb.noDiscovery then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_BG_SYSTEM_NEUTRAL", msgFilter5) end
 
@@ -273,7 +273,7 @@ local function removeMFltrs()
 	end
 	if prdb.noNPC then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_MONSTER_SAY", msgFilter1) end
 	if prdb.noPYell then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_YELL", msgFilter2) end
- 	if prdb.noDuel then	_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter3) end
+-- 	if prdb.noDuel then	_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter3) end
  	if prdb.noDrunk then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter4) end
 	if prdb.noDiscovery then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_BG_SYSTEM_NEUTRAL", msgFilter5) end
 
@@ -294,8 +294,8 @@ local function updateMFltrs()
 	else _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_MONSTER_SAY", msgFilter1) end
 	if prdb.noPYell then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", msgFilter2)
 	else _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_YELL", msgFilter2) end
-	if prdb.noDuel then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter3)
-	else _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter3) end
+--	if prdb.noDuel then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter3)
+--	else _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter3) end
 	if prdb.noDrunk then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter4)
 	else _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter4) end
 	if prdb.noDiscovery then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_BG_SYSTEM_NEUTRAL", msgFilter5)
@@ -583,8 +583,11 @@ function devnull:OnEnable()
 	enableEvents()
 	-- remove message groups as required
 	removeMGs()
-	-- check to see what mode we sould be in
+	-- check to see what mode we should be in
 	self:CheckMode()
+
+	-- always disable duel messages if required
+	if prdb.noDuel then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter3) end
 
 	-- handle profile changes
 	self.db.RegisterCallback(self, "OnProfileChanged", "ReloadAddon")
@@ -604,6 +607,9 @@ function devnull:OnDisable()
 	removeMFltrs()
 	-- add message groups as required
 	addMGs()
+	-- re-enable duel messages if required
+	if prdb.noDuel then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter3) end
+
 	-- turn channels back on
     for channel, on in pairs(cf1Channels) do
         if on then _G.ChatFrame_AddChannel(ChatFrame1, channel) end
@@ -636,7 +642,8 @@ function devnull:ReloadAddon(callback)
 end
 
 function devnull:CheckMode(...)
-	self:LevelDebug(1, "CheckMode: [%s]", _G.event)
+	local event = select(1, ...)
+	self:LevelDebug(1, "CheckMode: [%s]", event)
 	local rZone, rSubZone = GetRealZoneText(), GetSubZoneText()
     self:LevelDebug(2,"You Are Here: [%s:%s]", rZone or "<Anon>", rSubZone or "<Anon>")
     self:LevelDebug(4,"inInstance#1: [%s, %s, %s, %s, %s]", prdb.inInst, prdb.inBG, T:IsBattleground(rZone),  T:IsInstance(rZone), icecrownInstances[rZone])
@@ -655,22 +662,22 @@ function devnull:CheckMode(...)
 	end
 
 	-- if flying then disable events
-	if _G.event == "PLAYER_CONTROL_LOST" then
+	if event == "PLAYER_CONTROL_LOST" then
 		self:UnregisterAllEvents()
 		self:RegisterEvent("PLAYER_CONTROL_GAINED", "CheckMode")
 		onTaxi = true
 		self.DBObj.text = updateDBtext()
 		return
 	-- if finished flying then enable events
-	elseif _G.event == "PLAYER_CONTROL_GAINED" then
-		self:UnregisterEvent(_G.event)
+	elseif event == "PLAYER_CONTROL_GAINED" then
+		self:UnregisterEvent(event)
 		enableEvents()
 		onTaxi = false
 	end
 
     --> Pre Event Handler <--
     -- if entering a new area or just been loaded or come out of standby
-    if checkEvent[_G.event]	then
+    if checkEvent[event]then
 		if prdb.inInst or prdb.inBG then
             prdb.inInst = false
             prdb.inBG = false
@@ -725,7 +732,7 @@ function devnull:CheckMode(...)
 
     --> Post Event Handler <--
     -- if entering a new area or just been loaded or come out of standby
-    if checkEvent[_G.event]	then
+    if checkEvent[event]	then
         -- Mute chat in Instances/Battlegrounds if required
         if prdb.iChat
 		and prdb.inInst
