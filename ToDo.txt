@@ -12,6 +12,8 @@ N.B. √ is Alt+v - indicates completed
 			Player5 has joined the raid.
 		  I'd like to see:
 			Player1, Player2, Player3, Player4, Player5 have joined the raid.
+
 		- Same thing really with achievements. I dont want all of them filtered from my party or guild chat. That makes it really confusing when someone in guild says "grats" to someone and I have no idea why. I just want them grped. Instead of seeing lines and lines of names like with joining/leaving a raid, I'd like to just see one message listing everyone who got the achievement.
 		- HOWEVER, I would like the random achievements of people standing next to me in the AH or the mailbox to be filtered. If they're not in my guild or in my party I don't need to know that they have a plethora of pets.
+
 		- Also, I dont need to see everyone in my raid or party looting their Emblems of Frost. I only want to see that I got mine, and I dont care about their spam. I don't need to see their Stone Keeper's Shards or Emblems of Triumph or Crusader Mark or Badge of Justice.
