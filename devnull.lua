@@ -155,7 +155,7 @@ end
 --@debug@
 function devnull:Debug(a1, ...)
 
-	local output = ("|cff7fff7f(DBG) %s:[%s.%3d]|r"):format("devnull", date("%H:%M:%S"), (GetTime() % 1) * 1000)
+	local output = ("|cff7fff7f(DBG) %s:[%s.%3d]|r"):format(aName, date("%H:%M:%S"), (GetTime() % 1) * 1000)
 
 	printIt(output.." "..makeText(a1, ...), self.debugFrame)
 
@@ -248,34 +248,64 @@ local function msgFilter5(self, event, msg, ...)
 	end
 
 end
-local function addMFltrs()
+local function msgFilter6(self, event, msg, charFrom, ...)
+	devnull:LevelDebug(5, "msgFilter6:", ...)
+	devnull:LevelDebug(3, "mf6:[%s][%s]", msg, charFrom)
 
-	-- add message filters as required
-	if prdb.noEmote then
-		_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_EMOTE", msgFilter1)
-		_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_TEXT_EMOTE", msgFilter1)
-		_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_EMOTE", msgFilter1)
+	-- ignore Achievement messages if not from Guild/Party/Raid members
+	if UnitIsInMyGuild(charFrom)
+	or UnitInParty(charFrom)
+	or UnitInRaid(charFrom)
+	then
+		devnull:LevelDebug(3, "Guild/Party/Raid Achievement")
+		return false
+	else
+		return true
 	end
-	if prdb.noNPC then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", msgFilter1) end
-	if prdb.noPYell then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", msgFilter2) end
---	if prdb.noDuel then	_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter3) end
-	if prdb.noDrunk	then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter4)	end
-	if prdb.noDiscovery then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_BG_SYSTEM_NEUTRAL", msgFilter5) end
 
 end
-local function removeMFltrs()
+local function addMFltrs(allFilters)
 
-	-- remove message filters as required
-	if prdb.noEmote then
-		_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_EMOTE", msgFilter1)
-		_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_TEXT_EMOTE", msgFilter1)
-		_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_MONSTER_EMOTE", msgFilter1)
+	if inCity then
+		-- add message filters as required
+		if prdb.noEmote then
+			_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_EMOTE", msgFilter1)
+			_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_TEXT_EMOTE", msgFilter1)
+			_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_EMOTE", msgFilter1)
+		end
+		if prdb.noNPC then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", msgFilter1) end
+		if prdb.noPYell then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", msgFilter2) end
+		if prdb.noDrunk	then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter4)	end
+		if prdb.noDiscovery then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_BG_SYSTEM_NEUTRAL", msgFilter5) end
 	end
-	if prdb.noNPC then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_MONSTER_SAY", msgFilter1) end
-	if prdb.noPYell then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_YELL", msgFilter2) end
--- 	if prdb.noDuel then	_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter3) end
- 	if prdb.noDrunk then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter4) end
-	if prdb.noDiscovery then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_BG_SYSTEM_NEUTRAL", msgFilter5) end
+
+	if allFilters then
+		if prdb.noDuel then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter3) end
+		if prdb.achFilterType == 2 then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_ACHIEVEMENT", msgFilter6) end
+	end
+
+end
+local function removeMFltrs(allFilters)
+
+	if not inCity
+	or allFilters
+	then
+		-- remove message filters as required
+		if prdb.noEmote then
+			_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_EMOTE", msgFilter1)
+			_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_TEXT_EMOTE", msgFilter1)
+			_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_MONSTER_EMOTE", msgFilter1)
+		end
+		if prdb.noNPC then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_MONSTER_SAY", msgFilter1) end
+		if prdb.noPYell then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_YELL", msgFilter2) end
+	 	if prdb.noDrunk then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter4) end
+		if prdb.noDiscovery then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_BG_SYSTEM_NEUTRAL", msgFilter5) end
+	end
+
+	if allFilters then
+		if prdb.noDuel then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter3) end
+		if prdb.achFilterType == 2 then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_ACHIEVEMENT", msgFilter6) end
+	end
 
 end
 local function updateMFltrs()
@@ -294,12 +324,14 @@ local function updateMFltrs()
 	else _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_MONSTER_SAY", msgFilter1) end
 	if prdb.noPYell then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", msgFilter2)
 	else _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_YELL", msgFilter2) end
---	if prdb.noDuel then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter3)
---	else _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter3) end
+	if prdb.noDuel then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter3)
+	else _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter3) end
 	if prdb.noDrunk then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter4)
 	else _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter4) end
 	if prdb.noDiscovery then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_BG_SYSTEM_NEUTRAL", msgFilter5)
 	else _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_BG_SYSTEM_NEUTRAL", msgFilter5) end
+	if prdb.achFilterType == 2 then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_ACHIEVEMENT", msgFilter6)
+	else _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_ACHIEVEMENT", msgFilter6) end
 
 end
 local function addMGs()
@@ -310,7 +342,7 @@ local function addMGs()
 		if not prdb.noMYell then _G.ChatFrame_AddMessageGroup(cf, "MONSTER_YELL") end
 		if not prdb.noTradeskill then _G.ChatFrame_AddMessageGroup(cf, "TRADESKILLS") end
 		if not prdb.noPetInfo then _G.ChatFrame_AddMessageGroup(cf, "PET_INFO") end
-		if not prdb.noAchievement then _G.ChatFrame_AddMessageGroup(cf, "ACHIEVEMENT") end
+		if prdb.achFilterType == 0 then _G.ChatFrame_AddMessageGroup(cf, "ACHIEVEMENT") end
 	end
 
 end
@@ -322,7 +354,7 @@ local function removeMGs()
 		if prdb.noMYell then _G.ChatFrame_RemoveMessageGroup(cf, "MONSTER_YELL") end
 		if prdb.noTradeskill then _G.ChatFrame_RemoveMessageGroup(cf, "TRADESKILLS") end
 		if prdb.noPetInfo then _G.ChatFrame_RemoveMessageGroup(cf, "PET_INFO") end
-		if prdb.noAchievement then _G.ChatFrame_RemoveMessageGroup(cf, "ACHIEVEMENT") end
+		if prdb.achFilterType == 1 then _G.ChatFrame_RemoveMessageGroup(cf, "ACHIEVEMENT") end
 	end
 
 end
@@ -337,7 +369,7 @@ function devnull:OnInitialize()
 
 	local defaults = { profile = {
 		chatback      = true,
-		noAchievement = false,
+		achFilterType = 0,
 		noDiscovery   = true,
 		noDrunk       = true,
 		noDuel        = true,
@@ -394,6 +426,13 @@ function devnull:OnInitialize()
 		prdb.noPetInfo = prdb.CHAT_MSG_PET_INFO
 		prdb.CHAT_MSG_PET_INFO = nil
 	end
+	-- changed Achievement type
+	if prdb.noAchievement then
+		prdb.achFilterType = 1
+	else
+		prdb.achFilterType = 0
+	end
+	prdb.noAchievement = nil
 
 	local optTables = {
 
@@ -406,7 +445,7 @@ function devnull:OnInitialize()
 				desc = {
 					type = "description",
 					order = 1,
-					name = L["shhhh"] .." - "..GetAddOnMetadata("devnull", "Version").. "\n",
+					name = L["shhhh"] .." - "..(GetAddOnMetadata(aName, "X-Curse-Packaged-Version") or GetAddOnMetadata(aName, "Version") or "").."\n",
 				},
 				longdesc = {
 					type = "description",
@@ -438,11 +477,23 @@ function devnull:OnInitialize()
 					name = L["Global Settings"],
 					desc = L["Change the Global settings"],
 					args = {
-				        noAchievement = {
+				        achFilterType = {
+							type = 'select',
+							order = -1,
+							name = L["Achievement Filter"],
+							style = "radio",
+							width = "double",
+							values = {
+								[0] = L["None"],
+								[1] = L["All"],
+								[2] = L["All except Guild/Party/Raid"]
+							},
+						},
+						noDuel = {
 							type = 'toggle',
-				    		name = L["Achievement gains"],
-				        	desc = L["Mute Achievement gains."],
-				        },
+							name = L["Duels"],
+							desc = L["Mute Duel info."],
+						},
 				        noPetInfo = {
 							type = 'toggle',
 				    		name = L["Pet Info"],
@@ -462,7 +513,7 @@ function devnull:OnInitialize()
 				},
 				city = {
 					type = "group",
-					order = 1,
+					order = 2,
 					name = L["City/Town Settings"],
 					desc = L["Change the City/Town settings"],
 					args = {
@@ -475,11 +526,6 @@ function devnull:OnInitialize()
 							type = 'toggle',
 							name = L["Drunks"],
 							desc = L["Mute Drunken info."],
-						},
-						noDuel = {
-							type = 'toggle',
-							name = L["Duels"],
-							desc = L["Mute Duel info."],
 						},
 						noEmote = {
 							type = 'toggle',
@@ -500,13 +546,12 @@ function devnull:OnInitialize()
 				},
 				instance = {
 					type = "group",
-					order = 1,
+					order = 3,
 					name = L["Instance/Battleground Settings"],
 					desc = L["Change the Instance/Battleground settings"],
 					args = {
 				        iChat = {
 							type = 'toggle',
-							order = -2,
 							width = "double",
 				    		name = L["General chat in Instances/Battlegrounds"],
 				        	desc = L["Mute General chat in Instances/Battlegrounds."],
@@ -581,13 +626,13 @@ function devnull:OnEnable()
 
 	-- register required events
 	enableEvents()
+	-- add message filters as required
+	addMFltrs(true)
 	-- remove message groups as required
 	removeMGs()
+
 	-- check to see what mode we should be in
 	self:CheckMode()
-
-	-- always disable duel messages if required
-	if prdb.noDuel then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter3) end
 
 	-- handle profile changes
 	self.db.RegisterCallback(self, "OnProfileChanged", "ReloadAddon")
@@ -604,11 +649,9 @@ function devnull:OnDisable()
 	-- unregister events
 	self:UnregisterAllEvents()
 	-- remove message filters as required
-	removeMFltrs()
+	removeMFltrs(true)
 	-- add message groups as required
 	addMGs()
-	-- re-enable duel messages if required
-	if prdb.noDuel then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter3) end
 
 	-- turn channels back on
     for channel, on in pairs(cf1Channels) do
@@ -683,8 +726,8 @@ function devnull:CheckMode(...)
             prdb.inBG = false
 			exitedInstBG = true
         else
+        	-- otherwise save the current channel settings for Chat Frame 1
 			exitedInstBG = false
-        -- otherwise save the current channel settings for Chat Frame 1
             for key, _ in pairs(prdb.cf1Channels) do
                 prdb.cf1Channels[key] = false
             end
@@ -702,15 +745,13 @@ function devnull:CheckMode(...)
 	or nullAreas[rSubZone]
 	then
 		if not inCity then
-			addMFltrs()
-			if prdb.chatback then self:Print(L["City/Town mode enabled"]) end
 			inCity = true
+			if prdb.chatback then self:Print(L["City/Town mode enabled"]) end
 		end
 	else
 		if inCity then
-			removeMFltrs()
-			if prdb.chatback then self:Print(L["City/Town mode disabled"]) end
 			inCity = false
+			if prdb.chatback then self:Print(L["City/Town mode disabled"]) end
 		end
 	end
 
@@ -726,6 +767,9 @@ function devnull:CheckMode(...)
 	elseif exitedInstBG then
         if prdb.chatback then self:Print(L["Instance/Battleground mode disabled"]) end
     end
+	-- update message filters
+	addMFltrs()
+	removeMFltrs()
 
 	-- update DB object text
 	self.DBObj.text = updateDBtext()
