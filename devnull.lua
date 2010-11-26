@@ -12,7 +12,7 @@ LibStub("AceAddon-3.0"):NewAddon(devnull, aName, "AceConsole-3.0", "AceEvent-3.0
 
 -- specify where debug messages go
 devnull.debugFrame = ChatFrame10
-devnull.debugLevel = 5
+devnull.debugLevel = 1
 
 -- store player and pet names
 devnull.player = UnitName("player")
@@ -429,10 +429,8 @@ function devnull:OnInitialize()
 	-- changed Achievement type
 	if prdb.noAchievement then
 		prdb.achFilterType = 1
-	else
-		prdb.achFilterType = 0
+		prdb.noAchievement = nil
 	end
-	prdb.noAchievement = nil
 
 	local optTables = {
 
