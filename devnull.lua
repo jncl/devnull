@@ -1,4 +1,4 @@
-local aName, devnull = ...
+local aName, aObj = ...
 local _G = _G
 
 -- check to see if required libraries are loaded
@@ -8,18 +8,18 @@ for _, lib in pairs{"CallbackHandler-1.0", "AceAddon-3.0", "AceConsole-3.0", "Ac
 end
 
 -- create the addon
-LibStub("AceAddon-3.0"):NewAddon(devnull, aName, "AceConsole-3.0", "AceEvent-3.0")
+LibStub("AceAddon-3.0"):NewAddon(aObj, aName, "AceConsole-3.0", "AceEvent-3.0")
 
 -- specify where debug messages go
-devnull.debugFrame = ChatFrame10
-devnull.debugLevel = 1
+aObj.debugFrame = ChatFrame10
+aObj.debugLevel = 1
 
 -- store player and pet names
-devnull.player = UnitName("player")
-devnull.pet = UnitName("pet")
+aObj.player = UnitName("player")
+aObj.pet = UnitName("pet")
 
 -- Get Locale
-local L = LibStub("AceLocale-3.0"):GetLocale("devnull")
+local L = LibStub("AceLocale-3.0"):GetLocale(aName)
 local ZL = LibStub("LibBabble-Zone-3.0"):GetLookupTable()
 local T = LibStub("LibTourist-3.0")
 
@@ -87,16 +87,16 @@ local trackEvent = {
 }
 local function enableEvents()
 
-	devnull:LevelDebug(5, "enableEvents:", onTaxi, _G.UnitOnTaxi("player"))
+	aObj:LevelDebug(5, "enableEvents:", onTaxi, _G.UnitOnTaxi("player"))
 	if not onTaxi and _G.UnitOnTaxi("player") then -- on Taxi
-		devnull:LevelDebug(3, "on Taxi")
-		devnull:RegisterEvent("PLAYER_CONTROL_GAINED", "CheckMode")
+		aObj:LevelDebug(3, "on Taxi")
+		aObj:RegisterEvent("PLAYER_CONTROL_GAINED", "CheckMode")
 		onTaxi = true
 	else
-		devnull:LevelDebug(3, "registering normal events")
+		aObj:LevelDebug(3, "registering normal events")
 		-- register required events
 		for tEvent, enable in pairs(trackEvent) do
-			if enable then devnull:RegisterEvent(tEvent, "CheckMode") end
+			if enable then aObj:RegisterEvent(tEvent, "CheckMode") end
 		end
 	end
 
@@ -152,8 +152,16 @@ local function printIt(text, frame, r, g, b)
 
 end
 
+function aObj:CustomPrint(r, g, b, a1, ...)
+
+	output = ("|cffffff78"..aName..":|r")
+
+	printIt(output.." "..makeText(a1, ...), nil, r, g, b)
+
+end
+
 --@debug@
-function devnull:Debug(a1, ...)
+function aObj:Debug(a1, ...)
 
 	local output = ("|cff7fff7f(DBG) %s:[%s.%3d]|r"):format(aName, date("%H:%M:%S"), (GetTime() % 1) * 1000)
 
@@ -161,28 +169,28 @@ function devnull:Debug(a1, ...)
 
 end
 
-function devnull:LevelDebug(lvl, a1, ...) if self.debugLevel >= lvl then self:Debug(a1, ...) end end
+function aObj:LevelDebug(lvl, a1, ...) if self.debugLevel >= lvl then self:Debug(a1, ...) end end
 --@end-debug@
 --[===[@non-debug@
-function devnull:Debug() end
-function devnull:LevelDebug() end
+function aObj:Debug() end
+function aObj:LevelDebug() end
 --@end-non-debug@]===]
 
 -- message filters & groups
 local function msgFilter1(self, event, msg, charFrom, ...)
-	devnull:LevelDebug(5, "msgFilter1:", ...)
+	aObj:LevelDebug(5, "msgFilter1:", ...)
 
 	local charTo = select(7, ...)
-	devnull:LevelDebug(3, "mf1:[%s],[%s],[%s]", msg, charFrom, charTo)
+	aObj:LevelDebug(3, "mf1:[%s],[%s],[%s]", msg, charFrom, charTo)
 
 	-- allow emotes/says to/from the player/pet
-	if (msg:find(devnull.player)
-	or charFrom == devnull.player
+	if (msg:find(aObj.player)
+	or charFrom == aObj.player
 	or (msg:find(L["[Yy]ou"])
-	and charTo == devnull.player
-	or charTo == devnull.pet))
+	and charTo == aObj.player
+	or charTo == aObj.pet))
 	then
-		devnull:LevelDebug(3, "Emote/Say to/from player/pet")
+		aObj:LevelDebug(3, "Emote/Say to/from player/pet")
 		return false
 	else
 		return true
@@ -190,13 +198,13 @@ local function msgFilter1(self, event, msg, charFrom, ...)
 
 end
 local function msgFilter2(self, event, msg, charFrom, ...)
-	devnull:LevelDebug(5, "msgFilter2:", ...)
-	devnull:LevelDebug(3, "mf2:[%s]", charFrom)
+	aObj:LevelDebug(5, "msgFilter2:", ...)
+	aObj:LevelDebug(3, "mf2:[%s]", charFrom)
 
 	-- allow yells from the player
-	if charFrom == devnull.player
+	if charFrom == aObj.player
 	then
-		devnull:LevelDebug(3, "Player Yell")
+		aObj:LevelDebug(3, "Player Yell")
 		return false
 	else
 		return true
@@ -204,13 +212,13 @@ local function msgFilter2(self, event, msg, charFrom, ...)
 
 end
 local function msgFilter3(self, event, msg, ...)
-	devnull:LevelDebug(5, "msgFilter3:", ...)
-	devnull:LevelDebug(3, "mf3:[%s]", msg)
+	aObj:LevelDebug(5, "msgFilter3:", ...)
+	aObj:LevelDebug(3, "mf3:[%s]", msg)
 
 	-- ignore Duelling messages
 	if msg:find(L["in a duel"])
 	then
-		devnull:LevelDebug(3, "Duel")
+		aObj:LevelDebug(3, "Duel")
 		return true
 	else
 		return false
@@ -218,8 +226,8 @@ local function msgFilter3(self, event, msg, ...)
 
 end
 local function msgFilter4(self, event, msg, ...)
-	devnull:LevelDebug(5, "msgFilter4:", ...)
-	devnull:LevelDebug(3, "mf4:[%s]", msg)
+	aObj:LevelDebug(5, "msgFilter4:", ...)
+	aObj:LevelDebug(3, "mf4:[%s]", msg)
 
 	-- ignore Drunken messages
 	if (msg:find(L["tipsy"])
@@ -227,7 +235,7 @@ local function msgFilter4(self, event, msg, ...)
 	or msg:find(L["smashed"])
 	or msg:find(L["sober"]))
 	then
-		devnull:LevelDebug(3, "Drunken")
+		aObj:LevelDebug(3, "Drunken")
 		return true
 	else
 		return false
@@ -235,13 +243,13 @@ local function msgFilter4(self, event, msg, ...)
 
 end
 local function msgFilter5(self, event, msg, ...)
-	devnull:LevelDebug(5, "msgFilter5:", ...)
-	devnull:LevelDebug(3, "mf5:[%s]", msg)
+	aObj:LevelDebug(5, "msgFilter5:", ...)
+	aObj:LevelDebug(3, "mf5:[%s]", msg)
 
 	-- ignore discovery messages
 	if msg:find(L["DISCOVERY"])
 	then
-		devnull:LevelDebug(3, "Discovery")
+		aObj:LevelDebug(3, "Discovery")
 		return true
 	else
 		return false
@@ -249,15 +257,15 @@ local function msgFilter5(self, event, msg, ...)
 
 end
 local function msgFilter6(self, event, msg, charFrom, ...)
-	devnull:LevelDebug(5, "msgFilter6:", ...)
-	devnull:LevelDebug(3, "mf6:[%s][%s]", msg, charFrom)
+	aObj:LevelDebug(5, "msgFilter6:", ...)
+	aObj:LevelDebug(3, "mf6:[%s][%s]", msg, charFrom)
 
 	-- ignore Achievement messages if not from Guild/Party/Raid members
 	if UnitIsInMyGuild(charFrom)
 	or UnitInParty(charFrom)
 	or UnitInRaid(charFrom)
 	then
-		devnull:LevelDebug(3, "Guild/Party/Raid Achievement")
+		aObj:LevelDebug(3, "Guild/Party/Raid Achievement")
 		return false
 	else
 		return true
@@ -359,7 +367,7 @@ local function removeMGs()
 
 end
 
-function devnull:OnInitialize()
+function aObj:OnInitialize()
 	self:LevelDebug(5, "OnInitialize")
 
 --@debug@
@@ -392,7 +400,7 @@ function devnull:OnInitialize()
 		},
 	}}
 
-	self.db = LibStub("AceDB-3.0"):New("devnullDB", defaults, "Default")
+	self.db = LibStub("AceDB-3.0"):New(aName.."DB", defaults, "Default")
 
 	prdb = self.db.profile
 
@@ -594,11 +602,11 @@ function devnull:OnInitialize()
 
 		if not input or input:trim() == "" then
 			-- Open general panel if there are no parameters
-			_G.InterfaceOptionsFrame_OpenToCategory(devnull.optionsFrame)
+			_G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame)
 		elseif optCheck[input:lower()] then
-			_G.InterfaceOptionsFrame_OpenToCategory(devnull.optionsFrame[optCheck[input:lower()]])
+			_G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame[optCheck[input:lower()]])
 		elseif input:lower() == "dbg" then
-			devnull:Print("City:", inCity, "Taxi:", onTaxi, "Instance:", prdb.inInst, "Battleground:", prdb.inBG)
+			aObj:Print("City:", inCity, "Taxi:", onTaxi, "Instance:", prdb.inInst, "Battleground:", prdb.inBG)
 		else
 			LibStub("AceConfigCmd-3.0"):HandleCommand(aName, aName, input)
 		end
@@ -614,12 +622,12 @@ function devnull:OnInitialize()
 		type = "data source",
 		text = updateDBtext(),
 		icon = [[Interface\Icons\Spell_Holy_Silence]],
-		OnClick = function() _G.InterfaceOptionsFrame_OpenToCategory(devnull.optionsFrame) end,
+		OnClick = function() _G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame) end,
 	})
 
 end
 
-function devnull:OnEnable()
+function aObj:OnEnable()
 	self:LevelDebug(5, "OnEnable")
 
 	-- register required events
@@ -639,7 +647,7 @@ function devnull:OnEnable()
 
 end
 
-function devnull:OnDisable()
+function aObj:OnDisable()
 	self:LevelDebug(5, "OnDisable")
 
 	inCity, exitedInstBG = nil, nil
@@ -658,10 +666,8 @@ function devnull:OnDisable()
 
 end
 
-function devnull:ReloadAddon(callback)
-	self:LevelDebug(5, "ReloadAddon:[%s]", callback)
-
-	_G.StaticPopupDialogs["devnull_Reload_UI"] = {
+do
+	StaticPopupDialogs[aName.."_Reload_UI"] = {
 		text = L["Confirm reload of UI to activate profile changes"],
 		button1 = OKAY,
 		button2 = CANCEL,
@@ -670,7 +676,7 @@ function devnull:ReloadAddon(callback)
 		end,
 		OnCancel = function(this, data, reason)
 			if reason == "timeout" or reason == "clicked" then
-				self:CustomPrint(1, 1, 0, nil, nil, nil, "The profile '"..devnull.db:GetCurrentProfile().."' will be activated next time you Login or Reload the UI")
+				aObj:CustomPrint(1, 1, 0, "The profile '"..aObj.db:GetCurrentProfile().."' will be activated next time you Login or Reload the UI")
 			end
 		end,
 		timeout = 0,
@@ -678,11 +684,15 @@ function devnull:ReloadAddon(callback)
 		exclusive = 1,
 		hideOnEscape = 1
 	}
-	_G.StaticPopup_Show("devnull_Reload_UI")
+end
+function aObj:ReloadAddon(callback)
+	self:LevelDebug(5, "ReloadAddon:[%s]", callback)
+
+	StaticPopup_Show(aName.."_Reload_UI")
 
 end
 
-function devnull:CheckMode(...)
+function aObj:CheckMode(...)
 	local event = select(1, ...)
 	self:LevelDebug(1, "CheckMode: [%s]", event)
 	local rZone, rSubZone = GetRealZoneText(), GetSubZoneText()
