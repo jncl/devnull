@@ -21,6 +21,7 @@ aObj.pet = UnitName("pet")
 -- Get Locale
 local L = LibStub("AceLocale-3.0"):GetLocale(aName)
 local ZL = LibStub("LibBabble-Zone-3.0"):GetLookupTable()
+local SZL = LibStub("LibBabble-SubZone-3.0"):GetLookupTable()
 local T = LibStub("LibTourist-3.0")
 
 local prdb, inCity, onTaxi, exitedInstBG
@@ -37,27 +38,28 @@ local nullCities = {
 	[ZL["Shattrath City"]] = true, -- TBC
 	[ZL["Dalaran"]] = true, -- WotLK
 }
-local nullAreas = {
-	[L["The Old Port Authority"]] = true, -- in BB
-	[L["The Salty Sailor Tavern"]] = true, -- in BB
-	[L["Foothold Citadel"]] = true, -- in Theramore Isle
-}
 local nullTowns = {
 	[ZL["Booty Bay"]] = true,
 	[ZL["Everlook"]] = true,
 	[ZL["Gadgetzan"]] = true,
 	[ZL["Ratchet"]] = true,
 	[ZL["Theramore Isle"]] = true,
-	[L["Goldshire"]] = true, -- in Elwynn Forest
-	[L["Honor Hold"]] = true, -- TBC
-	[L["Area 52"]] = true, -- TBC
-	[L["Valiance Keep"]] = true, -- WotLK (BT)
-	[L["Warsong Hold"]] = true, -- WotLK (BT)
-	[L["Valgarde"]] = true, -- WotLK (HF)
-	[L["Vengeance Landing"]] = true, -- WotLK (HF)
-	[L["Fort Wildervar"]] = true, -- WotLK (HF)
+	[SZL["Goldshire"]] = true, -- in Elwynn Forest
+	[SZL["Honor Hold"]] = true, -- TBC
+	[SZL["Area 52"]] = true, -- TBC
+	[SZL["Valiance Keep"]] = true, -- WotLK (BT)
+	[SZL["Warsong Hold"]] = true, -- WotLK (BT)
+	[SZL["Valgarde"]] = true, -- WotLK (HF)
+	[SZL["Vengeance Landing"]] = true, -- WotLK (HF)
+	[SZL["Fort Wildervar"]] = true, -- WotLK (HF)
+}
+local nullAreas = {
+	[SZL["The Old Port Authority"]] = true, -- in BB
+	[SZL["The Salty Sailor Tavern"]] = true, -- in BB
+	[SZL["Foothold Citadel"]] = true, -- in Theramore Isle
 }
 local checkZones = { -- used for smaller area changes
+	[ZL["Elwynn Forest"]] = true, -- for Goldshire
 	[ZL["Stranglethorn Vale"]] = true, -- for Booty Bay
 	[ZL["Winterspring"]] = true, -- for Everlook
 	[ZL["Tanaris"]] = true, -- for Gadgetzan
@@ -260,13 +262,15 @@ local function msgFilter6(self, event, msg, charFrom, ...)
 	aObj:LevelDebug(5, "msgFilter6:", ...)
 	aObj:LevelDebug(3, "mf6:[%s][%s]", msg, charFrom)
 
-	-- ignore Achievement messages if not from Guild/Party/Raid members
-	if UnitIsInMyGuild(charFrom)
-	or UnitInParty(charFrom)
-	or UnitInRaid(charFrom)
-	then
-		aObj:LevelDebug(3, "Guild/Party/Raid Achievement")
-		return false
+	if prdb.achFilterType == 2 then
+		-- ignore Achievement messages if not from Guild/Party/Raid members
+		if UnitIsInMyGuild(charFrom)
+		or UnitInParty(charFrom)
+		or UnitInRaid(charFrom)
+		then
+			aObj:LevelDebug(3, "Guild/Party/Raid Achievement")
+			return false
+		end
 	else
 		return true
 	end
@@ -289,7 +293,7 @@ local function addMFltrs(allFilters)
 
 	if allFilters then
 		if prdb.noDuel then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter3) end
-		if prdb.achFilterType == 2 then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_ACHIEVEMENT", msgFilter6) end
+		if prdb.achFilterType > 0 then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_ACHIEVEMENT", msgFilter6) end
 	end
 
 end
@@ -312,7 +316,7 @@ local function removeMFltrs(allFilters)
 
 	if allFilters then
 		if prdb.noDuel then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter3) end
-		if prdb.achFilterType == 2 then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_ACHIEVEMENT", msgFilter6) end
+		if prdb.achFilterType > 0 then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_ACHIEVEMENT", msgFilter6) end
 	end
 
 end
@@ -784,7 +788,7 @@ function aObj:CheckMode(...)
 
     --> Post Event Handler <--
     -- if entering a new area or just been loaded or come out of standby
-    if checkEvent[event]	then
+    if checkEvent[event] then
         -- Mute chat in Instances/Battlegrounds if required
         if prdb.iChat
 		and prdb.inInst
