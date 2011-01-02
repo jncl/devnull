@@ -60,7 +60,7 @@ local nullAreas = {
 }
 local checkZones = { -- used for smaller area changes
 	[ZL["Elwynn Forest"]] = true, -- for Goldshire
-	[ZL["Stranglethorn Vale"]] = true, -- for Booty Bay
+	[ZL["The Cape of Stranglethorn"]] = true, -- for Booty Bay
 	[ZL["Winterspring"]] = true, -- for Everlook
 	[ZL["Tanaris"]] = true, -- for Gadgetzan
 	[ZL["The Barrens"]] = true, -- for Ratchet
@@ -710,21 +710,27 @@ function aObj:CheckMode(...)
 		self:UnregisterEvent("ZONE_CHANGED")
 	end
 	-- handle this for the tunnel into Booty Bay
-	if rZone == ZL["Stranglethorn Vale"] then
+	if rZone == ZL["The Cape of Stranglethorn"] then
 		self:RegisterEvent("ZONE_CHANGED_INDOORS", "CheckMode")
 	else
 		self:UnregisterEvent("ZONE_CHANGED_INDOORS")
 	end
 
 	-- if flying then disable events
-	if event == "PLAYER_CONTROL_LOST" then
+	if event == "PLAYER_CONTROL_LOST"
+	and not prdb.inInst
+	then
+		self:LevelDebug(5, "PLAYER_CONTROL_LOST", _G.UnitOnTaxi("player"), _G.UnitIsCharmed("player"), _G.UnitIsPossessed("player"), prdb.inBG, prdb.inInst)
 		self:UnregisterAllEvents()
 		self:RegisterEvent("PLAYER_CONTROL_GAINED", "CheckMode")
 		onTaxi = true
 		self.DBObj.text = updateDBtext()
 		return
 	-- if finished flying then enable events
-	elseif event == "PLAYER_CONTROL_GAINED" then
+	elseif event == "PLAYER_CONTROL_GAINED"
+	and not prdb.inInst
+	then
+		self:LevelDebug(5, "PLAYER_CONTROL_GAINED", _G.UnitOnTaxi("player"), _G.UnitIsCharmed("player"), _G.UnitIsPossessed("player"), prdb.inBG, prdb.inInst)
 		self:UnregisterEvent(event)
 		enableEvents()
 		onTaxi = false
