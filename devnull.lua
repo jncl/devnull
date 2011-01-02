@@ -262,15 +262,13 @@ local function msgFilter6(self, event, msg, charFrom, ...)
 	aObj:LevelDebug(5, "msgFilter6:", ...)
 	aObj:LevelDebug(3, "mf6:[%s][%s]", msg, charFrom)
 
-	if prdb.achFilterType == 2 then
-		-- ignore Achievement messages if not from Guild/Party/Raid members
-		if UnitIsInMyGuild(charFrom)
-		or UnitInParty(charFrom)
-		or UnitInRaid(charFrom)
-		then
-			aObj:LevelDebug(3, "Guild/Party/Raid Achievement")
-			return false
-		end
+	-- ignore Achievement messages if not from Guild/Party/Raid members
+	if UnitIsInMyGuild(charFrom)
+	or UnitInParty(charFrom)
+	or UnitInRaid(charFrom)
+	then
+		aObj:LevelDebug(3, "Guild/Party/Raid Achievement")
+		return false
 	else
 		return true
 	end
@@ -293,7 +291,7 @@ local function addMFltrs(allFilters)
 
 	if allFilters then
 		if prdb.noDuel then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter3) end
-		if prdb.achFilterType > 0 then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_ACHIEVEMENT", msgFilter6) end
+		if prdb.achFilterType == 2 then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_ACHIEVEMENT", msgFilter6) end
 	end
 
 end
@@ -316,7 +314,7 @@ local function removeMFltrs(allFilters)
 
 	if allFilters then
 		if prdb.noDuel then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter3) end
-		if prdb.achFilterType > 0 then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_ACHIEVEMENT", msgFilter6) end
+		if prdb.achFilterType == 2 then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_ACHIEVEMENT", msgFilter6) end
 	end
 
 end
@@ -349,25 +347,19 @@ end
 local function addMGs()
 
 	-- add message groups as required
-	for i = 1, NUM_CHAT_WINDOWS do
-		local cf = _G["ChatFrame"..i]
-		if not prdb.noMYell then _G.ChatFrame_AddMessageGroup(cf, "MONSTER_YELL") end
-		if not prdb.noTradeskill then _G.ChatFrame_AddMessageGroup(cf, "TRADESKILLS") end
-		if not prdb.noPetInfo then _G.ChatFrame_AddMessageGroup(cf, "PET_INFO") end
-		if prdb.achFilterType == 0 then _G.ChatFrame_AddMessageGroup(cf, "ACHIEVEMENT") end
-	end
+	if not prdb.noMYell then _G.ChatFrame_AddMessageGroup(ChatFrame1, "MONSTER_YELL") end
+	if not prdb.noTradeskill then _G.ChatFrame_AddMessageGroup(ChatFrame1, "TRADESKILLS") end
+	if not prdb.noPetInfo then _G.ChatFrame_AddMessageGroup(ChatFrame1, "PET_INFO") end
+	if prdb.achFilterType == 0 then _G.ChatFrame_AddMessageGroup(ChatFrame1, "ACHIEVEMENT") end
 
 end
 local function removeMGs()
 
 	-- remove message groups as required
-	for i = 1, NUM_CHAT_WINDOWS do
-		local cf = _G["ChatFrame"..i]
-		if prdb.noMYell then _G.ChatFrame_RemoveMessageGroup(cf, "MONSTER_YELL") end
-		if prdb.noTradeskill then _G.ChatFrame_RemoveMessageGroup(cf, "TRADESKILLS") end
-		if prdb.noPetInfo then _G.ChatFrame_RemoveMessageGroup(cf, "PET_INFO") end
-		if prdb.achFilterType == 1 then _G.ChatFrame_RemoveMessageGroup(cf, "ACHIEVEMENT") end
-	end
+	if prdb.noMYell then _G.ChatFrame_RemoveMessageGroup(ChatFrame1, "MONSTER_YELL") end
+	if prdb.noTradeskill then _G.ChatFrame_RemoveMessageGroup(ChatFrame1, "TRADESKILLS") end
+	if prdb.noPetInfo then _G.ChatFrame_RemoveMessageGroup(ChatFrame1, "PET_INFO") end
+	if prdb.achFilterType == 1 then _G.ChatFrame_RemoveMessageGroup(ChatFrame1, "ACHIEVEMENT") end
 
 end
 
@@ -700,8 +692,8 @@ function aObj:CheckMode(...)
 	local event = select(1, ...)
 	self:LevelDebug(1, "CheckMode: [%s]", event)
 	local rZone, rSubZone = GetRealZoneText(), GetSubZoneText()
-    self:LevelDebug(2,"You Are Here: [%s:%s]", rZone or "<Anon>", rSubZone or "<Anon>")
-    self:LevelDebug(4,"inInstance#1: [%s, %s, %s, %s, %s]", prdb.inInst, prdb.inBG, T:IsBattleground(rZone),  T:IsInstance(rZone), icecrownInstances[rZone])
+    self:LevelDebug(2, "You Are Here: [%s:%s]", rZone or "<Anon>", rSubZone or "<Anon>")
+    self:LevelDebug(4, "inInstance#1: [%s, %s, %s, %s, %s]", prdb.inInst, prdb.inBG, T:IsBattleground(rZone),  T:IsInstance(rZone), icecrownInstances[rZone])
 
 	-- handle zones when ZONE_CHANGED_NEW_AREA isn't good enough
 	if checkZones[rZone] then
