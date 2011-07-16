@@ -28,7 +28,7 @@ local prdb, inCity, onTaxi, exitedInstBG
 
 local nullCities = {
 	[ZL["Stormwind City"]] = true,
-	[ZL["Ironforge"]] = true,
+	[SZL["City of Ironforge"]] = true,
 	[ZL["Darnassus"]] = true,
 	[ZL["Orgrimmar"]] = true,
 	[ZL["Undercity"]] = true,
@@ -52,6 +52,7 @@ local nullTowns = {
 	[SZL["Valgarde"]] = true, -- WotLK (HF)
 	[SZL["Vengeance Landing"]] = true, -- WotLK (HF)
 	[SZL["Fort Wildervar"]] = true, -- WotLK (HF)
+	[SZL["Mudsprocket"]] = true, -- WotLK
 }
 local nullAreas = {
 	[SZL["The Old Port Authority"]] = true, -- in BB
