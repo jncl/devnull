@@ -1,10 +1,10 @@
-﻿## Interface: 40200
+﻿## Interface: 40300
 ## Title: /dev/null
 ## Notes: Mutes various chat related annoyances while in capital cities and instances.
 ## Notes-deDE: Unterdr\195\188ckt diverse st\195\182rende Meldungen - w\195\164hrend man sich in Hauptst\195\164dten oder Instanzen befindet.
 ## Notes-zhTW: 當你在主城或是副本時，關掉各種惱人的聊天對話內容
-## Author: Zalkalin
-## X-Credits: Thanks to Jncl and Tekkub for various changes.
+## Author: Jncl
+## X-Credits: Many thanks to Zalkalin for the original code and Tekkub for various changes.
 ## Version: @project-version@
 ## X-Category: Chat/Communication
 ## SavedVariables: devnullDB
@@ -13,7 +13,6 @@
 # LibStub & Callback Handler
 libs\LibStub\LibStub.lua
 libs\CallbackHandler-1.0\CallbackHandler-1.0.lua
-#
 # LDB Library
 libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
 #
