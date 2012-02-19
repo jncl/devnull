@@ -3,7 +3,7 @@ local _G = _G
 
 -- check to see if required libraries are loaded
 assert(LibStub, aName.." requires LibStub")
-for _, lib in pairs{"CallbackHandler-1.0", "AceAddon-3.0", "AceConsole-3.0", "AceEvent-3.0", "AceLocale-3.0", "LibBabble-Zone-3.0", "LibTourist-3.0", "AceDB-3.0", "AceDBOptions-3.0", "AceGUI-3.0",  "AceConfig-3.0", "AceConfigCmd-3.0", "AceConfigRegistry-3.0", "AceConfigDialog-3.0", "LibDataBroker-1.1",} do
+for _, lib in pairs{"CallbackHandler-1.0", "AceAddon-3.0", "AceConsole-3.0", "AceEvent-3.0", "AceLocale-3.0", "LibBabble-Zone-3.0", "LibBabble-SubZone-3.0", "LibTourist-3.0", "AceDB-3.0", "AceDBOptions-3.0", "AceGUI-3.0",  "AceConfig-3.0", "AceConfigCmd-3.0", "AceConfigRegistry-3.0", "AceConfigDialog-3.0", "LibDataBroker-1.1",} do
 	assert(LibStub:GetLibrary(lib, true), aName.." requires "..lib)
 end
 
