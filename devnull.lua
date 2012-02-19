@@ -58,8 +58,10 @@ local nullAreas = {
 	[SZL["The Old Port Authority"]] = true, -- in BB
 	[SZL["The Salty Sailor Tavern"]] = true, -- in BB
 	[SZL["Foothold Citadel"]] = true, -- in Theramore Isle
+	[SZL["The Darkmoon Faire"]] = true, -- Darkmoon Island (patch 4.3)
 }
-local checkZones = { -- used for smaller area changes
+local checkZones = {
+	-- used for smaller area changes
 	[ZL["Elwynn Forest"]] = true, -- for Goldshire
 	[ZL["The Cape of Stranglethorn"]] = true, -- for Booty Bay
 	[ZL["Winterspring"]] = true, -- for Everlook
