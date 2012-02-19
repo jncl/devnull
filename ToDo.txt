@@ -1,9 +1,13 @@
 ToDos
 
-N.B. √ is Alt+v - indicates completed
- 	 ≈ is Alt+x - indicates partially completed
+Legend:
+	√ is Alt+v	- indicates completed
+	≈ is Alt+x	- indicates partially completed or dry-coded
+	x			- indicates nothing to change
+	¶ is Alt+7	- indicates localisation changes required
+	I/O			- Issue(Bug)/Other change
 
-	requested by JLBurnett04, 19.04.10
+?	O	requested by JLBurnett04, 19.04.10
 		- When you enter a raid, you often see this:
 			Player1 has joined the raid.
 			Player2 has joined the raid.
@@ -17,3 +21,8 @@ N.B. √ is Alt+v - indicates completed
 		- HOWEVER, I would like the random achievements of people standing next to me in the AH or the mailbox to be filtered. If they're not in my guild or in my party I don't need to know that they have a plethora of pets.
 
 		- Also, I dont need to see everyone in my raid or party looting their Emblems of Frost. I only want to see that I got mine, and I dont care about their spam. I don't need to see their Stone Keeper's Shards or Emblems of Triumph or Crusader Mark or Badge of Justice.
+
+		--> I think a lot of this is now done automatically, don't raid enough to test this properly.
+
+	I	reported by Lore21, 23.12.2010
+		- If I leave the mob/NPC yells active (not muted) in the General tab, the addon keeps turning on Yells for EVERY chat frame, not just the main chat one, so I'm spammed with them even where they should not appear (like other addons frames, ie HitsMode5).
