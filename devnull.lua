@@ -1,9 +1,12 @@
 local aName, aObj = ...
 local _G = _G
 
+local pairs, ipairs, type, rawget, tostring, select, unpack, table, output, date, wipe = _G.pairs, _G.ipairs, _G.type, _G.rawget, _G.tostring, _G.select, _G.unpack, _G.table, _G.output, _G.date, _G.wipe
+local LibStub, InCombatLockdown, ChatFrame1, GetInstanceInfo, GetMapNameByID = _G.LibStub, _G.InCombatLockdown, _G.ChatFrame1, _G.GetInstanceInfo, _G.GetMapNameByID
+
 -- check to see if required libraries are loaded
 assert(LibStub, aName.." requires LibStub")
-for _, lib in pairs{"CallbackHandler-1.0", "AceAddon-3.0", "AceConsole-3.0", "AceEvent-3.0", "AceLocale-3.0", "LibBabble-Zone-3.0", "LibBabble-SubZone-3.0", "LibTourist-3.0", "AceDB-3.0", "AceDBOptions-3.0", "AceGUI-3.0",  "AceConfig-3.0", "AceConfigCmd-3.0", "AceConfigRegistry-3.0", "AceConfigDialog-3.0", "LibDataBroker-1.1",} do
+for _, lib in pairs{"CallbackHandler-1.0", "AceAddon-3.0", "AceConsole-3.0", "AceEvent-3.0", "AceLocale-3.0", "LibBabble-SubZone-3.0", "AceDB-3.0", "AceDBOptions-3.0", "AceGUI-3.0",  "AceConfig-3.0", "AceConfigCmd-3.0", "AceConfigRegistry-3.0", "AceConfigDialog-3.0", "LibDataBroker-1.1",} do
 	assert(LibStub:GetLibrary(lib, true), aName.." requires "..lib)
 end
 
@@ -20,64 +23,73 @@ aObj.pet = UnitName("pet")
 
 -- Get Locale
 local L = LibStub("AceLocale-3.0"):GetLocale(aName)
-local ZL = LibStub("LibBabble-Zone-3.0"):GetLookupTable()
 local SZL = LibStub("LibBabble-SubZone-3.0"):GetLookupTable()
-local T = LibStub("LibTourist-3.0")
 
-local prdb, inCity, onTaxi, exitedInstBG
+local prdb, inCity, onTaxi, exitedInst
 
 local nullCities = {
-	[ZL["Stormwind City"]] = true,
-	[SZL["City of Ironforge"]] = true,
-	[ZL["Darnassus"]] = true,
-	[ZL["Orgrimmar"]] = true,
-	[ZL["Undercity"]] = true,
-	[ZL["Thunder Bluff"]] = true,
-	[ZL["The Exodar"]] = true, -- TBC
-	[ZL["Silvermoon City"]] = true, -- TBC
-	[ZL["Shattrath City"]] = true, -- TBC
-	[ZL["Dalaran"]] = true, -- WotLK
+	-- Kalimdor
+	[GetMapNameByID(321)] = true, -- Orgrimmar
+	[GetMapNameByID(362)] = true, -- Thunder Bluff
+	[GetMapNameByID(381)] = true, -- Darnassus
+	[GetMapNameByID(471)] = true, -- The Exodar
+	-- Eastern Kingdoms
+	[GetMapNameByID(301)] = true, -- Stormwind City
+	[GetMapNameByID(341)] = true, -- Ironforge
+	[GetMapNameByID(382)] = true, -- Undercity
+	[GetMapNameByID(480)] = true, -- Silvermoon City
+	-- Outland (TBC)
+	[GetMapNameByID(481)] = true, -- Shattrath City
+	-- Northrend (WotLK)
+	[GetMapNameByID(504)] = true, -- Dalaran
+	-- Pandaria (MoP)
+	[GetMapNameByID(903)] = true, -- Shrine of Two Moons (Horde)
+	[GetMapNameByID(905)] = true, -- Shrine of Seven Stars (Alliance)
 }
 local nullTowns = {
-	[ZL["Booty Bay"]] = true,
-	[ZL["Everlook"]] = true,
-	[ZL["Gadgetzan"]] = true,
-	[ZL["Ratchet"]] = true,
-	[ZL["Theramore Isle"]] = true,
+	-- Kalimdor
+	[SZL["Booty Bay"]] = true,
+	[SZL["Everlook"]] = true,
+	[SZL["Gadgetzan"]] = true,
+	[SZL["Ratchet"]] = true,
+	[SZL["Theramore Isle"]] = true,
+	[SZL["Mudsprocket"]] = true,
+	-- Eastern Kingdoms
 	[SZL["Goldshire"]] = true, -- in Elwynn Forest
-	[SZL["Honor Hold"]] = true, -- TBC
-	[SZL["Area 52"]] = true, -- TBC
-	[SZL["Valiance Keep"]] = true, -- WotLK (BT)
-	[SZL["Warsong Hold"]] = true, -- WotLK (BT)
-	[SZL["Valgarde"]] = true, -- WotLK (HF)
-	[SZL["Vengeance Landing"]] = true, -- WotLK (HF)
-	[SZL["Fort Wildervar"]] = true, -- WotLK (HF)
-	[SZL["Mudsprocket"]] = true, -- WotLK
+	-- Outland (TBC)
+	[SZL["Thrallmar"]] = true, -- Hellfire Peninsula (Horde)
+	[SZL["Honor Hold"]] = true, -- Hellfire Peninsula (Alliance)
+	[SZL["Area 52"]] = true, -- Netherstorm
+	-- Northrend (WotLK)
+	[SZL["Warsong Hold"]] = true, --  Borean Tundra (Horde)
+	[SZL["Valiance Keep"]] = true, --  Borean Tundra (Alliance)
+	[SZL["Vengeance Landing"]] = true, -- Howling Fjord (Horde)
+	[SZL["Valgarde"]] = true, -- Howling Fjord (Alliance)
 }
 local nullAreas = {
 	[SZL["The Old Port Authority"]] = true, -- in BB
 	[SZL["The Salty Sailor Tavern"]] = true, -- in BB
 	[SZL["Foothold Citadel"]] = true, -- in Theramore Isle
 	[SZL["The Darkmoon Faire"]] = true, -- Darkmoon Island (patch 4.3)
+	[SZL["KTC Headquarters"]] = true, -- Goblin starting area (Cataclysm)
+	[GetMapNameByID(799)] = true, -- Karazhan
+	[SZL["Krom'gar Fortress"]] = true, -- Horde Base in Stonetalon Mts (Cataclysm)
 }
 local checkZones = {
 	-- used for smaller area changes
-	[ZL["Elwynn Forest"]] = true, -- for Goldshire
-	[ZL["The Cape of Stranglethorn"]] = true, -- for Booty Bay
-	[ZL["Winterspring"]] = true, -- for Everlook
-	[ZL["Tanaris"]] = true, -- for Gadgetzan
-	[ZL["The Barrens"]] = true, -- for Ratchet
-	[ZL["Dustwallow Marsh"]] = true, -- for Theramore Isle
-	[ZL["Hellfire Peninsula"]] = true, -- for Honor Hold
-	[ZL["Netherstorm"]] = true, -- for Area 52
-	[ZL["Borean Tundra"]] = true, -- for Valiance Keep/Warsong Hold
-	[ZL["Howling Fjord"]] = true, -- for Valgarde/Vengeance Landing
-}
-local icecrownInstances = {
-	[ZL["Icecrown Citadel"]] = true,
-	[ZL["Halls of Reflection"]] = true, -- Frozen Halls
-	[ZL["Pit of Saron"]] = true, -- Frozen Halls
-	[ZL["The Forge of Souls"]] = true, -- Frozen Halls
+	[GetMapNameByID(11)] = true, -- Northern Barrens (for Ratchet)
+	[GetMapNameByID(30)] = true, -- Elwynn Forest (for Goldshire)
+	[GetMapNameByID(32)] = true, -- Deadwind Pass (for Karazhan)
+	[GetMapNameByID(81)] = true, -- Stonetalon Mountains (for Krom'gar Fortess)
+	[GetMapNameByID(141)] = true, -- Dustwallow Marsh (for Theramore Isle)
+	[GetMapNameByID(161)] = true, -- Tanaris (for Gadgetzan)
+	[GetMapNameByID(281)] = true, -- Winterspring (for Everlook)
+	[GetMapNameByID(465)] = true, -- Hellfire Peninsula (for Honor Hold)
+	[GetMapNameByID(479)] = true, -- Netherstorm (for Area 52)
+	[GetMapNameByID(486)] = true, -- Borean Tundra (for Valiance Keep/Warsong Hold)
+	[GetMapNameByID(491)] = true, -- Howling Fjord (for Valgarde/Vengeance Landing)
+	[GetMapNameByID(673)] = true, -- The Cape of Stranglethorn (for Booty Bay)
+	[GetMapNameByID(605)] = true, -- Kezan (for KTC Headquarters)
 }
 local checkEvent = {
     ["ZONE_CHANGED_INDOORS"] = true, -- for tunnel into Booty Bay
@@ -111,7 +123,6 @@ local function updateDBtext()
 	return onTaxi and L["Taxi"]
 	or inCity and L["City"]
 	or prdb.inInst and L["Instance"]
-	or prdb.inBG and L["Battleground"]
 	or L["Off"]
 
 end
@@ -165,10 +176,16 @@ function aObj:CustomPrint(r, g, b, a1, ...)
 
 end
 
+function aObj:add2Table(table, value)
+
+	table[#table + 1] = value
+
+end
+
 --@debug@
 function aObj:Debug(a1, ...)
 
-	local output = ("|cff7fff7f(DBG) %s:[%s.%3d]|r"):format(aName, date("%H:%M:%S"), (GetTime() % 1) * 1000)
+	local output = ("|cff7fff7f(DBG) %s:[%s.%3d]|r"):format(aName, date("%H:%M:%S"), (_G.GetTime() % 1) * 1000)
 
 	printIt(output.." "..makeText(a1, ...), self.debugFrame)
 
@@ -266,9 +283,9 @@ local function msgFilter6(self, event, msg, charFrom, ...)
 	aObj:LevelDebug(3, "mf6:[%s][%s]", msg, charFrom)
 
 	-- ignore Achievement messages if not from Guild/Party/Raid members
-	if UnitIsInMyGuild(charFrom)
-	or UnitInParty(charFrom)
-	or UnitInRaid(charFrom)
+	if _G.UnitIsInMyGuild(charFrom)
+	or _G.UnitInParty(charFrom)
+	or _G.UnitInRaid(charFrom)
 	then
 		aObj:LevelDebug(3, "Guild/Party/Raid Achievement")
 		return false
@@ -278,6 +295,11 @@ local function msgFilter6(self, event, msg, charFrom, ...)
 
 end
 local function addMFltrs(allFilters)
+
+	if InCombatLockdown() then
+		aObj:add2Table(aObj.oocTab, {addMFltrs, {allFilters}})
+		return
+	end
 
 	if inCity then
 		-- add message filters as required
@@ -299,6 +321,11 @@ local function addMFltrs(allFilters)
 
 end
 local function removeMFltrs(allFilters)
+
+	if InCombatLockdown() then
+		aObj:add2Table(aObj.oocTab, {removeMFltrs, {allFilters}})
+		return
+	end
 
 	if not inCity
 	or allFilters
@@ -322,6 +349,11 @@ local function removeMFltrs(allFilters)
 
 end
 local function updateMFltrs()
+
+	if InCombatLockdown() then
+		aObj:add2Table(aObj.oocTab, {updateMFltrs, {}})
+		return
+	end
 
 	-- update message filters as required
 	if prdb.noEmote then
@@ -349,6 +381,11 @@ local function updateMFltrs()
 end
 local function addMGs()
 
+	if InCombatLockdown() then
+		aObj:add2Table(aObj.oocTab, {addMGs, {}})
+		return
+	end
+
 	-- add message groups as required
 	if not prdb.noMYell then _G.ChatFrame_AddMessageGroup(ChatFrame1, "MONSTER_YELL") end
 	if not prdb.noTradeskill then _G.ChatFrame_AddMessageGroup(ChatFrame1, "TRADESKILLS") end
@@ -357,6 +394,11 @@ local function addMGs()
 
 end
 local function removeMGs()
+
+	if InCombatLockdown() then
+		aObj:add2Table(aObj.oocTab, {removeMGs, {}})
+		return
+	end
 
 	-- remove message groups as required
 	if prdb.noMYell then _G.ChatFrame_RemoveMessageGroup(ChatFrame1, "MONSTER_YELL") end
@@ -388,7 +430,6 @@ function aObj:OnInitialize()
 		noPYell       = false,
 		iChat         = true,
 		inInst        = false,
-		inBG          = false,
 		-- ChatFrame1 channel settings
 		cf1Channels = {
 		   [L["General"]]          = false,
@@ -450,7 +491,7 @@ function aObj:OnInitialize()
 				desc = {
 					type = "description",
 					order = 1,
-					name = L["shhhh"] .." - "..(GetAddOnMetadata(aName, "X-Curse-Packaged-Version") or GetAddOnMetadata(aName, "Version") or "").."\n",
+					name = L["shhhh"] .." - "..(_G.GetAddOnMetadata(aName, "X-Curse-Packaged-Version") or _G.GetAddOnMetadata(aName, "Version") or "").."\n",
 				},
 				longdesc = {
 					type = "description",
@@ -552,14 +593,14 @@ function aObj:OnInitialize()
 				instance = {
 					type = "group",
 					order = 3,
-					name = L["Instance/Battleground Settings"],
-					desc = L["Change the Instance/Battleground settings"],
+					name = L["Instance Settings"],
+					desc = L["Change the Instance settings"],
 					args = {
 				        iChat = {
 							type = 'toggle',
 							width = "double",
-				    		name = L["General chat in Instances/Battlegrounds"],
-				        	desc = L["Mute General chat in Instances/Battlegrounds."],
+				    		name = L["General chat in Instances"],
+				        	desc = L["Mute General chat in Instances."],
 				        },
 					},
 				},
@@ -604,8 +645,16 @@ function aObj:OnInitialize()
 			_G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame)
 		elseif optCheck[input:lower()] then
 			_G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame[optCheck[input:lower()]])
-		elseif input:lower() == "dbg" then
-			aObj:Print("City:", inCity, "Taxi:", onTaxi, "Instance:", prdb.inInst, "Battleground:", prdb.inBG)
+		elseif input:lower() == "status" then
+			aObj:Print("City mode:", inCity, "Taxi:", onTaxi, "Instance:", prdb.inInst)
+		elseif input:lower() == "loud" then
+			aObj.debugLevel = 5
+			aObj:Print("Debug messages ON")
+		elseif input:lower() == "quiet" then
+			aObj.debugLevel = 1
+			aObj:Print("Debug messages OFF")
+		elseif input:lower() == "locate" then
+			aObj:Print("You Are Here:", _G.GetRealZoneText(), _G.GetSubZoneText(), _G.GetCurrentMapAreaID())
 		else
 			LibStub("AceConfigCmd-3.0"):HandleCommand(aName, aName, input)
 		end
@@ -623,6 +672,15 @@ function aObj:OnInitialize()
 		icon = [[Interface\Icons\Spell_Holy_Silence]],
 		OnClick = function() _G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame) end,
 	})
+
+	-- handle InCombat issues
+	self.oocTab = {}
+	self:RegisterEvent("PLAYER_REGEN_ENABLED", function()
+		for _, v in pairs(self.oocTab) do
+			v[1](unpack(v[2]))
+		end
+		wipe(self.oocTab)
+	end)
 
 end
 
@@ -649,7 +707,7 @@ end
 function aObj:OnDisable()
 	self:LevelDebug(5, "OnDisable")
 
-	inCity, exitedInstBG = nil, nil
+	inCity, exitedInst = nil, nil
 
 	-- unregister events
 	self:UnregisterAllEvents()
@@ -659,7 +717,7 @@ function aObj:OnDisable()
 	addMGs()
 
 	-- turn channels back on
-    for channel, on in pairs(cf1Channels) do
+    for channel, on in pairs(prdb.cf1Channels) do
         if on then _G.ChatFrame_AddChannel(ChatFrame1, channel) end
     end
 
@@ -671,7 +729,7 @@ do
 		button1 = OKAY,
 		button2 = CANCEL,
 		OnAccept = function()
-			ReloadUI()
+			_G.ReloadUI()
 		end,
 		OnCancel = function(this, data, reason)
 			if reason == "timeout" or reason == "clicked" then
@@ -687,16 +745,16 @@ end
 function aObj:ReloadAddon(callback)
 	self:LevelDebug(5, "ReloadAddon:[%s]", callback)
 
-	StaticPopup_Show(aName.."_Reload_UI")
+	_G.StaticPopup_Show(aName.."_Reload_UI")
 
 end
 
 function aObj:CheckMode(...)
 	local event = select(1, ...)
-	self:LevelDebug(1, "CheckMode: [%s]", event)
-	local rZone, rSubZone = GetRealZoneText(), GetSubZoneText()
-    self:LevelDebug(2, "You Are Here: [%s:%s]", rZone or "<Anon>", rSubZone or "<Anon>")
-    self:LevelDebug(4, "inInstance#1: [%s, %s, %s, %s, %s]", prdb.inInst, prdb.inBG, T:IsBattleground(rZone),  T:IsInstance(rZone), icecrownInstances[rZone])
+	self:LevelDebug(2, "CheckMode: [%s]", event)
+	local rZone, rSubZone = _G.GetRealZoneText(), _G.GetSubZoneText()
+    self:LevelDebug(3, "You Are Here: [%s:%s]", rZone or "<Anon>", rSubZone or "<Anon>")
+	self:LevelDebug(4, "inInstance#1: [%s, %s, %s]", prdb.inInst, select(2, GetInstanceInfo()), select(1, GetInstanceInfo()))
 
 	-- handle zones when ZONE_CHANGED_NEW_AREA isn't good enough
 	if checkZones[rZone] then
@@ -705,7 +763,7 @@ function aObj:CheckMode(...)
 		self:UnregisterEvent("ZONE_CHANGED")
 	end
 	-- handle this for the tunnel into Booty Bay
-	if rZone == ZL["The Cape of Stranglethorn"] then
+	if rZone == GetMapNameByID(673) then -- The Cape of Stranglethorn
 		self:RegisterEvent("ZONE_CHANGED_INDOORS", "CheckMode")
 	else
 		self:UnregisterEvent("ZONE_CHANGED_INDOORS")
@@ -715,7 +773,7 @@ function aObj:CheckMode(...)
 	if event == "PLAYER_CONTROL_LOST"
 	and not prdb.inInst
 	then
-		self:LevelDebug(5, "PLAYER_CONTROL_LOST", _G.UnitOnTaxi("player"), _G.UnitIsCharmed("player"), _G.UnitIsPossessed("player"), prdb.inBG, prdb.inInst)
+		self:LevelDebug(5, "PLAYER_CONTROL_LOST", _G.UnitOnTaxi("player"), _G.UnitIsCharmed("player"), _G.UnitIsPossessed("player"), prdb.inInst)
 		self:UnregisterAllEvents()
 		self:RegisterEvent("PLAYER_CONTROL_GAINED", "CheckMode")
 		onTaxi = true
@@ -725,7 +783,7 @@ function aObj:CheckMode(...)
 	elseif event == "PLAYER_CONTROL_GAINED"
 	and not prdb.inInst
 	then
-		self:LevelDebug(5, "PLAYER_CONTROL_GAINED", _G.UnitOnTaxi("player"), _G.UnitIsCharmed("player"), _G.UnitIsPossessed("player"), prdb.inBG, prdb.inInst)
+		self:LevelDebug(5, "PLAYER_CONTROL_GAINED", _G.UnitOnTaxi("player"), _G.UnitIsCharmed("player"), _G.UnitIsPossessed("player"), prdb.inInst)
 		self:UnregisterEvent(event)
 		enableEvents()
 		onTaxi = false
@@ -734,13 +792,13 @@ function aObj:CheckMode(...)
     --> Pre Event Handler <--
     -- if entering a new area or just been loaded or come out of standby
     if checkEvent[event]then
-		if prdb.inInst or prdb.inBG then
+		if prdb.inInst
+		then
             prdb.inInst = false
-            prdb.inBG = false
-			exitedInstBG = true
+			exitedInst = true
         else
         	-- otherwise save the current channel settings for Chat Frame 1
-			exitedInstBG = false
+			exitedInst = false
             for key, _ in pairs(prdb.cf1Channels) do
                 prdb.cf1Channels[key] = false
             end
@@ -768,18 +826,15 @@ function aObj:CheckMode(...)
 		end
 	end
 
-    --> Instance/Battleground Handler <--
-    if T:IsBattleground(rZone) then
-        if prdb.chatback then self:Print(L["Battleground mode enabled"]) end
-        prdb.inBG = true
-    elseif T:IsInstance(rZone)
-	or icecrownInstances[rZone]
+    --> Instance Handler <--
+	if select(2, GetInstanceInfo()) ~= "none"
 	then
         if prdb.chatback then self:Print(L["Instance mode enabled"]) end
         prdb.inInst = true
-	elseif exitedInstBG then
-        if prdb.chatback then self:Print(L["Instance/Battleground mode disabled"]) end
+	elseif exitedInst then
+        if prdb.chatback then self:Print(L["Instance mode disabled"]) end
     end
+
 	-- update message filters
 	addMFltrs()
 	removeMFltrs()
@@ -790,17 +845,16 @@ function aObj:CheckMode(...)
     --> Post Event Handler <--
     -- if entering a new area or just been loaded or come out of standby
     if checkEvent[event] then
-        -- Mute chat in Instances/Battlegrounds if required
+        -- Mute chat in Instances if required
         if prdb.iChat
 		and prdb.inInst
-		or prdb.inBG
 		then
             for _, channel in pairs{L["General"], L["LocalDefense"], L["WorldDefense"]} do
 				_G.ChatFrame_RemoveChannel(ChatFrame1, channel)
 				self:LevelDebug(2, "Removed CF1 Channel: [%s]", channel)
             end
         elseif prdb.iChat
-		and exitedInstBG
+		and exitedInst
 		then
             for channel, on in pairs(prdb.cf1Channels) do
                 if on then

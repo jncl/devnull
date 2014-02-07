@@ -1,4 +1,4 @@
-﻿## Interface: 40300
+﻿## Interface: 50001
 ## Title: /dev/null
 ## Notes: Mutes various chat related annoyances while in capital cities and instances.
 ## Notes-deDE: Unterdr\195\188ckt diverse st\195\182rende Meldungen - w\195\164hrend man sich in Hauptst\195\164dten oder Instanzen befindet.
@@ -8,7 +8,7 @@
 ## Version: @project-version@
 ## X-Category: Chat/Communication
 ## SavedVariables: devnullDB
-## OptionalDeps: Ace3, LibBabble-Zone-3.0, LibTourist-3.0
+## OptionalDeps: Ace3, LibBabble-SubZone-3.0
 #
 # LibStub & Callback Handler
 libs\LibStub\LibStub.lua
@@ -27,9 +27,7 @@ libs\AceLocale-3.0\AceLocale-3.0.xml
 libs\AceGUI-3.0\AceGUI-3.0.xml
 libs\AceConfig-3.0\AceConfig-3.0.xml
 #Other Libraries
-libs\LibBabble-Zone-3.0\lib.xml
 libs\LibBabble-SubZone-3.0\lib.xml
-libs\LibTourist-3.0\lib.xml
 #@end-no-lib-strip@
 #
 # Locale files
