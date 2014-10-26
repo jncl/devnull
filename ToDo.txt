@@ -6,7 +6,3 @@ Legend:
 	x			- indicates nothing to change
 	¶ is Alt+7	- indicates localisation changes required
 	I/O			- Issue(Bug)/Other change
-
-√	O	Replace LibBabble-Zone-3.0 by GetMapNameByID
-
-√	O	Remove all references to LibTourist and replace with GetInstanceInfo()
