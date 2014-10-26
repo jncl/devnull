@@ -27,6 +27,7 @@ local SZL = LibStub("LibBabble-SubZone-3.0"):GetLookupTable()
 
 local prdb, inCity, onTaxi, exitedInst
 
+-- Map IDs can be found here: http://wowpedia.org/MapID
 local nullCities = {
 	-- Kalimdor
 	[GetMapNameByID(321)] = true, -- Orgrimmar
@@ -45,6 +46,7 @@ local nullCities = {
 	-- Pandaria (MoP)
 	[GetMapNameByID(903)] = true, -- Shrine of Two Moons (Horde)
 	[GetMapNameByID(905)] = true, -- Shrine of Seven Stars (Alliance)
+	-- [GetMapNameByID(951)] = true, -- Timeless Isle (All of it)
 }
 local nullTowns = {
 	-- Kalimdor
@@ -74,6 +76,7 @@ local nullAreas = {
 	[SZL["KTC Headquarters"]] = true, -- Goblin starting area (Cataclysm)
 	[GetMapNameByID(799)] = true, -- Karazhan
 	[SZL["Krom'gar Fortress"]] = true, -- Horde Base in Stonetalon Mts (Cataclysm)
+	["The Celestial Court"] = true, -- Timeless Isle (MoP)
 }
 local checkZones = {
 	-- used for smaller area changes
@@ -90,6 +93,7 @@ local checkZones = {
 	[GetMapNameByID(491)] = true, -- Howling Fjord (for Valgarde/Vengeance Landing)
 	[GetMapNameByID(673)] = true, -- The Cape of Stranglethorn (for Booty Bay)
 	[GetMapNameByID(605)] = true, -- Kezan (for KTC Headquarters)
+	[GetMapNameByID(951)] = true, -- Timeless Isle
 }
 local checkEvent = {
     ["ZONE_CHANGED_INDOORS"] = true, -- for tunnel into Booty Bay
@@ -390,7 +394,10 @@ local function addMGs()
 	if not prdb.noMYell then _G.ChatFrame_AddMessageGroup(ChatFrame1, "MONSTER_YELL") end
 	if not prdb.noTradeskill then _G.ChatFrame_AddMessageGroup(ChatFrame1, "TRADESKILLS") end
 	if not prdb.noPetInfo then _G.ChatFrame_AddMessageGroup(ChatFrame1, "PET_INFO") end
-	if prdb.achFilterType == 0 then _G.ChatFrame_AddMessageGroup(ChatFrame1, "ACHIEVEMENT") end
+	if prdb.achFilterType == 0 then
+		_G.ChatFrame_AddMessageGroup(ChatFrame1, "ACHIEVEMENT")
+		_G.ChatFrame_AddMessageGroup(ChatFrame1, "GUILD_ACHIEVEMENT")
+	end
 
 end
 local function removeMGs()
@@ -404,7 +411,10 @@ local function removeMGs()
 	if prdb.noMYell then _G.ChatFrame_RemoveMessageGroup(ChatFrame1, "MONSTER_YELL") end
 	if prdb.noTradeskill then _G.ChatFrame_RemoveMessageGroup(ChatFrame1, "TRADESKILLS") end
 	if prdb.noPetInfo then _G.ChatFrame_RemoveMessageGroup(ChatFrame1, "PET_INFO") end
-	if prdb.achFilterType == 1 then _G.ChatFrame_RemoveMessageGroup(ChatFrame1, "ACHIEVEMENT") end
+	if prdb.achFilterType == 1 then
+		_G.ChatFrame_RemoveMessageGroup(ChatFrame1, "ACHIEVEMENT")
+		_G.ChatFrame_RemoveMessageGroup(ChatFrame1, "GUILD_ACHIEVEMENT")
+	end
 
 end
 
@@ -753,8 +763,9 @@ function aObj:CheckMode(...)
 	local event = select(1, ...)
 	self:LevelDebug(2, "CheckMode: [%s]", event)
 	local rZone, rSubZone = _G.GetRealZoneText(), _G.GetSubZoneText()
+	local instInfo = {GetInstanceInfo()}
     self:LevelDebug(3, "You Are Here: [%s:%s]", rZone or "<Anon>", rSubZone or "<Anon>")
-	self:LevelDebug(4, "inInstance#1: [%s, %s, %s]", prdb.inInst, select(2, GetInstanceInfo()), select(1, GetInstanceInfo()))
+	self:LevelDebug(4, "inInstance#1: [%s, %s, %s, %s]", prdb.inInst, instInfo[2], instInfo[1], instInfo[9])
 
 	-- handle zones when ZONE_CHANGED_NEW_AREA isn't good enough
 	if checkZones[rZone] then
@@ -827,7 +838,7 @@ function aObj:CheckMode(...)
 	end
 
     --> Instance Handler <--
-	if select(2, GetInstanceInfo()) ~= "none"
+	if instInfo[2] ~= "none"
 	then
         if prdb.chatback then self:Print(L["Instance mode enabled"]) end
         prdb.inInst = true
