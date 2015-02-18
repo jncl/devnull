@@ -2,16 +2,16 @@ local aName, aObj = ...
 local _G = _G
 
 local pairs, ipairs, type, rawget, tostring, select, unpack, table, output, date, wipe = _G.pairs, _G.ipairs, _G.type, _G.rawget, _G.tostring, _G.select, _G.unpack, _G.table, _G.output, _G.date, _G.wipe
-local LibStub, InCombatLockdown, ChatFrame1, GetInstanceInfo, GetMapNameByID = _G.LibStub, _G.InCombatLockdown, _G.ChatFrame1, _G.GetInstanceInfo, _G.GetMapNameByID
+local LibStub, InCombatLockdown, ChatFrame1, GetMapNameByID, GetCurrentMapAreaID = _G.LibStub, _G.InCombatLockdown, _G.ChatFrame1,  _G.GetMapNameByID, _G.GetCurrentMapAreaID
 
 -- check to see if required libraries are loaded
 assert(LibStub, aName.." requires LibStub")
-for _, lib in pairs{"CallbackHandler-1.0", "AceAddon-3.0", "AceConsole-3.0", "AceEvent-3.0", "AceLocale-3.0", "LibBabble-SubZone-3.0", "AceDB-3.0", "AceDBOptions-3.0", "AceGUI-3.0",  "AceConfig-3.0", "AceConfigCmd-3.0", "AceConfigRegistry-3.0", "AceConfigDialog-3.0", "LibDataBroker-1.1",} do
+for _, lib in pairs{"CallbackHandler-1.0", "AceAddon-3.0", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0", "AceLocale-3.0", "LibBabble-SubZone-3.0", "AceDB-3.0", "AceDBOptions-3.0", "AceGUI-3.0",  "AceConfig-3.0", "AceConfigCmd-3.0", "AceConfigRegistry-3.0", "AceConfigDialog-3.0", "LibDataBroker-1.1",} do
 	assert(LibStub:GetLibrary(lib, true), aName.." requires "..lib)
 end
 
 -- create the addon
-LibStub("AceAddon-3.0"):NewAddon(aObj, aName, "AceConsole-3.0", "AceEvent-3.0")
+LibStub("AceAddon-3.0"):NewAddon(aObj, aName, "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
 
 -- specify where debug messages go
 aObj.debugFrame = ChatFrame10
@@ -25,7 +25,7 @@ aObj.pet = UnitName("pet")
 local L = LibStub("AceLocale-3.0"):GetLocale(aName)
 local SZL = LibStub("LibBabble-SubZone-3.0"):GetLookupTable()
 
-local prdb, inCity, onTaxi, exitedInst
+local prdb, inCity, onTaxi, exitedInst, inScenario, inGarrison
 
 -- Map IDs can be found here: http://wowpedia.org/MapID
 local nullCities = {
@@ -95,16 +95,23 @@ local checkZones = {
 	[GetMapNameByID(605)] = true, -- Kezan (for KTC Headquarters)
 	[GetMapNameByID(951)] = true, -- Timeless Isle
 }
+local garrisonZones = {
+	[971] = true, -- Lunarfall (Alliance)
+	[976] = true, -- Frostwall (Horde)
+}
 local checkEvent = {
     ["ZONE_CHANGED_INDOORS"] = true, -- for tunnel into Booty Bay
     ["ZONE_CHANGED_NEW_AREA"] = true, -- used to handle most changes of area
     ["ZONE_CHANGED"] = true, -- used to handle boat trips
     ["PLAYER_CONTROL_GAINED"] = true, -- this is for taxi check
+	["SCENARIO_UPDATE"] = true, -- this is for scenario check
 }
 local trackEvent = {
     ["ZONE_CHANGED_NEW_AREA"] = true, -- this is for changes of area
     ["PLAYER_LEAVING_WORLD"] = true, -- this is for boat trips
     ["PLAYER_CONTROL_LOST"] = true, -- this is for taxi check
+    ["PLAYER_ENTERING_WORLD"] = true, -- this is for garrison check
+	["SCENARIO_UPDATE"] = true, -- this is for scenario check
 }
 local function enableEvents()
 
@@ -126,7 +133,9 @@ local function updateDBtext()
 
 	return onTaxi and L["Taxi"]
 	or inCity and L["City"]
+	or inScenario and L["Scenario"]
 	or prdb.inInst and L["Instance"]
+	or inGarrison and L["Garrison"]
 	or L["Off"]
 
 end
@@ -664,7 +673,7 @@ function aObj:OnInitialize()
 			aObj.debugLevel = 1
 			aObj:Print("Debug messages OFF")
 		elseif input:lower() == "locate" then
-			aObj:Print("You Are Here:", _G.GetRealZoneText(), _G.GetSubZoneText(), _G.GetCurrentMapAreaID())
+			aObj:Print("You Are Here:", _G.GetRealZoneText(), _G.GetSubZoneText(), GetCurrentMapAreaID())
 		else
 			LibStub("AceConfigCmd-3.0"):HandleCommand(aName, aName, input)
 		end
@@ -704,9 +713,6 @@ function aObj:OnEnable()
 	-- remove message groups as required
 	removeMGs()
 
-	-- check to see what mode we should be in
-	self:CheckMode()
-
 	-- handle profile changes
 	self.db.RegisterCallback(self, "OnProfileChanged", "ReloadAddon")
 	self.db.RegisterCallback(self, "OnProfileCopied", "ReloadAddon")
@@ -717,7 +723,7 @@ end
 function aObj:OnDisable()
 	self:LevelDebug(5, "OnDisable")
 
-	inCity, exitedInst = nil, nil
+	inCity, exitedInst, inScenario, inGarrison = nil, nil, nil ,nil
 
 	-- unregister events
 	self:UnregisterAllEvents()
@@ -759,20 +765,40 @@ function aObj:ReloadAddon(callback)
 
 end
 
+local function isGarrison(str)
+	return str:find("Garrison Level") and true or false
+end
 function aObj:CheckMode(...)
+
 	local event = select(1, ...)
 	self:LevelDebug(2, "CheckMode: [%s]", event)
+
+	-- if WorldMapFrame currently open defer check until it is closed
+	if _G.WorldMapFrame:IsShown() then
+		if not self:IsHooked(_G.WorldMapFrame, "OnHide") then
+			self:SecureHookScript(_G.WorldMapFrame, "OnHide", function(this)
+				self:CheckMode("WorldMap closed")
+				self:Unhook(_G.WorldMapFrame, "OnHide")
+			end)
+		end
+		return
+	end
+
+	-- force map change to get correct info
+	_G.SetMapToCurrentZone()
 	local rZone, rSubZone = _G.GetRealZoneText(), _G.GetSubZoneText()
-	local instInfo = {GetInstanceInfo()}
-    self:LevelDebug(3, "You Are Here: [%s:%s]", rZone or "<Anon>", rSubZone or "<Anon>")
-	self:LevelDebug(4, "inInstance#1: [%s, %s, %s, %s]", prdb.inInst, instInfo[2], instInfo[1], instInfo[9])
+    self:LevelDebug(3, "You Are Here: [%s:%s, %s]", rZone or "<Anon>", rSubZone or "<Anon>", GetCurrentMapAreaID())
+	local instInfo = {_G.GetInstanceInfo()}
+	self:LevelDebug(4, "inInstance#1: [%s, %s, %s, %s, %s]", prdb.inInst, instInfo[2], instInfo[1], instInfo[9], instInfo[8])
 
 	-- handle zones when ZONE_CHANGED_NEW_AREA isn't good enough
 	if checkZones[rZone] then
+	    self:LevelDebug(4, "checkZone - ZONE_CHANGED event registered")
 		self:RegisterEvent("ZONE_CHANGED", "CheckMode")
 	else
 		self:UnregisterEvent("ZONE_CHANGED")
 	end
+
 	-- handle this for the tunnel into Booty Bay
 	if rZone == GetMapNameByID(673) then -- The Cape of Stranglethorn
 		self:RegisterEvent("ZONE_CHANGED_INDOORS", "CheckMode")
@@ -802,6 +828,7 @@ function aObj:CheckMode(...)
 
     --> Pre Event Handler <--
     -- if entering a new area or just been loaded or come out of standby
+	self:LevelDebug(4, "Pre-Event Handler", checkEvent[event], prdb.inInst)
     if checkEvent[event]then
 		if prdb.inInst
 		then
@@ -822,6 +849,7 @@ function aObj:CheckMode(...)
     end
 
     --> Event Handler <--
+	self:LevelDebug(4, "Event Handler", nullCities[rZone], nullTowns[rSubZone], nullAreas[rSubZone])
 	if nullCities[rZone]
 	or nullTowns[rSubZone]
 	or nullAreas[rSubZone]
@@ -837,14 +865,48 @@ function aObj:CheckMode(...)
 		end
 	end
 
-    --> Instance Handler <--
+    --> Instance/Scenario Handler <--
+	self:LevelDebug(4, "Instance/Scenario Handler", instInfo[2] ~= "none", isGarrison(instInfo[1]), prdb.inInst, exitedInst, inScenario)
 	if instInfo[2] ~= "none"
+	and not isGarrison(instInfo[1])
 	then
-        if prdb.chatback then self:Print(L["Instance mode enabled"]) end
-        prdb.inInst = true
-	elseif exitedInst then
-        if prdb.chatback then self:Print(L["Instance mode disabled"]) end
+		if instInfo[2] == "scenario" then
+			if not inScenario then
+		        inScenario = true
+		        if prdb.chatback then self:Print(L["Scenario mode enabled"]) end
+			end
+		else
+			if not prdb.inInst then
+				prdb.inInst = true
+	        	if prdb.chatback then self:Print(L["Instance mode enabled"]) end
+			end
+		end
+	else
+		if exitedInst
+        and prdb.chatback
+		then
+			if prdb.inInst
+			or inScenario
+			then
+				self:Print(L["Instance/Scenario mode disabled"])
+			end
+		end
+		prdb.inInst = false
+		inScenario = false
     end
+
+	--> Garrison Handler <--
+	self:LevelDebug(4, "Garrison Handler", garrisonZones[GetCurrentMapAreaID()], isGarrison(instInfo[1]))
+	if garrisonZones[GetCurrentMapAreaID()]
+	or isGarrison(instInfo[1])
+	then
+		if not inGarrison then
+			inGarrison = true
+			if prdb.chatback then self:Print(L["Garrison mode enabled"]) end
+		end
+	else
+		inGarrison = false
+	end
 
 	-- update message filters
 	addMFltrs()
