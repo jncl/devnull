@@ -1,4 +1,4 @@
-﻿## Interface: 60000
+﻿## Interface: 60200
 ## Title: /dev/null
 ## Notes: Mutes various chat related annoyances while in capital cities and instances.
 ## Notes-deDE: Unterdr\195\188ckt diverse st\195\182rende Meldungen - w\195\164hrend man sich in Hauptst\195\164dten oder Instanzen befindet.
@@ -21,6 +21,7 @@ libs\LibDataBroker-1.1\LibDataBroker-1.1.lua
 libs\AceAddon-3.0\AceAddon-3.0.xml
 libs\AceConsole-3.0\AceConsole-3.0.xml
 libs\AceEvent-3.0\AceEvent-3.0.xml
+libs\AceEvent-3.0\AceHook-3.0.xml
 libs\AceDB-3.0\AceDB-3.0.xml
 libs\AceDBOptions-3.0\AceDBOptions-3.0.xml
 libs\AceLocale-3.0\AceLocale-3.0.xml
