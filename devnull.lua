@@ -2,7 +2,7 @@ local aName, aObj = ...
 local _G = _G
 
 local pairs, ipairs, type, rawget, tostring, select, unpack, table, output, date, wipe = _G.pairs, _G.ipairs, _G.type, _G.rawget, _G.tostring, _G.select, _G.unpack, _G.table, _G.output, _G.date, _G.wipe
-local LibStub, InCombatLockdown, ChatFrame1, GetMapNameByID, GetCurrentMapAreaID = _G.LibStub, _G.InCombatLockdown, _G.ChatFrame1,  _G.GetMapNameByID, _G.GetCurrentMapAreaID
+local LibStub, InCombatLockdown, ChatFrame1, GetMapNameByID, GetCurrentMapAreaID = _G.LibStub, _G.InCombatLockdown, _G.ChatFrame1, _G.GetMapNameByID, _G.GetCurrentMapAreaID
 
 -- check to see if required libraries are loaded
 assert(LibStub, aName.." requires LibStub")
@@ -50,40 +50,40 @@ local nullCities = {
 }
 local nullTowns = {
 	-- Kalimdor
-	[SZL["Booty Bay"]] = true,
-	[SZL["Everlook"]] = true,
-	[SZL["Gadgetzan"]] = true,
-	[SZL["Ratchet"]] = true,
-	[SZL["Theramore Isle"]] = true,
-	[SZL["Mudsprocket"]] = true,
+	[SZL["Booty Bay"]]         = true,
+	[SZL["Everlook"]]          = true,
+	[SZL["Gadgetzan"]]         = true,
+	[SZL["Ratchet"]]           = true,
+	[SZL["Theramore Isle"]]    = true,
+	[SZL["Mudsprocket"]]       = true,
 	-- Eastern Kingdoms
-	[SZL["Goldshire"]] = true, -- in Elwynn Forest
+	[SZL["Goldshire"]]         = true, -- in Elwynn Forest
 	-- Outland (TBC)
-	[SZL["Thrallmar"]] = true, -- Hellfire Peninsula (Horde)
-	[SZL["Honor Hold"]] = true, -- Hellfire Peninsula (Alliance)
-	[SZL["Area 52"]] = true, -- Netherstorm
+	[SZL["Thrallmar"]]         = true, -- Hellfire Peninsula (Horde)
+	[SZL["Honor Hold"]]        = true, -- Hellfire Peninsula (Alliance)
+	[SZL["Area 52"]]           = true, -- Netherstorm
 	-- Northrend (WotLK)
-	[SZL["Warsong Hold"]] = true, --  Borean Tundra (Horde)
-	[SZL["Valiance Keep"]] = true, --  Borean Tundra (Alliance)
+	[SZL["Warsong Hold"]]      = true, --  Borean Tundra (Horde)
+	[SZL["Valiance Keep"]]     = true, --  Borean Tundra (Alliance)
 	[SZL["Vengeance Landing"]] = true, -- Howling Fjord (Horde)
-	[SZL["Valgarde"]] = true, -- Howling Fjord (Alliance)
+	[SZL["Valgarde"]]          = true, -- Howling Fjord (Alliance)
 }
 local nullAreas = {
-	[SZL["The Old Port Authority"]] = true, -- in BB
+	[SZL["The Old Port Authority"]]  = true, -- in BB
 	[SZL["The Salty Sailor Tavern"]] = true, -- in BB
-	[SZL["Foothold Citadel"]] = true, -- in Theramore Isle
-	[SZL["The Darkmoon Faire"]] = true, -- Darkmoon Island (patch 4.3)
-	[SZL["KTC Headquarters"]] = true, -- Goblin starting area (Cataclysm)
-	[GetMapNameByID(799)] = true, -- Karazhan
-	[SZL["Krom'gar Fortress"]] = true, -- Horde Base in Stonetalon Mts (Cataclysm)
-	["The Celestial Court"] = true, -- Timeless Isle (MoP)
+	[SZL["Foothold Citadel"]]        = true, -- in Theramore Isle
+	[SZL["The Darkmoon Faire"]]      = true, -- Darkmoon Island (patch 4.3)
+	[SZL["KTC Headquarters"]]        = true, -- Goblin starting area (Cataclysm)
+	[GetMapNameByID(799)]            = true, -- Karazhan
+	[SZL["Krom'gar Fortress"]]       = true, -- Horde Base in Stonetalon Mts (Cataclysm)
+	["The Celestial Court"]          = true, -- Timeless Isle (MoP)
 }
 local checkZones = {
 	-- used for smaller area changes
-	[GetMapNameByID(11)] = true, -- Northern Barrens (for Ratchet)
-	[GetMapNameByID(30)] = true, -- Elwynn Forest (for Goldshire)
-	[GetMapNameByID(32)] = true, -- Deadwind Pass (for Karazhan)
-	[GetMapNameByID(81)] = true, -- Stonetalon Mountains (for Krom'gar Fortess)
+	[GetMapNameByID(11)]  = true, -- Northern Barrens (for Ratchet)
+	[GetMapNameByID(30)]  = true, -- Elwynn Forest (for Goldshire)
+	[GetMapNameByID(32)]  = true, -- Deadwind Pass (for Karazhan)
+	[GetMapNameByID(81)]  = true, -- Stonetalon Mountains (for Krom'gar Fortess)
 	[GetMapNameByID(141)] = true, -- Dustwallow Marsh (for Theramore Isle)
 	[GetMapNameByID(161)] = true, -- Tanaris (for Gadgetzan)
 	[GetMapNameByID(281)] = true, -- Winterspring (for Everlook)
@@ -100,18 +100,18 @@ local garrisonZones = {
 	[976] = true, -- Frostwall (Horde)
 }
 local checkEvent = {
-    ["ZONE_CHANGED_INDOORS"] = true, -- for tunnel into Booty Bay
-    ["ZONE_CHANGED_NEW_AREA"] = true, -- used to handle most changes of area
-    ["ZONE_CHANGED"] = true, -- used to handle boat trips
-    ["PLAYER_CONTROL_GAINED"] = true, -- this is for taxi check
-	["SCENARIO_UPDATE"] = true, -- this is for scenario check
+	["ZONE_CHANGED_INDOORS"]  = true, -- for tunnel into Booty Bay
+	["ZONE_CHANGED_NEW_AREA"] = true, -- used to handle most changes of area
+	["ZONE_CHANGED"]          = true, -- used to handle boat trips
+	["PLAYER_CONTROL_GAINED"] = true, -- this is for taxi check
+	["SCENARIO_UPDATE"]       = true, -- this is for scenario check
 }
 local trackEvent = {
-    ["ZONE_CHANGED_NEW_AREA"] = true, -- this is for changes of area
-    ["PLAYER_LEAVING_WORLD"] = true, -- this is for boat trips
-    ["PLAYER_CONTROL_LOST"] = true, -- this is for taxi check
-    ["PLAYER_ENTERING_WORLD"] = true, -- this is for garrison check
-	["SCENARIO_UPDATE"] = true, -- this is for scenario check
+	["ZONE_CHANGED_NEW_AREA"] = true, -- this is for changes of area
+	["PLAYER_LEAVING_WORLD"]  = true, -- this is for boat trips
+	["PLAYER_CONTROL_LOST"]   = true, -- this is for taxi check
+	["PLAYER_ENTERING_WORLD"] = true, -- this is for garrison check
+	["SCENARIO_UPDATE"]       = true, -- this is for scenario check
 }
 local function enableEvents()
 
@@ -323,7 +323,7 @@ local function addMFltrs(allFilters)
 		end
 		if prdb.noNPC then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", msgFilter1) end
 		if prdb.noPYell then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", msgFilter2) end
-		if prdb.noDrunk	then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter4)	end
+		if prdb.noDrunk then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter4)	end
 		if prdb.noDiscovery then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_BG_SYSTEM_NEUTRAL", msgFilter5) end
 	end
 
@@ -351,7 +351,7 @@ local function removeMFltrs(allFilters)
 		end
 		if prdb.noNPC then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_MONSTER_SAY", msgFilter1) end
 		if prdb.noPYell then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_YELL", msgFilter2) end
-	 	if prdb.noDrunk then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter4) end
+		if prdb.noDrunk then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter4) end
 		if prdb.noDiscovery then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_BG_SYSTEM_NEUTRAL", msgFilter5) end
 	end
 
@@ -436,26 +436,26 @@ function aObj:OnInitialize()
 --@end-debug@
 
 	local defaults = { profile = {
-		chatback      = true,
+		chatback	  = true,
 		achFilterType = 0,
-		noDiscovery   = true,
-		noDrunk       = true,
-		noDuel        = true,
-		noEmote       = false,
-		noNPC         = false,
-		noPetInfo     = false,
+		noDiscovery	  = true,
+		noDrunk		  = true,
+		noDuel		  = true,
+		noEmote		  = false,
+		noNPC		  = false,
+		noPetInfo	  = false,
 		noTradeskill  = false,
-		noMYell       = false,
-		noPYell       = false,
-		iChat         = true,
-		inInst        = false,
+		noMYell		  = false,
+		noPYell		  = false,
+		iChat		  = true,
+		inInst		  = false,
 		-- ChatFrame1 channel settings
 		cf1Channels = {
-		   [L["General"]]          = false,
-		   [L["Trade"]]            = false,
-		   [L["LocalDefense"]]     = false,
-		   [L["WorldDefense"]]     = false,
-		   [L["GuildRecruitment"]] = false,
+			[L["General"]]          = false,
+			[L["Trade"]]            = false,
+			[L["LocalDefense"]]     = false,
+			[L["WorldDefense"]]     = false,
+			[L["GuildRecruitment"]] = false,
 		},
 	}}
 
@@ -503,7 +503,7 @@ function aObj:OnInitialize()
 
 		General = {
 			type = "group",
-	    	name = aName,
+			name = aName,
 			get = function(info) return prdb[info[#info]] end,
 			set = function(info, value) prdb[info[#info]] = value end,
 			args = {
@@ -542,7 +542,7 @@ function aObj:OnInitialize()
 					name = L["Global Settings"],
 					desc = L["Change the Global settings"],
 					args = {
-				        achFilterType = {
+						achFilterType = {
 							type = 'select',
 							order = -1,
 							name = L["Achievement Filter"],
@@ -559,16 +559,16 @@ function aObj:OnInitialize()
 							name = L["Duels"],
 							desc = L["Mute Duel info."],
 						},
-				        noPetInfo = {
+						noPetInfo = {
 							type = 'toggle',
-				    		name = L["Pet Info"],
-				        	desc = L["Mute Pet Info."],
-				        },
-				        noTradeskill = {
+							name = L["Pet Info"],
+							desc = L["Mute Pet Info."],
+						},
+						noTradeskill = {
 							type = 'toggle',
-				    		name = L["Tradeskills"],
-				        	desc = L["Mute Tradeskills."],
-				        },
+							name = L["Tradeskills"],
+							desc = L["Mute Tradeskills."],
+						},
 						noMYell = {
 							type = 'toggle',
 							name = L["NPC/Mob Yells"],
@@ -596,7 +596,7 @@ function aObj:OnInitialize()
 							type = 'toggle',
 							name = L["Emotes"],
 							desc = L["Mute Emotes."],
-				        },
+						},
 						noNPC = {
 							type = 'toggle',
 							name = L["NPCs"],
@@ -615,12 +615,12 @@ function aObj:OnInitialize()
 					name = L["Instance Settings"],
 					desc = L["Change the Instance settings"],
 					args = {
-				        iChat = {
+						iChat = {
 							type = 'toggle',
 							width = "double",
-				    		name = L["General chat in Instances"],
-				        	desc = L["Mute General chat in Instances."],
-				        },
+							name = L["General chat in Instances"],
+							desc = L["Mute General chat in Instances."],
+						},
 					},
 				},
 			},
@@ -733,9 +733,9 @@ function aObj:OnDisable()
 	addMGs()
 
 	-- turn channels back on
-    for channel, on in pairs(prdb.cf1Channels) do
-        if on then _G.ChatFrame_AddChannel(ChatFrame1, channel) end
-    end
+	for channel, on in pairs(prdb.cf1Channels) do
+		if on then _G.ChatFrame_AddChannel(ChatFrame1, channel) end
+	end
 
 end
 
@@ -787,13 +787,13 @@ function aObj:CheckMode(...)
 	-- force map change to get correct info
 	_G.SetMapToCurrentZone()
 	local rZone, rSubZone = _G.GetRealZoneText(), _G.GetSubZoneText()
-    self:LevelDebug(3, "You Are Here: [%s:%s, %s]", rZone or "<Anon>", rSubZone or "<Anon>", GetCurrentMapAreaID())
+	self:LevelDebug(3, "You Are Here: [%s:%s, %s]", rZone or "<Anon>", rSubZone or "<Anon>", GetCurrentMapAreaID())
 	local instInfo = {_G.GetInstanceInfo()}
 	self:LevelDebug(4, "inInstance#1: [%s, %s, %s, %s, %s]", prdb.inInst, instInfo[2], instInfo[1], instInfo[9], instInfo[8])
 
 	-- handle zones when ZONE_CHANGED_NEW_AREA isn't good enough
 	if checkZones[rZone] then
-	    self:LevelDebug(4, "checkZone - ZONE_CHANGED event registered")
+		self:LevelDebug(4, "checkZone - ZONE_CHANGED event registered")
 		self:RegisterEvent("ZONE_CHANGED", "CheckMode")
 	else
 		self:UnregisterEvent("ZONE_CHANGED")
@@ -826,29 +826,29 @@ function aObj:CheckMode(...)
 		onTaxi = false
 	end
 
-    --> Pre Event Handler <--
-    -- if entering a new area or just been loaded or come out of standby
+	--> Pre Event Handler <--
+	-- if entering a new area or just been loaded or come out of standby
 	self:LevelDebug(4, "Pre-Event Handler", checkEvent[event], prdb.inInst)
-    if checkEvent[event]then
+	if checkEvent[event]then
 		if prdb.inInst
 		then
-            prdb.inInst = false
+			prdb.inInst = false
 			exitedInst = true
-        else
-        	-- otherwise save the current channel settings for Chat Frame 1
+		else
+			-- otherwise save the current channel settings for Chat Frame 1
 			exitedInst = false
-            for key, _ in pairs(prdb.cf1Channels) do
-                prdb.cf1Channels[key] = false
-            end
-            local cwc = {_G.GetChatWindowChannels(1)}
-            for  i = 1, #cwc, 2 do
-	           self:LevelDebug(3, "cwc: [%s]", cwc[i])
-	           prdb.cf1Channels[cwc[i]] = true
-            end
-        end
-    end
+			for key, _ in pairs(prdb.cf1Channels) do
+				prdb.cf1Channels[key] = false
+			end
+			local cwc = {_G.GetChatWindowChannels(1)}
+			for	 i = 1, #cwc, 2 do
+				self:LevelDebug(3, "cwc: [%s]", cwc[i])
+				prdb.cf1Channels[cwc[i]] = true
+			end
+		end
+	end
 
-    --> Event Handler <--
+	--> Event Handler <--
 	self:LevelDebug(4, "Event Handler", nullCities[rZone], nullTowns[rSubZone], nullAreas[rSubZone])
 	if nullCities[rZone]
 	or nullTowns[rSubZone]
@@ -865,25 +865,25 @@ function aObj:CheckMode(...)
 		end
 	end
 
-    --> Instance/Scenario Handler <--
+	--> Instance/Scenario Handler <--
 	self:LevelDebug(4, "Instance/Scenario Handler", instInfo[2] ~= "none", isGarrison(instInfo[1]), prdb.inInst, exitedInst, inScenario)
 	if instInfo[2] ~= "none"
 	and not isGarrison(instInfo[1])
 	then
 		if instInfo[2] == "scenario" then
 			if not inScenario then
-		        inScenario = true
-		        if prdb.chatback then self:Print(L["Scenario mode enabled"]) end
+				inScenario = true
+				if prdb.chatback then self:Print(L["Scenario mode enabled"]) end
 			end
 		else
 			if not prdb.inInst then
 				prdb.inInst = true
-	        	if prdb.chatback then self:Print(L["Instance mode enabled"]) end
+				if prdb.chatback then self:Print(L["Instance mode enabled"]) end
 			end
 		end
 	else
 		if exitedInst
-        and prdb.chatback
+		and prdb.chatback
 		then
 			if prdb.inInst
 			or inScenario
@@ -893,7 +893,7 @@ function aObj:CheckMode(...)
 		end
 		prdb.inInst = false
 		inScenario = false
-    end
+	end
 
 	--> Garrison Handler <--
 	self:LevelDebug(4, "Garrison Handler", garrisonZones[GetCurrentMapAreaID()], isGarrison(instInfo[1]))
@@ -915,27 +915,27 @@ function aObj:CheckMode(...)
 	-- update DB object text
 	self.DBObj.text = updateDBtext()
 
-    --> Post Event Handler <--
-    -- if entering a new area or just been loaded or come out of standby
-    if checkEvent[event] then
-        -- Mute chat in Instances if required
-        if prdb.iChat
+	--> Post Event Handler <--
+	-- if entering a new area or just been loaded or come out of standby
+	if checkEvent[event] then
+		-- Mute chat in Instances if required
+		if prdb.iChat
 		and prdb.inInst
 		then
-            for _, channel in pairs{L["General"], L["LocalDefense"], L["WorldDefense"]} do
+			for _, channel in pairs{L["General"], L["LocalDefense"], L["WorldDefense"]} do
 				_G.ChatFrame_RemoveChannel(ChatFrame1, channel)
 				self:LevelDebug(2, "Removed CF1 Channel: [%s]", channel)
-            end
-        elseif prdb.iChat
+			end
+		elseif prdb.iChat
 		and exitedInst
 		then
-            for channel, on in pairs(prdb.cf1Channels) do
-                if on then
+			for channel, on in pairs(prdb.cf1Channels) do
+				if on then
 					_G.ChatFrame_AddChannel(ChatFrame1, channel)
 					self:LevelDebug(2, "Added CF1 Channel: [%s]", channel)
 				end
-            end
-        end
-    end
+			end
+		end
+	end
 
 end
