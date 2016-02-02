@@ -46,7 +46,9 @@ local nullCities = {
 	-- Pandaria (MoP)
 	[GetMapNameByID(903)] = true, -- Shrine of Two Moons (Horde)
 	[GetMapNameByID(905)] = true, -- Shrine of Seven Stars (Alliance)
-	-- [GetMapNameByID(951)] = true, -- Timeless Isle (All of it)
+	-- Ashran (Draenor)
+	[GetMapNameByID(1009)] = true, -- Stormshield (Alliance)
+	[GetMapNameByID(1011)] = true, -- Warspear (Horde)
 }
 local nullTowns = {
 	-- Kalimdor
@@ -63,8 +65,8 @@ local nullTowns = {
 	[SZL["Honor Hold"]]        = true, -- Hellfire Peninsula (Alliance)
 	[SZL["Area 52"]]           = true, -- Netherstorm
 	-- Northrend (WotLK)
-	[SZL["Warsong Hold"]]      = true, --  Borean Tundra (Horde)
-	[SZL["Valiance Keep"]]     = true, --  Borean Tundra (Alliance)
+	[SZL["Warsong Hold"]]      = true, -- Borean Tundra (Horde)
+	[SZL["Valiance Keep"]]     = true, -- Borean Tundra (Alliance)
 	[SZL["Vengeance Landing"]] = true, -- Howling Fjord (Horde)
 	[SZL["Valgarde"]]          = true, -- Howling Fjord (Alliance)
 }
@@ -76,7 +78,7 @@ local nullAreas = {
 	[SZL["KTC Headquarters"]]        = true, -- Goblin starting area (Cataclysm)
 	[GetMapNameByID(799)]            = true, -- Karazhan
 	[SZL["Krom'gar Fortress"]]       = true, -- Horde Base in Stonetalon Mts (Cataclysm)
-	["The Celestial Court"]          = true, -- Timeless Isle (MoP)
+	[SZL["The Celestial Court"]]     = true, -- Timeless Isle (MoP)
 }
 local checkZones = {
 	-- used for smaller area changes
