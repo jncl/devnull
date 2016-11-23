@@ -7,7 +7,7 @@ local LibStub, InCombatLockdown, ChatFrame1, GetMapNameByID, GetCurrentMapAreaID
 -- check to see if required libraries are loaded
 assert(LibStub, aName.." requires LibStub")
 for _, lib in pairs{"CallbackHandler-1.0", "AceAddon-3.0", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0", "AceLocale-3.0", "LibBabble-SubZone-3.0", "AceDB-3.0", "AceDBOptions-3.0", "AceGUI-3.0",  "AceConfig-3.0", "AceConfigCmd-3.0", "AceConfigRegistry-3.0", "AceConfigDialog-3.0", "LibDataBroker-1.1",} do
-	assert(LibStub:GetLibrary(lib, true), aName.." requires "..lib)
+	assert(LibStub:GetLibrary(lib, true), aName .. " requires " .. lib)
 end
 
 -- create the addon
@@ -16,7 +16,8 @@ LibStub("AceAddon-3.0"):NewAddon(aObj, aName, "AceConsole-3.0", "AceEvent-3.0", 
 -- specify where debug messages go
 aObj.debugFrame = ChatFrame10
 aObj.debugLevel = 1
-
+-- specify status text size
+aObj.shrink = false
 -- store player and pet names
 aObj.player = UnitName("player")
 aObj.pet = UnitName("pet")
@@ -25,8 +26,24 @@ aObj.pet = UnitName("pet")
 local L = LibStub("AceLocale-3.0"):GetLocale(aName)
 local SZL = LibStub("LibBabble-SubZone-3.0"):GetLookupTable()
 
-local prdb, inCity, onTaxi, exitedInst, inScenario, inGarrison
+local prdb, inCity, onTaxi, exitedInst, inScenario, inGarrison, inOrderHall
 
+local mGs = {
+	["MONSTER_YELL"] = false,
+	["TRADESKILLS"] = false,
+	["PET_INFO"] = false,
+	["ACHIEVEMENT"] = false,
+	["GUILD_ACHIEVEMENT"] = false,
+}
+local function getMGSettings()
+
+	for group, _ in pairs(mGs) do
+		if _G.tContains(ChatFrame1.messageTypeList, group) then
+			mGs[group] = true
+		end
+	end
+
+end
 -- Map IDs can be found here: http://wowpedia.org/MapID
 local nullCities = {
 	-- Kalimdor
@@ -76,7 +93,7 @@ local nullAreas = {
 	[SZL["Foothold Citadel"]]        = true, -- in Theramore Isle
 	[SZL["The Darkmoon Faire"]]      = true, -- Darkmoon Island (patch 4.3)
 	[SZL["KTC Headquarters"]]        = true, -- Goblin starting area (Cataclysm)
-	[GetMapNameByID(799)]            = true, -- Karazhan
+	-- [GetMapNameByID(799)]            = true, -- Karazhan
 	[SZL["Krom'gar Fortress"]]       = true, -- Horde Base in Stonetalon Mts (Cataclysm)
 	[SZL["The Celestial Court"]]     = true, -- Timeless Isle (MoP)
 }
@@ -101,6 +118,16 @@ local garrisonZones = {
 	[971] = true, -- Lunarfall (Alliance)
 	[976] = true, -- Frostwall (Horde)
 }
+local orderHalls = {
+	[1035] = true, -- Skyhold (Warrior)
+	[1040] = true, -- Netherlight Temple (Priest)
+	[1044] = true, -- The Wandering Isle (Monk)
+	[1052] = true, -- Mardum, the Shattered Abyss (Demon Hunter)
+	[1057] = true, -- The Heart of Azeroth (Shaman)
+	[1068] = true, -- Hall of the Guardian (Mage)
+	[1072] = true, -- Trueshot Lodge (Hunter)
+	[1077] = true, -- The Dreamgrove (Druid)
+}
 local checkEvent = {
 	["ZONE_CHANGED_INDOORS"]  = true, -- for tunnel into Booty Bay
 	["ZONE_CHANGED_NEW_AREA"] = true, -- used to handle most changes of area
@@ -115,6 +142,26 @@ local trackEvent = {
 	["PLAYER_ENTERING_WORLD"] = true, -- this is for garrison check
 	["SCENARIO_UPDATE"]       = true, -- this is for scenario check
 }
+local bodyguardNames = {
+	-- Tormmok [193]
+	-- Defender Illona (A) [207]
+	-- Aeda Brightdawn (H) [207]
+	-- Delvar Ironfist (A) [216]
+	-- Vivianne (H) [216]
+	-- Talonpriest Ishaal [218]
+	-- Leorajh [219]
+}
+local function getBGNames()
+
+	if prdb.noBguard then
+		for _, id in _G.pairs{193, 207, 216, 218, 219} do
+			info = _G.C_Garrison.GetFollowerInfo(id)
+			bodyguardNames[info.name] = true
+			aObj:LevelDebug(5, "Bodyguard:", info.name)
+		end
+	end
+
+end
 local function enableEvents()
 
 	aObj:LevelDebug(5, "enableEvents:", onTaxi, _G.UnitOnTaxi("player"))
@@ -133,12 +180,15 @@ local function enableEvents()
 end
 local function updateDBtext()
 
-	return onTaxi and L["Taxi"]
-	or inCity and L["City"]
-	or inScenario and L["Scenario"]
+	local status =  onTaxi and L["Taxi"]
 	or prdb.inInst and L["Instance"]
+	or inScenario and L["Scenario"]
 	or inGarrison and L["Garrison"]
+	or inOrderHall and L["OrderHall"]
+	or inCity and L["City"]
 	or L["Off"]
+
+	return prdb.shrink and status:sub(1, 1) or status
 
 end
 -- Printing Functions
@@ -239,8 +289,7 @@ local function msgFilter2(self, event, msg, charFrom, ...)
 	aObj:LevelDebug(3, "mf2:[%s]", charFrom)
 
 	-- allow yells from the player
-	if charFrom == aObj.player
-	then
+	if charFrom == aObj.player then
 		aObj:LevelDebug(3, "Player Yell")
 		return false
 	else
@@ -253,8 +302,7 @@ local function msgFilter3(self, event, msg, ...)
 	aObj:LevelDebug(3, "mf3:[%s]", msg)
 
 	-- ignore Duelling messages
-	if msg:find(L["in a duel"])
-	then
+	if msg:find(L["in a duel"]) then
 		aObj:LevelDebug(3, "Duel")
 		return true
 	else
@@ -284,8 +332,7 @@ local function msgFilter5(self, event, msg, ...)
 	aObj:LevelDebug(3, "mf5:[%s]", msg)
 
 	-- ignore discovery messages
-	if msg:find(L["DISCOVERY"])
-	then
+	if msg:find(L["DISCOVERY"]) then
 		aObj:LevelDebug(3, "Discovery")
 		return true
 	else
@@ -309,7 +356,22 @@ local function msgFilter6(self, event, msg, charFrom, ...)
 	end
 
 end
-local function addMFltrs(allFilters)
+-- stop messages from followers who are Bodyguards including Faction gains
+local function msgFilter7(self, event, msg, charFrom, ...)
+	aObj:LevelDebug(5, "msgFilter7:", ...)
+	aObj:LevelDebug(3, "mf7:[%s][%s][%s]", event, msg, charFrom)
+
+	-- ignore Bodyguard's chat or Reputation gains
+	if bodyguardNames[charFrom]
+	or bodyguardNames[msg:match(L["Reputation with"] .. "%s(.*)%s" .. L["increased by"])]
+	then
+		return true
+	else
+		return false
+	end
+
+end
+local function addMFltrs()
 
 	if InCombatLockdown() then
 		aObj:add2Table(aObj.oocTab, {addMFltrs, {allFilters}})
@@ -317,114 +379,140 @@ local function addMFltrs(allFilters)
 	end
 
 	if inCity then
-		-- add message filters as required
+		-- add message filters
 		if prdb.noEmote then
 			_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_EMOTE", msgFilter1)
 			_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_TEXT_EMOTE", msgFilter1)
 			_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_EMOTE", msgFilter1)
 		end
-		if prdb.noNPC then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", msgFilter1) end
 		if prdb.noPYell then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", msgFilter2) end
 		if prdb.noDrunk then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter4)	end
 		if prdb.noDiscovery then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_BG_SYSTEM_NEUTRAL", msgFilter5) end
 	end
 
-	if allFilters then
-		if prdb.noDuel then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter3) end
-		if prdb.achFilterType == 2 then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_ACHIEVEMENT", msgFilter6) end
+	if inCity
+	or (inGarrison and prdb.gChat)
+	or (inOrderHall and prdb.noOrderHall)
+	then
+		if prdb.noNPC then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", msgFilter1) end
+	end
+
+	if prdb.noDuel then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter3) end
+	if prdb.achFilterType == 2 then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_ACHIEVEMENT", msgFilter6) end
+
+	if prdb.noBguard then
+		_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", msgFilter7)
+		_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_COMBAT_FACTION_CHANGE", msgFilter7)
 	end
 
 end
-local function removeMFltrs(allFilters)
+local function removeMFltrs(upd)
 
 	if InCombatLockdown() then
 		aObj:add2Table(aObj.oocTab, {removeMFltrs, {allFilters}})
 		return
 	end
 
-	if not inCity
-	or allFilters
-	then
-		-- remove message filters as required
+	if not inCity then
+		-- remove message filters
 		if prdb.noEmote then
 			_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_EMOTE", msgFilter1)
 			_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_TEXT_EMOTE", msgFilter1)
 			_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_MONSTER_EMOTE", msgFilter1)
 		end
-		if prdb.noNPC then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_MONSTER_SAY", msgFilter1) end
 		if prdb.noPYell then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_YELL", msgFilter2) end
 		if prdb.noDrunk then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter4) end
 		if prdb.noDiscovery then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_BG_SYSTEM_NEUTRAL", msgFilter5) end
 	end
 
-	if allFilters then
-		if prdb.noDuel then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter3) end
-		if prdb.achFilterType == 2 then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_ACHIEVEMENT", msgFilter6) end
+	if not inCity
+	and not inGarrison
+	and not inOrderHall
+	then
+		if prdb.noNPC then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_MONSTER_SAY", msgFilter1) end
+	end
+
+	if prdb.noDuel then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter3) end
+	if prdb.achFilterType == 2 then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_ACHIEVEMENT", msgFilter6) end
+
+	if prdb.noBguard then
+		_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_MONSTER_SAY", msgFilter7)
+		_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_COMBAT_FACTION_CHANGE", msgFilter7)
 	end
 
 end
 local function updateMFltrs()
+	-- called by CheckMode function when events trigger changes
 
 	if InCombatLockdown() then
 		aObj:add2Table(aObj.oocTab, {updateMFltrs, {}})
 		return
 	end
 
-	-- update message filters as required
-	if prdb.noEmote then
-		_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_EMOTE", msgFilter1)
-		_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_TEXT_EMOTE", msgFilter1)
-		_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_EMOTE", msgFilter1)
+	-- update message filters
+	if inCity then
+		-- add message filters
+		if prdb.noEmote then
+			_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_EMOTE", msgFilter1)
+			_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_TEXT_EMOTE", msgFilter1)
+			_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_EMOTE", msgFilter1)
+		end
+		if prdb.noPYell then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", msgFilter2) end
+		if prdb.noDrunk then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter4)	end
+		if prdb.noDiscovery then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_BG_SYSTEM_NEUTRAL", msgFilter5) end
 	else
-		_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_EMOTE", msgFilter1)
-		_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_TEXT_EMOTE", msgFilter1)
-		_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_MONSTER_EMOTE", msgFilter1)
-	end
-	if prdb.noNPC then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", msgFilter1)
-	else _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_MONSTER_SAY", msgFilter1) end
-	if prdb.noPYell then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", msgFilter2)
-	else _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_YELL", msgFilter2) end
-	if prdb.noDuel then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter3)
-	else _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter3) end
-	if prdb.noDrunk then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter4)
-	else _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter4) end
-	if prdb.noDiscovery then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_BG_SYSTEM_NEUTRAL", msgFilter5)
-	else _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_BG_SYSTEM_NEUTRAL", msgFilter5) end
-	if prdb.achFilterType == 2 then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_ACHIEVEMENT", msgFilter6)
-	else _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_ACHIEVEMENT", msgFilter6) end
-
-end
-local function addMGs()
-
-	if InCombatLockdown() then
-		aObj:add2Table(aObj.oocTab, {addMGs, {}})
-		return
+		-- remove message filters
+		if prdb.noEmote then
+			_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_EMOTE", msgFilter1)
+			_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_TEXT_EMOTE", msgFilter1)
+			_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_MONSTER_EMOTE", msgFilter1)
+		end
+		if prdb.noPYell then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_YELL", msgFilter2) end
+		if prdb.noDrunk then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", msgFilter4) end
+		if prdb.noDiscovery then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_BG_SYSTEM_NEUTRAL", msgFilter5) end
 	end
 
-	-- add message groups as required
-	if not prdb.noMYell then _G.ChatFrame_AddMessageGroup(ChatFrame1, "MONSTER_YELL") end
-	if not prdb.noTradeskill then _G.ChatFrame_AddMessageGroup(ChatFrame1, "TRADESKILLS") end
-	if not prdb.noPetInfo then _G.ChatFrame_AddMessageGroup(ChatFrame1, "PET_INFO") end
-	if prdb.achFilterType == 0 then
-		_G.ChatFrame_AddMessageGroup(ChatFrame1, "ACHIEVEMENT")
-		_G.ChatFrame_AddMessageGroup(ChatFrame1, "GUILD_ACHIEVEMENT")
+	if inCity
+	or (inGarrison and prdb.gChat)
+	or (inOrderHall and prdb.noOrderHall)
+	then
+		if prdb.noNPC then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", msgFilter1) end
+	else
+		if prdb.noNPC then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_MONSTER_SAY", msgFilter1) end
 	end
 
 end
-local function removeMGs()
+local function filterMGs()
 
 	if InCombatLockdown() then
-		aObj:add2Table(aObj.oocTab, {removeMGs, {}})
+		aObj:add2Table(aObj.oocTab, {filterMGs, {}})
 		return
 	end
 
-	-- remove message groups as required
+	-- remove message groups
 	if prdb.noMYell then _G.ChatFrame_RemoveMessageGroup(ChatFrame1, "MONSTER_YELL") end
 	if prdb.noTradeskill then _G.ChatFrame_RemoveMessageGroup(ChatFrame1, "TRADESKILLS") end
 	if prdb.noPetInfo then _G.ChatFrame_RemoveMessageGroup(ChatFrame1, "PET_INFO") end
 	if prdb.achFilterType == 1 then
 		_G.ChatFrame_RemoveMessageGroup(ChatFrame1, "ACHIEVEMENT")
 		_G.ChatFrame_RemoveMessageGroup(ChatFrame1, "GUILD_ACHIEVEMENT")
+	end
+
+end
+local function unfilterMGs()
+
+	if InCombatLockdown() then
+		aObj:add2Table(aObj.oocTab, {unfilterMGs, {}})
+		return
+	end
+
+	-- re-add message groups if they were originally enabled
+	if not prdb.noMYell and mGs["MONSTER_YELL"] then _G.ChatFrame_AddMessageGroup(ChatFrame1, "MONSTER_YELL") end
+	if not prdb.noTradeskill and mGs["TRADESKILLS"] then _G.ChatFrame_AddMessageGroup(ChatFrame1, "TRADESKILLS") end
+	if not prdb.noPetInfo and mGs["PET_INFO"] then _G.ChatFrame_AddMessageGroup(ChatFrame1, "PET_INFO") end
+	if prdb.achFilterType == 0 then
+		if mGs["ACHIEVEMENT"] then _G.ChatFrame_AddMessageGroup(ChatFrame1, "ACHIEVEMENT") end
+		if mGs["GUILD_ACHIEVEMENT"] then _G.ChatFrame_AddMessageGroup(ChatFrame1, "GUILD_ACHIEVEMENT") end
 	end
 
 end
@@ -449,8 +537,12 @@ function aObj:OnInitialize()
 		noTradeskill  = false,
 		noMYell		  = false,
 		noPYell		  = false,
+		gChat		  = false,
+		noBguard	  = false,
+		noOrderHall	  = false,
 		iChat		  = true,
 		inInst		  = false,
+		shrink		  = false,
 		-- ChatFrame1 channel settings
 		cf1Channels = {
 			[L["General"]]          = false,
@@ -576,6 +668,11 @@ function aObj:OnInitialize()
 							name = L["NPC/Mob Yells"],
 							desc = L["Mute NPC/Mob Yells."],
 						},
+						noOrderHall = {
+							type = 'toggle',
+							name = L["OrderHall Chat"],
+							desc = L["Mute OrderHall NPC Chat"],
+						},
 					},
 				},
 				city = {
@@ -625,6 +722,25 @@ function aObj:OnInitialize()
 						},
 					},
 				},
+				garrison = {
+					type = "group",
+					order = 4,
+					name = L["Garrison Settings"],
+					desc = L["Change the Garrison Settings"],
+					args = {
+						gChat = {
+							type = 'toggle',
+							width = "double",
+							name = L["General chat in Garrisons"],
+							desc = L["Mute General chat in Garrisons."],
+						},
+						noBguard = {
+							type = 'toggle',
+							name = L["Bodyguard Chat"],
+							desc = L["Mute Bodyguard Chat & Faction updates"],
+						},
+					},
+				},
 			},
 		},
 	}
@@ -653,9 +769,11 @@ function aObj:OnInitialize()
 	end
 	-- runs when the player clicks "Okay"
 	self.optionsFrame[L["Mutes"]].okay = function()
-		updateMFltrs()
-		addMGs()
-		removeMGs()
+		getBGNames()
+		unfilterMGs()
+		removeMFltrs()
+		filterMGs()
+		addMFltrs()
 	end
 
 	-- Slash command handler
@@ -667,7 +785,8 @@ function aObj:OnInitialize()
 		elseif optCheck[input:lower()] then
 			_G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame[optCheck[input:lower()]])
 		elseif input:lower() == "status" then
-			aObj:Print("City mode:", inCity, "Taxi:", onTaxi, "Instance:", prdb.inInst)
+			aObj:Print("City mode:", inCity, "Taxi:", onTaxi, "Scenario:", inScenario, "Instance:", prdb.inInst)
+			aObj:Print("Garrison:", inGarrison, "Bodyguard mode:", prdb.noBguard, "OrderHall mode:", prdb.noOrderHall)
 		elseif input:lower() == "loud" then
 			aObj.debugLevel = 5
 			aObj:Print("Debug messages ON")
@@ -675,7 +794,10 @@ function aObj:OnInitialize()
 			aObj.debugLevel = 1
 			aObj:Print("Debug messages OFF")
 		elseif input:lower() == "locate" then
-			aObj:Print("You Are Here:", _G.GetRealZoneText(), _G.GetSubZoneText(), GetCurrentMapAreaID())
+			aObj:Print("You Are Here:", _G.GetRealZoneText(), _G.GetSubZoneText(), _G.GetCurrentMapAreaID())
+		elseif input:lower() == "shrink" then
+			prdb.shrink = true
+			self.DBObj.text = updateDBtext()
 		else
 			LibStub("AceConfigCmd-3.0"):HandleCommand(aName, aName, input)
 		end
@@ -708,12 +830,20 @@ end
 function aObj:OnEnable()
 	self:LevelDebug(5, "OnEnable")
 
+	-- get existing Message Group settings
+	getMGSettings()
+
 	-- register required events
 	enableEvents()
-	-- add message filters as required
-	addMFltrs(true)
-	-- remove message groups as required
-	removeMGs()
+
+	-- get Bodyguard follower names
+	getBGNames()
+
+	-- remove message groups
+	filterMGs()
+
+	-- add message filters
+	addMFltrs()
 
 	-- handle profile changes
 	self.db.RegisterCallback(self, "OnProfileChanged", "ReloadAddon")
@@ -729,10 +859,10 @@ function aObj:OnDisable()
 
 	-- unregister events
 	self:UnregisterAllEvents()
-	-- remove message filters as required
-	removeMFltrs(true)
-	-- add message groups as required
-	addMGs()
+	-- re-add message groups
+	unfilterMGs()
+	-- remove message filters
+	removeMFltrs()
 
 	-- turn channels back on
 	for channel, on in pairs(prdb.cf1Channels) do
@@ -770,9 +900,9 @@ end
 local function isGarrison(str)
 	return str:find("Garrison Level") and true or false
 end
-function aObj:CheckMode(...)
+function aObj:CheckMode(event, ...)
 
-	local event = select(1, ...)
+	-- local event = select(1, ...)
 	self:LevelDebug(2, "CheckMode: [%s]", event)
 
 	-- if WorldMapFrame currently open defer check until it is closed
@@ -910,9 +1040,19 @@ function aObj:CheckMode(...)
 		inGarrison = false
 	end
 
+	--> OrderHall Handler <--
+	self:LevelDebug(4, "OrderHall Handler", orderHalls[GetCurrentMapAreaID()])
+	if orderHalls[GetCurrentMapAreaID()] then
+		if not inOrderHall then
+			inOrderHall = true
+			if prdb.chatback then self:Print(L["OrderHall mode enabled"]) end
+		end
+	else
+		inOrderHall = false
+	end
+
 	-- update message filters
-	addMFltrs()
-	removeMFltrs()
+	updateMFltrs()
 
 	-- update DB object text
 	self.DBObj.text = updateDBtext()
