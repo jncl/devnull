@@ -6,13 +6,3 @@ Legend:
 	x			- indicates nothing to change
 	¶ is Alt+7	- indicates localisation changes required
 	I/O			- Issue(Bug)/Other change
-
-√	I	- Honour existing Chat settings
-
-	I	Garrison Chat
-√		- Options
-√		- Localisations
-
-	I 	OrderHall Chat
-√		- Options
-√		- Localisations
