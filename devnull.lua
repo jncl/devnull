@@ -93,9 +93,10 @@ local nullAreas = {
 	[SZL["Foothold Citadel"]]        = true, -- in Theramore Isle
 	[SZL["The Darkmoon Faire"]]      = true, -- Darkmoon Island (patch 4.3)
 	[SZL["KTC Headquarters"]]        = true, -- Goblin starting area (Cataclysm)
-	-- [GetMapNameByID(799)]            = true, -- Karazhan
+	-- [GetMapNameByID(799)]         = true, -- Karazhan
 	[SZL["Krom'gar Fortress"]]       = true, -- Horde Base in Stonetalon Mts (Cataclysm)
 	[SZL["The Celestial Court"]]     = true, -- Timeless Isle (MoP)
+	[SZL["The Vindicaar"]]           = true, -- The Vindicaar (Legion [Argus])
 }
 local checkZones = {
 	-- used for smaller area changes
