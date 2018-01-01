@@ -782,6 +782,7 @@ function aObj:OnInitialize()
 		if not input or input:trim() == "" then
 			-- Open general panel if there are no parameters
 			_G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame)
+			_G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame)
 		elseif optCheck[input:lower()] then
 			_G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame[optCheck[input:lower()]])
 		elseif input:lower() == "status" then
