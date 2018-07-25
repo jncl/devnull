@@ -2,7 +2,7 @@ local aName, aObj = ...
 local _G = _G
 
 local pairs, ipairs, type, rawget, tostring, select, unpack, table, output, date, wipe = _G.pairs, _G.ipairs, _G.type, _G.rawget, _G.tostring, _G.select, _G.unpack, _G.table, _G.output, _G.date, _G.wipe
-local LibStub, InCombatLockdown, ChatFrame1, GetMapNameByID, GetCurrentMapAreaID = _G.LibStub, _G.InCombatLockdown, _G.ChatFrame1, _G.GetMapNameByID, _G.GetCurrentMapAreaID
+local LibStub, InCombatLockdown, ChatFrame1 = _G.LibStub, _G.InCombatLockdown, _G.ChatFrame1
 
 -- check to see if required libraries are loaded
 assert(LibStub, aName.." requires LibStub")
@@ -22,11 +22,37 @@ aObj.shrink = false
 aObj.player = UnitName("player")
 aObj.pet = UnitName("pet")
 
+local betaInfo = {"8.0.1", 27165}
+local ptrInfo = {"8.0.1", 27165}
+
+local buildInfo, portal = {_G.GetBuildInfo()}, _G.GetCVar("portal") or nil
+
+aObj.isBeta = aObj.isBeta or buildInfo[1] == betaInfo[1] and _G.tonumber(buildInfo[2]) == betaInfo[2] and true or false
+aObj.isPTR = aObj.isPTR or buildInfo[1] == ptrInfo[1] and _G.tonumber(buildInfo[2]) == ptrInfo[2] and true or false
+if aObj.isBeta then
+	aObj.isPTR = false
+end
+if aObj.isPTR then
+	_G.DEFAULT_CHAT_FRAME:AddMessage(aName .. " - Version No. updated, any PTR changes to be applied?", 1, 0, 0, nil, true)
+	aObj.isBeta = true
+end
+ptrInfo, betaInfo, buildInfo, portal = nil, nil, nil, nil
+
+-- Beta Mapping functions
+local function GetMapNameByID(id)
+	-- _G.print("GetMapInfo:", _G.C_Map.GetMapInfo(id)["name"])
+	return _G.C_Map.GetMapInfo(id)["name"]
+end
+local function GetCurrentMapAreaID()
+	-- _G.print("Current Map Area ID:", _G.C_Map.GetBestMapForUnit("player"))
+	return _G.C_Map.GetBestMapForUnit("player") or nil
+end
+
 -- Get Locale
 local L = LibStub("AceLocale-3.0"):GetLocale(aName)
 local SZL = LibStub("LibBabble-SubZone-3.0"):GetLookupTable()
 
-local prdb, inCity, onTaxi, exitedInst, inScenario, inGarrison, inOrderHall
+local prdb, inHub, onTaxi, exitedInst, inScenario, inGarrison, inOrderHall, inVehicle
 
 local mGs = {
 	["MONSTER_YELL"] = false,
@@ -45,27 +71,70 @@ local function getMGSettings()
 
 end
 -- Map IDs can be found here: http://wowpedia.org/MapID
-local nullCities = {
+-- These have been changed in BfA and a transitional list can be found here:
+-- AddOns/Blizzard_Deprecated/UIMapIDToWorldMapAreaID.lua
+local nullHubs, checkZones, garrisonZones, orderHalls
+nullHubs = {
 	-- Kalimdor
-	[GetMapNameByID(321)] = true, -- Orgrimmar
-	[GetMapNameByID(362)] = true, -- Thunder Bluff
-	[GetMapNameByID(381)] = true, -- Darnassus
-	[GetMapNameByID(471)] = true, -- The Exodar
+	[GetMapNameByID(85)] = true, -- Orgrimmar
+	[GetMapNameByID(88)] = true, -- Thunder Bluff
+	[GetMapNameByID(89)] = true, -- Darnassus
+	[GetMapNameByID(103)] = true, -- The Exodar
 	-- Eastern Kingdoms
-	[GetMapNameByID(301)] = true, -- Stormwind City
-	[GetMapNameByID(341)] = true, -- Ironforge
-	[GetMapNameByID(382)] = true, -- Undercity
-	[GetMapNameByID(480)] = true, -- Silvermoon City
+	[GetMapNameByID(84)] = true, -- Stormwind City
+	[GetMapNameByID(87)] = true, -- Ironforge
+	[GetMapNameByID(998)] = true, -- Undercity
+	[GetMapNameByID(110)] = true, -- Silvermoon City
 	-- Outland (TBC)
-	[GetMapNameByID(481)] = true, -- Shattrath City
+	[GetMapNameByID(111)] = true, -- Shattrath City
 	-- Northrend (WotLK)
-	[GetMapNameByID(504)] = true, -- Dalaran
+	[GetMapNameByID(125)] = true, -- Dalaran
 	-- Pandaria (MoP)
-	[GetMapNameByID(903)] = true, -- Shrine of Two Moons (Horde)
-	[GetMapNameByID(905)] = true, -- Shrine of Seven Stars (Alliance)
+	[GetMapNameByID(391)--[[392]]] = true, -- Shrine of Two Moons (Horde)
+	[GetMapNameByID(393)--[[394]]] = true, -- Shrine of Seven Stars (Alliance)
 	-- Ashran (Draenor)
-	[GetMapNameByID(1009)] = true, -- Stormshield (Alliance)
-	[GetMapNameByID(1011)] = true, -- Warspear (Horde)
+	[GetMapNameByID(622)] = true, -- Stormshield (Alliance)
+	[GetMapNameByID(624)] = true, -- Warspear (Horde)
+	-- Boralus (BfA)
+	["Boralus Harbor"] = true, -- (Alliance)
+	["Stormsong Monastery"] = true, -- (Alliance)
+}
+checkZones = {
+	-- used for smaller area changes
+	[GetMapNameByID(10)]  = true, -- Northern Barrens (for Ratchet)
+	[GetMapNameByID(37)]  = true, -- Elwynn Forest (for Goldshire)
+	[GetMapNameByID(42)]  = true, -- Deadwind Pass (for Karazhan)
+	[GetMapNameByID(65)]  = true, -- Stonetalon Mountains (for Krom'gar Fortess)
+	[GetMapNameByID(70)] = true, -- Dustwallow Marsh (for Theramore Isle)
+	[GetMapNameByID(71)] = true, -- Tanaris (for Gadgetzan)
+	[GetMapNameByID(83)] = true, -- Winterspring (for Everlook)
+	[GetMapNameByID(100)] = true, -- Hellfire Peninsula (for Honor Hold)
+	[GetMapNameByID(109)] = true, -- Netherstorm (for Area 52)
+	[GetMapNameByID(114)] = true, -- Borean Tundra (for Valiance Keep/Warsong Hold)
+	[GetMapNameByID(117)] = true, -- Howling Fjord (for Valgarde/Vengeance Landing)
+	[GetMapNameByID(210)] = true, -- The Cape of Stranglethorn (for Booty Bay)
+	[GetMapNameByID(194)] = true, -- Kezan (for KTC Headquarters)
+	[GetMapNameByID(554)] = true, -- Timeless Isle
+}
+garrisonZones = {
+	[582] = true, -- Lunarfall (Alliance)
+	[590] = true, -- Frostwall (Horde)
+}
+orderHalls = {
+	[695] = true, -- Skyhold (Warrior)
+	[702] = true, -- Netherlight Temple (Priest)
+	[709] = true, -- The Wandering Isle (Monk)
+	[719] = true, -- Mardum, the Shattered Abyss (Demon Hunter)
+	-- [726] = true, -- The Heart of Azeroth (Shaman)
+	[734] = true, -- Hall of the Guardian (Mage)
+	[739] = true, -- Trueshot Lodge (Hunter)
+	[747] = true, -- The Dreamgrove (Druid)
+}
+local checkZonesByID = {
+	[862] = true, -- Zuldazar (Horde)
+	[895] = true, -- Tiragarde Sound (Alliance)
+	[1161] = true, -- Boralus (Alliance)
+	[1165] = true, -- Dazar'alor (Horde)
 }
 local nullTowns = {
 	-- Kalimdor
@@ -87,61 +156,44 @@ local nullTowns = {
 	[SZL["Vengeance Landing"]] = true, -- Howling Fjord (Horde)
 	[SZL["Valgarde"]]          = true, -- Howling Fjord (Alliance)
 }
+local nullTownsByID = {
+	-- Kul Tiras (BfA)
+	[1161] = true, -- Boralus, Tiragarde Sound (Alliance)
+	-- Zandalar (BfA)
+	[1163] = true, -- Dazar'alor [The Great Seal], Zuldazar (Horde)
+	[1165] = true, -- Dazar'alor, Zuldazar (Horde)
+}
 local nullAreas = {
 	[SZL["The Old Port Authority"]]  = true, -- in BB
 	[SZL["The Salty Sailor Tavern"]] = true, -- in BB
 	[SZL["Foothold Citadel"]]        = true, -- in Theramore Isle
 	[SZL["The Darkmoon Faire"]]      = true, -- Darkmoon Island (patch 4.3)
 	[SZL["KTC Headquarters"]]        = true, -- Goblin starting area (Cataclysm)
-	-- [GetMapNameByID(799)]         = true, -- Karazhan
+	[SZL["Karazhan"]]                = true, -- Karazhan
 	[SZL["Krom'gar Fortress"]]       = true, -- Horde Base in Stonetalon Mts (Cataclysm)
 	[SZL["The Celestial Court"]]     = true, -- Timeless Isle (MoP)
 	[SZL["The Vindicaar"]]           = true, -- The Vindicaar (Legion [Argus])
-}
-local checkZones = {
-	-- used for smaller area changes
-	[GetMapNameByID(11)]  = true, -- Northern Barrens (for Ratchet)
-	[GetMapNameByID(30)]  = true, -- Elwynn Forest (for Goldshire)
-	[GetMapNameByID(32)]  = true, -- Deadwind Pass (for Karazhan)
-	[GetMapNameByID(81)]  = true, -- Stonetalon Mountains (for Krom'gar Fortess)
-	[GetMapNameByID(141)] = true, -- Dustwallow Marsh (for Theramore Isle)
-	[GetMapNameByID(161)] = true, -- Tanaris (for Gadgetzan)
-	[GetMapNameByID(281)] = true, -- Winterspring (for Everlook)
-	[GetMapNameByID(465)] = true, -- Hellfire Peninsula (for Honor Hold)
-	[GetMapNameByID(479)] = true, -- Netherstorm (for Area 52)
-	[GetMapNameByID(486)] = true, -- Borean Tundra (for Valiance Keep/Warsong Hold)
-	[GetMapNameByID(491)] = true, -- Howling Fjord (for Valgarde/Vengeance Landing)
-	[GetMapNameByID(673)] = true, -- The Cape of Stranglethorn (for Booty Bay)
-	[GetMapNameByID(605)] = true, -- Kezan (for KTC Headquarters)
-	[GetMapNameByID(951)] = true, -- Timeless Isle
-}
-local garrisonZones = {
-	[971] = true, -- Lunarfall (Alliance)
-	[976] = true, -- Frostwall (Horde)
-}
-local orderHalls = {
-	[1035] = true, -- Skyhold (Warrior)
-	[1040] = true, -- Netherlight Temple (Priest)
-	[1044] = true, -- The Wandering Isle (Monk)
-	[1052] = true, -- Mardum, the Shattered Abyss (Demon Hunter)
-	[1057] = true, -- The Heart of Azeroth (Shaman)
-	[1068] = true, -- Hall of the Guardian (Mage)
-	[1072] = true, -- Trueshot Lodge (Hunter)
-	[1077] = true, -- The Dreamgrove (Druid)
+	["Upton Borough"]                = true, -- Boralus Hub (BfA)
 }
 local checkEvent = {
 	["ZONE_CHANGED_INDOORS"]  = true, -- for tunnel into Booty Bay
-	["ZONE_CHANGED_NEW_AREA"] = true, -- used to handle most changes of area
 	["ZONE_CHANGED"]          = true, -- used to handle boat trips
+	["ZONE_CHANGED_NEW_AREA"] = true, -- used to handle most changes of area
 	["PLAYER_CONTROL_GAINED"] = true, -- this is for taxi check
 	["SCENARIO_UPDATE"]       = true, -- this is for scenario check
+	["UNIT_EXITED_VEHICLE"]   = false, -- this is used when in a vehicle
 }
 local trackEvent = {
+	["ZONE_CHANGED_INDOORS"]  = false, -- for tunnel into Booty Bay & Boralus Harbor
+	["ZONE_CHANGED"]		  = false, -- this is for changes of sub area
 	["ZONE_CHANGED_NEW_AREA"] = true, -- this is for changes of area
 	["PLAYER_LEAVING_WORLD"]  = true, -- this is for boat trips
 	["PLAYER_CONTROL_LOST"]   = true, -- this is for taxi check
+	["PLAYER_CONTROL_GAINED"] = false, -- this is for taxi check
 	["PLAYER_ENTERING_WORLD"] = true, -- this is for garrison check
 	["SCENARIO_UPDATE"]       = true, -- this is for scenario check
+	["UNIT_ENTERED_VEHICLE"]  = true, -- this is used when in a vehicle
+	["UNIT_EXITED_VEHICLE"]   = false, -- this is used when in a vehicle
 }
 local bodyguardNames = {
 	-- Tormmok [193]
@@ -165,11 +217,15 @@ local function getBGNames()
 end
 local function enableEvents()
 
-	aObj:LevelDebug(5, "enableEvents:", onTaxi, _G.UnitOnTaxi("player"))
+	aObj:LevelDebug(5, "enableEvents:", onTaxi, _G.UnitOnTaxi("player"), inVehicle, _G.UnitInVehicle("player"))
 	if not onTaxi and _G.UnitOnTaxi("player") then -- on Taxi
 		aObj:LevelDebug(3, "on Taxi")
 		aObj:RegisterEvent("PLAYER_CONTROL_GAINED", "CheckMode")
 		onTaxi = true
+	elseif not inVehicle and _G.UnitInVehicle("player") then -- in Vehicle
+		aObj:LevelDebug(3, "in Vehicle")
+		aObj:RegisterEvent("UNIT_EXITED_VEHICLE", "CheckMode")
+		inVehicle = true
 	else
 		aObj:LevelDebug(3, "registering normal events")
 		-- register required events
@@ -182,11 +238,12 @@ end
 local function updateDBtext()
 
 	local status =  onTaxi and L["Taxi"]
+	or inVehicle and L["Vehicle"]
 	or prdb.inInst and L["Instance"]
 	or inScenario and L["Scenario"]
 	or inGarrison and L["Garrison"]
 	or inOrderHall and L["OrderHall"]
-	or inCity and L["City"]
+	or inHub and L["City"]
 	or L["Off"]
 
 	return prdb.shrink and status:sub(1, 1) or status
@@ -257,7 +314,7 @@ function aObj:Debug(a1, ...)
 
 end
 
-function aObj:LevelDebug(lvl, a1, ...) if self.debugLevel >= lvl then self:Debug(a1, ...) end end
+function aObj:LevelDebug(lvl, a1, ...) if lvl <= self.debugLevel then self:Debug(a1, ...) end end
 --@end-debug@
 --[===[@non-debug@
 function aObj:Debug() end
@@ -379,7 +436,7 @@ local function addMFltrs()
 		return
 	end
 
-	if inCity then
+	if inHub then
 		-- add message filters
 		if prdb.noEmote then
 			_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_EMOTE", msgFilter1)
@@ -391,7 +448,7 @@ local function addMFltrs()
 		if prdb.noDiscovery then _G.ChatFrame_AddMessageEventFilter("CHAT_MSG_BG_SYSTEM_NEUTRAL", msgFilter5) end
 	end
 
-	if inCity
+	if inHub
 	or (inGarrison and prdb.gChat)
 	or (inOrderHall and prdb.noOrderHall)
 	then
@@ -414,7 +471,7 @@ local function removeMFltrs(upd)
 		return
 	end
 
-	if not inCity then
+	if not inHub then
 		-- remove message filters
 		if prdb.noEmote then
 			_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_EMOTE", msgFilter1)
@@ -426,7 +483,7 @@ local function removeMFltrs(upd)
 		if prdb.noDiscovery then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_BG_SYSTEM_NEUTRAL", msgFilter5) end
 	end
 
-	if not inCity
+	if not inHub
 	and not inGarrison
 	and not inOrderHall
 	then
@@ -451,7 +508,7 @@ local function updateMFltrs()
 	end
 
 	-- update message filters
-	if inCity then
+	if inHub then
 		-- add message filters
 		if prdb.noEmote then
 			_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_EMOTE", msgFilter1)
@@ -473,7 +530,7 @@ local function updateMFltrs()
 		if prdb.noDiscovery then _G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_BG_SYSTEM_NEUTRAL", msgFilter5) end
 	end
 
-	if inCity
+	if inHub
 	or (inGarrison and prdb.gChat)
 	or (inOrderHall and prdb.noOrderHall)
 	then
@@ -780,6 +837,8 @@ function aObj:OnInitialize()
 	-- Slash command handler
 	local function chatCommand(input)
 
+		local cmds = { (" "):split(input) }
+
 		if not input or input:trim() == "" then
 			-- Open general panel if there are no parameters
 			_G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame)
@@ -787,7 +846,7 @@ function aObj:OnInitialize()
 		elseif optCheck[input:lower()] then
 			_G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame[optCheck[input:lower()]])
 		elseif input:lower() == "status" then
-			aObj:Print("City mode:", inCity, "Taxi:", onTaxi, "Scenario:", inScenario, "Instance:", prdb.inInst)
+			aObj:Print("City mode:", inHub, "Taxi:", onTaxi, "Vehicle:", inVehicle, "Scenario:", inScenario, "Instance:", prdb.inInst)
 			aObj:Print("Garrison:", inGarrison, "Bodyguard mode:", prdb.noBguard, "OrderHall mode:", prdb.noOrderHall)
 		elseif input:lower() == "loud" then
 			aObj.debugLevel = 5
@@ -796,10 +855,27 @@ function aObj:OnInitialize()
 			aObj.debugLevel = 1
 			aObj:Print("Debug messages OFF")
 		elseif input:lower() == "locate" then
-			aObj:Print("You Are Here:", _G.GetRealZoneText(), _G.GetSubZoneText(), _G.GetCurrentMapAreaID())
+			_G.C_Map.GetBestMapForUnit("player")
+			aObj:Print("You Are Here: [", _G.GetRealZoneText(), "][", _G.GetSubZoneText(), "][", GetCurrentMapAreaID(), "]")
+		elseif input:lower() == "mapinfo" then
+			uiMapID = _G.C_Map.GetBestMapForUnit("player")
+			mapinfo = _G.C_Map.GetMapInfo(uiMapID)
+			posn = _G.C_Map.GetPlayerMapPosition(uiMapID, "player")
+			areaName= _G.MapUtil.FindBestAreaNameAtMouse(uiMapID, posn["x"], posn["y"])
+			aObj:Print("Map Info:", mapinfo["mapID"], mapinfo["name"], mapinfo["mapType"], mapinfo["parentMapID"], posn["x"], posn["y"], areaName)
 		elseif input:lower() == "shrink" then
 			prdb.shrink = true
 			self.DBObj.text = updateDBtext()
+		elseif cmds[1]:lower() == "sam" then
+			for i = 1, 1200 do
+				self:Debug("GetMapInfo:", i, _G.C_Map.GetMapInfo(i) and _G.C_Map.GetMapInfo(i)["name"] or "")
+			end
+		elseif cmds[1]:lower() == "sm4" then
+			for i = 1, 1200 do
+				if _G.C_Map.GetMapInfo(i) and _G.C_Map.GetMapInfo(i)["name"]:find(cmds[2]) then
+					_G.print("GetMapInfo:", i, _G.C_Map.GetMapInfo(i) and _G.C_Map.GetMapInfo(i)["name"])
+				end
+			end
 		else
 			LibStub("AceConfigCmd-3.0"):HandleCommand(aName, aName, input)
 		end
@@ -857,7 +933,7 @@ end
 function aObj:OnDisable()
 	self:LevelDebug(5, "OnDisable")
 
-	inCity, exitedInst, inScenario, inGarrison = nil, nil, nil ,nil
+	inHub, exitedInst, inScenario, inGarrison = nil, nil, nil ,nil
 
 	-- unregister events
 	self:UnregisterAllEvents()
@@ -905,7 +981,7 @@ end
 function aObj:CheckMode(event, ...)
 
 	-- local event = select(1, ...)
-	self:LevelDebug(2, "CheckMode: [%s]", event)
+	self:LevelDebug(2, "CheckMode: [%s, %s]", event, ... or "nil")
 
 	-- if WorldMapFrame currently open defer check until it is closed
 	if _G.WorldMapFrame:IsShown() then
@@ -916,28 +992,6 @@ function aObj:CheckMode(event, ...)
 			end)
 		end
 		return
-	end
-
-	-- force map change to get correct info
-	_G.SetMapToCurrentZone()
-	local rZone, rSubZone = _G.GetRealZoneText(), _G.GetSubZoneText()
-	self:LevelDebug(3, "You Are Here: [%s:%s, %s]", rZone or "<Anon>", rSubZone or "<Anon>", GetCurrentMapAreaID())
-	local instInfo = {_G.GetInstanceInfo()}
-	self:LevelDebug(4, "inInstance#1: [%s, %s, %s, %s, %s]", prdb.inInst, instInfo[2], instInfo[1], instInfo[9], instInfo[8])
-
-	-- handle zones when ZONE_CHANGED_NEW_AREA isn't good enough
-	if checkZones[rZone] then
-		self:LevelDebug(4, "checkZone - ZONE_CHANGED event registered")
-		self:RegisterEvent("ZONE_CHANGED", "CheckMode")
-	else
-		self:UnregisterEvent("ZONE_CHANGED")
-	end
-
-	-- handle this for the tunnel into Booty Bay
-	if rZone == GetMapNameByID(673) then -- The Cape of Stranglethorn
-		self:RegisterEvent("ZONE_CHANGED_INDOORS", "CheckMode")
-	else
-		self:UnregisterEvent("ZONE_CHANGED_INDOORS")
 	end
 
 	-- if flying then disable events
@@ -958,6 +1012,57 @@ function aObj:CheckMode(event, ...)
 		self:UnregisterEvent(event)
 		enableEvents()
 		onTaxi = false
+	end
+
+	-- if in a vehicle then disable events
+	if event == "UNIT_ENTERED_VEHICLE"
+	and _G.select(1, ...) == "player"
+	then
+		self:LevelDebug(5, "UNIT_ENTERED_VEHICLE", GetCurrentMapAreaID())
+		self:UnregisterAllEvents()
+		self:RegisterEvent("UNIT_EXITED_VEHICLE", "CheckMode")
+		inVehicle = true
+		self.DBObj.text = updateDBtext()
+		return
+	-- if finished flying then enable events
+	elseif event == "UNIT_EXITED_VEHICLE"
+	then
+		self:LevelDebug(5, "UNIT_EXITED_VEHICLE", GetCurrentMapAreaID())
+		self:UnregisterEvent(event)
+		enableEvents()
+		inVehicle = false
+	end
+
+	-- force map change to get correct info
+	-- _G.SetMapToCurrentZone()
+	local rZone, rSubZone = _G.GetRealZoneText(), _G.GetSubZoneText()
+	self:LevelDebug(3, "You Are Here: [%s:%s, %s]", rZone or "<Anon>", rSubZone or "<Anon>", GetCurrentMapAreaID())
+	local instInfo = {_G.GetInstanceInfo()}
+	self:LevelDebug(4, "inInstance#1: [%s, %s, %s, %s, %s]", prdb.inInst, instInfo[2], instInfo[1], instInfo[9], instInfo[8])
+
+	-- handle zones when ZONE_CHANGED_NEW_AREA isn't good enough
+	if checkZones[rZone]
+	or checkZonesByID[GetCurrentMapAreaID()]
+	then
+		self:LevelDebug(4, "checkZone - ZONE_CHANGED event registered")
+		trackEvent["ZONE_CHANGED"] = true
+		self:RegisterEvent("ZONE_CHANGED", "CheckMode")
+	else
+		self:LevelDebug(4, "checkZone - ZONE_CHANGED event unregistered")
+		trackEvent["ZONE_CHANGED"] = false
+		self:UnregisterEvent("ZONE_CHANGED")
+	end
+
+	-- handle this for the tunnel into Booty Bay & Harbormaster's Office
+	if rZone == GetMapNameByID(210) -- The Cape of Stranglethorn
+	then
+		self:LevelDebug(4, "checkZone - ZONE_CHANGED_INDOORS event registered")
+		trackEvent["ZONE_CHANGED_INDOORS"] = true
+		self:RegisterEvent("ZONE_CHANGED_INDOORS", "CheckMode")
+	else
+		self:LevelDebug(4, "checkZone - ZONE_CHANGED_INDOORS event unregistered")
+		trackEvent["ZONE_CHANGED_INDOORS"] = false
+		self:UnregisterEvent("ZONE_CHANGED_INDOORS")
 	end
 
 	--> Pre Event Handler <--
@@ -983,18 +1088,19 @@ function aObj:CheckMode(event, ...)
 	end
 
 	--> Event Handler <--
-	self:LevelDebug(4, "Event Handler", nullCities[rZone], nullTowns[rSubZone], nullAreas[rSubZone])
-	if nullCities[rZone]
+	self:LevelDebug(4, "Event Handler", nullHubs[rZone], nullTowns[rSubZone], nullTownsByID[GetCurrentMapAreaID()], nullAreas[rSubZone])
+	if nullHubs[rZone]
 	or nullTowns[rSubZone]
+	or nullTownsByID[GetCurrentMapAreaID()]
 	or nullAreas[rSubZone]
 	then
-		if not inCity then
-			inCity = true
+		if not inHub then
+			inHub = true
 			if prdb.chatback then self:Print(L["City/Town mode enabled"]) end
 		end
 	else
-		if inCity then
-			inCity = false
+		if inHub then
+			inHub = false
 			if prdb.chatback then self:Print(L["City/Town mode disabled"]) end
 		end
 	end
