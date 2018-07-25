@@ -5,8 +5,8 @@ local pairs, ipairs, type, rawget, tostring, select, unpack, table, output, date
 local LibStub, InCombatLockdown, ChatFrame1 = _G.LibStub, _G.InCombatLockdown, _G.ChatFrame1
 
 -- check to see if required libraries are loaded
-assert(LibStub, aName.." requires LibStub")
-for _, lib in pairs{"CallbackHandler-1.0", "AceAddon-3.0", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0", "AceLocale-3.0", "LibBabble-SubZone-3.0", "AceDB-3.0", "AceDBOptions-3.0", "AceGUI-3.0",  "AceConfig-3.0", "AceConfigCmd-3.0", "AceConfigRegistry-3.0", "AceConfigDialog-3.0", "LibDataBroker-1.1",} do
+assert(LibStub, aName .. " requires LibStub")
+for _, lib in pairs{"CallbackHandler-1.0", "AceAddon-3.0", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0", "AceLocale-3.0", "AceDB-3.0", "AceDBOptions-3.0", "AceGUI-3.0",  "AceConfig-3.0", "AceConfigCmd-3.0", "AceConfigRegistry-3.0", "AceConfigDialog-3.0", "LibDataBroker-1.1", "LibBabble-SubZone-3.0"} do
 	assert(LibStub:GetLibrary(lib, true), aName .. " requires " .. lib)
 end
 
