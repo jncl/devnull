@@ -6,3 +6,8 @@ Legend:
 	x			- indicates nothing to change
 	¶ is Alt+7	- indicates localisation changes required
 	I/O			- Issue(Bug)/Other change
+
+	I	Missing Localisation, reported by txamethyst, 26.05.17
+√		- OrderHall mode enabled
+
+√	I	Not working for BfA, reported by txamethyst, 25.07.18
