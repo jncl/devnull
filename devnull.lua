@@ -867,16 +867,6 @@ function aObj:OnInitialize()
 		elseif input:lower() == "shrink" then
 			prdb.shrink = true
 			self.DBObj.text = updateDBtext()
-		elseif cmds[1]:lower() == "sam" then
-			for i = 1, 1200 do
-				self:Debug("GetMapInfo:", i, _G.C_Map.GetMapInfo(i) and _G.C_Map.GetMapInfo(i)["name"] or "")
-			end
-		elseif cmds[1]:lower() == "sm4" then
-			for i = 1, 1200 do
-				if _G.C_Map.GetMapInfo(i) and _G.C_Map.GetMapInfo(i)["name"]:find(cmds[2]) then
-					_G.print("GetMapInfo:", i, _G.C_Map.GetMapInfo(i) and _G.C_Map.GetMapInfo(i)["name"])
-				end
-			end
 		else
 			LibStub("AceConfigCmd-3.0"):HandleCommand(aName, aName, input)
 		end
