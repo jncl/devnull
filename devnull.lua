@@ -845,6 +845,7 @@ function aObj:OnInitialize()
 			_G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame)
 		elseif optCheck[input:lower()] then
 			_G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame[optCheck[input:lower()]])
+			_G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame[optCheck[input:lower()]])
 		elseif input:lower() == "status" then
 			aObj:Print("City mode:", inHub, "Taxi:", onTaxi, "Vehicle:", inVehicle, "Scenario:", inScenario, "Instance:", prdb.inInst)
 			aObj:Print("Garrison:", inGarrison, "Bodyguard mode:", prdb.noBguard, "OrderHall mode:", prdb.noOrderHall)
