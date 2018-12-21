@@ -22,8 +22,8 @@ aObj.shrink = false
 aObj.player = UnitName("player")
 aObj.pet = UnitName("pet")
 
-local betaInfo = {"8.0.1", 27326}
-local ptrInfo = {"8.0.1", 27326}
+local betaInfo = {"9.0.0", 99999}
+local ptrInfo = {"8.1.0", 99999}
 
 local buildInfo, portal = {_G.GetBuildInfo()}, _G.GetCVar("portal") or nil
 
