@@ -19,236 +19,14 @@ aObj.debugLevel = 1
 -- specify status text size
 aObj.shrink = false
 -- store player and pet names
-aObj.player = UnitName("player")
-aObj.pet = UnitName("pet")
+aObj.player = _G.UnitName("player")
+aObj.pet = _G.UnitName("pet")
 
-local betaInfo = {"9.0.0", 99999}
-local ptrInfo = {"8.1.0", 99999}
+local agentUID = _G.GetCVar("agentUID")
+aObj.isClassic = agentUID:find("wow_classic") and true or false
+aObj.isPTR = agentUID:find("wow_ptr_") and true or false
+agentUID = nil
 
-local buildInfo, portal = {_G.GetBuildInfo()}, _G.GetCVar("portal") or nil
-
-aObj.isBeta = aObj.isBeta or buildInfo[1] == betaInfo[1] and _G.tonumber(buildInfo[2]) == betaInfo[2] and true or false
-aObj.isPTR = aObj.isPTR or buildInfo[1] == ptrInfo[1] and _G.tonumber(buildInfo[2]) == ptrInfo[2] and true or false
-if aObj.isBeta then
-	aObj.isPTR = false
-end
-if aObj.isPTR then
-	_G.DEFAULT_CHAT_FRAME:AddMessage(aName .. " - Version No. updated, any PTR changes to be applied?", 1, 0, 0, nil, true)
-	aObj.isBeta = true
-end
-ptrInfo, betaInfo, buildInfo, portal = nil, nil, nil, nil
-
--- Beta Mapping functions
-local function GetMapNameByID(id)
-	-- _G.print("GetMapInfo:", _G.C_Map.GetMapInfo(id)["name"])
-	return _G.C_Map.GetMapInfo(id)["name"]
-end
-local function GetCurrentMapAreaID()
-	-- _G.print("Current Map Area ID:", _G.C_Map.GetBestMapForUnit("player"))
-	return _G.C_Map.GetBestMapForUnit("player") or nil
-end
-
--- Get Locale
-local L = LibStub("AceLocale-3.0"):GetLocale(aName)
-local SZL = LibStub("LibBabble-SubZone-3.0"):GetLookupTable()
-
-local prdb, inHub, onTaxi, exitedInst, inScenario, inGarrison, inOrderHall, inVehicle
-
-local mGs = {
-	["MONSTER_YELL"] = false,
-	["TRADESKILLS"] = false,
-	["PET_INFO"] = false,
-	["ACHIEVEMENT"] = false,
-	["GUILD_ACHIEVEMENT"] = false,
-}
-local function getMGSettings()
-
-	for group, _ in pairs(mGs) do
-		if _G.tContains(ChatFrame1.messageTypeList, group) then
-			mGs[group] = true
-		end
-	end
-
-end
--- Map IDs can be found here: http://wowpedia.org/MapID
--- These have been changed in BfA and a transitional list can be found here:
--- AddOns/Blizzard_Deprecated/UIMapIDToWorldMapAreaID.lua
-local nullHubs, checkZones, garrisonZones, orderHalls
-nullHubs = {
-	-- Kalimdor
-	[GetMapNameByID(85)] = true, -- Orgrimmar
-	[GetMapNameByID(88)] = true, -- Thunder Bluff
-	[GetMapNameByID(89)] = true, -- Darnassus
-	[GetMapNameByID(103)] = true, -- The Exodar
-	-- Eastern Kingdoms
-	[GetMapNameByID(84)] = true, -- Stormwind City
-	[GetMapNameByID(87)] = true, -- Ironforge
-	[GetMapNameByID(998)] = true, -- Undercity
-	[GetMapNameByID(110)] = true, -- Silvermoon City
-	-- Outland (TBC)
-	[GetMapNameByID(111)] = true, -- Shattrath City
-	-- Northrend (WotLK)
-	[GetMapNameByID(125)] = true, -- Dalaran
-	-- Pandaria (MoP)
-	[GetMapNameByID(391)--[[392]]] = true, -- Shrine of Two Moons (Horde)
-	[GetMapNameByID(393)--[[394]]] = true, -- Shrine of Seven Stars (Alliance)
-	-- Ashran (Draenor)
-	[GetMapNameByID(622)] = true, -- Stormshield (Alliance)
-	[GetMapNameByID(624)] = true, -- Warspear (Horde)
-	-- Boralus (BfA)
-	["Boralus Harbor"] = true, -- (Alliance)
-	["Stormsong Monastery"] = true, -- (Alliance)
-}
-checkZones = {
-	-- used for smaller area changes
-	[GetMapNameByID(10)]  = true, -- Northern Barrens (for Ratchet)
-	[GetMapNameByID(37)]  = true, -- Elwynn Forest (for Goldshire)
-	[GetMapNameByID(42)]  = true, -- Deadwind Pass (for Karazhan)
-	[GetMapNameByID(65)]  = true, -- Stonetalon Mountains (for Krom'gar Fortess)
-	[GetMapNameByID(70)] = true, -- Dustwallow Marsh (for Theramore Isle)
-	[GetMapNameByID(71)] = true, -- Tanaris (for Gadgetzan)
-	[GetMapNameByID(83)] = true, -- Winterspring (for Everlook)
-	[GetMapNameByID(100)] = true, -- Hellfire Peninsula (for Honor Hold)
-	[GetMapNameByID(109)] = true, -- Netherstorm (for Area 52)
-	[GetMapNameByID(114)] = true, -- Borean Tundra (for Valiance Keep/Warsong Hold)
-	[GetMapNameByID(117)] = true, -- Howling Fjord (for Valgarde/Vengeance Landing)
-	[GetMapNameByID(210)] = true, -- The Cape of Stranglethorn (for Booty Bay)
-	[GetMapNameByID(194)] = true, -- Kezan (for KTC Headquarters)
-	[GetMapNameByID(554)] = true, -- Timeless Isle
-}
-garrisonZones = {
-	[582] = true, -- Lunarfall (Alliance)
-	[590] = true, -- Frostwall (Horde)
-}
-orderHalls = {
-	[695] = true, -- Skyhold (Warrior)
-	[702] = true, -- Netherlight Temple (Priest)
-	[709] = true, -- The Wandering Isle (Monk)
-	[719] = true, -- Mardum, the Shattered Abyss (Demon Hunter)
-	-- [726] = true, -- The Heart of Azeroth (Shaman)
-	[734] = true, -- Hall of the Guardian (Mage)
-	[739] = true, -- Trueshot Lodge (Hunter)
-	[747] = true, -- The Dreamgrove (Druid)
-}
-local checkZonesByID = {
-	[862] = true, -- Zuldazar (Horde)
-	[895] = true, -- Tiragarde Sound (Alliance)
-	[1161] = true, -- Boralus (Alliance)
-	[1165] = true, -- Dazar'alor (Horde)
-}
-local nullTowns = {
-	-- Kalimdor
-	[SZL["Booty Bay"]]         = true,
-	[SZL["Everlook"]]          = true,
-	[SZL["Gadgetzan"]]         = true,
-	[SZL["Ratchet"]]           = true,
-	[SZL["Theramore Isle"]]    = true,
-	[SZL["Mudsprocket"]]       = true,
-	-- Eastern Kingdoms
-	[SZL["Goldshire"]]         = true, -- in Elwynn Forest
-	-- Outland (TBC)
-	[SZL["Thrallmar"]]         = true, -- Hellfire Peninsula (Horde)
-	[SZL["Honor Hold"]]        = true, -- Hellfire Peninsula (Alliance)
-	[SZL["Area 52"]]           = true, -- Netherstorm
-	-- Northrend (WotLK)
-	[SZL["Warsong Hold"]]      = true, -- Borean Tundra (Horde)
-	[SZL["Valiance Keep"]]     = true, -- Borean Tundra (Alliance)
-	[SZL["Vengeance Landing"]] = true, -- Howling Fjord (Horde)
-	[SZL["Valgarde"]]          = true, -- Howling Fjord (Alliance)
-}
-local nullTownsByID = {
-	-- Kul Tiras (BfA)
-	[1161] = true, -- Boralus, Tiragarde Sound (Alliance)
-	-- Zandalar (BfA)
-	[1163] = true, -- Dazar'alor [The Great Seal], Zuldazar (Horde)
-	[1165] = true, -- Dazar'alor, Zuldazar (Horde)
-}
-local nullAreas = {
-	[SZL["The Old Port Authority"]]  = true, -- in BB
-	[SZL["The Salty Sailor Tavern"]] = true, -- in BB
-	[SZL["Foothold Citadel"]]        = true, -- in Theramore Isle
-	[SZL["The Darkmoon Faire"]]      = true, -- Darkmoon Island (patch 4.3)
-	[SZL["KTC Headquarters"]]        = true, -- Goblin starting area (Cataclysm)
-	[SZL["Karazhan"]]                = true, -- Karazhan
-	[SZL["Krom'gar Fortress"]]       = true, -- Horde Base in Stonetalon Mts (Cataclysm)
-	[SZL["The Celestial Court"]]     = true, -- Timeless Isle (MoP)
-	[SZL["The Vindicaar"]]           = true, -- The Vindicaar (Legion [Argus])
-	["Upton Borough"]                = true, -- Boralus Hub (BfA)
-}
-local checkEvent = {
-	["ZONE_CHANGED_INDOORS"]  = true, -- for tunnel into Booty Bay
-	["ZONE_CHANGED"]          = true, -- used to handle boat trips
-	["ZONE_CHANGED_NEW_AREA"] = true, -- used to handle most changes of area
-	["PLAYER_CONTROL_GAINED"] = true, -- this is for taxi check
-	["SCENARIO_UPDATE"]       = true, -- this is for scenario check
-	["UNIT_EXITED_VEHICLE"]   = false, -- this is used when in a vehicle
-}
-local trackEvent = {
-	["ZONE_CHANGED_INDOORS"]  = false, -- for tunnel into Booty Bay & Boralus Harbor
-	["ZONE_CHANGED"]		  = false, -- this is for changes of sub area
-	["ZONE_CHANGED_NEW_AREA"] = true, -- this is for changes of area
-	["PLAYER_LEAVING_WORLD"]  = true, -- this is for boat trips
-	["PLAYER_CONTROL_LOST"]   = true, -- this is for taxi check
-	["PLAYER_CONTROL_GAINED"] = false, -- this is for taxi check
-	["PLAYER_ENTERING_WORLD"] = true, -- this is for garrison check
-	["SCENARIO_UPDATE"]       = true, -- this is for scenario check
-	["UNIT_ENTERED_VEHICLE"]  = true, -- this is used when in a vehicle
-	["UNIT_EXITED_VEHICLE"]   = false, -- this is used when in a vehicle
-}
-local bodyguardNames = {
-	-- Tormmok [193]
-	-- Defender Illona (A) [207]
-	-- Aeda Brightdawn (H) [207]
-	-- Delvar Ironfist (A) [216]
-	-- Vivianne (H) [216]
-	-- Talonpriest Ishaal [218]
-	-- Leorajh [219]
-}
-local function getBGNames()
-
-	if prdb.noBguard then
-		for _, id in _G.pairs{193, 207, 216, 218, 219} do
-			info = _G.C_Garrison.GetFollowerInfo(id)
-			bodyguardNames[info.name] = true
-			aObj:LevelDebug(5, "Bodyguard:", info.name)
-		end
-	end
-
-end
-local function enableEvents()
-
-	aObj:LevelDebug(5, "enableEvents:", onTaxi, _G.UnitOnTaxi("player"), inVehicle, _G.UnitInVehicle("player"))
-	if not onTaxi and _G.UnitOnTaxi("player") then -- on Taxi
-		aObj:LevelDebug(3, "on Taxi")
-		aObj:RegisterEvent("PLAYER_CONTROL_GAINED", "CheckMode")
-		onTaxi = true
-	elseif not inVehicle and _G.UnitInVehicle("player") then -- in Vehicle
-		aObj:LevelDebug(3, "in Vehicle")
-		aObj:RegisterEvent("UNIT_EXITED_VEHICLE", "CheckMode")
-		inVehicle = true
-	else
-		aObj:LevelDebug(3, "registering normal events")
-		-- register required events
-		for tEvent, enable in pairs(trackEvent) do
-			if enable then aObj:RegisterEvent(tEvent, "CheckMode") end
-		end
-	end
-
-end
-local function updateDBtext()
-
-	local status =  onTaxi and L["Taxi"]
-	or inVehicle and L["Vehicle"]
-	or prdb.inInst and L["Instance"]
-	or inScenario and L["Scenario"]
-	or inGarrison and L["Garrison"]
-	or inOrderHall and L["OrderHall"]
-	or inHub and L["City"]
-	or L["Off"]
-
-	return prdb.shrink and status:sub(1, 1) or status
-
-end
 -- Printing Functions
 local function makeString(t)
 
@@ -298,7 +76,6 @@ function aObj:CustomPrint(r, g, b, a1, ...)
 	printIt(output.." "..makeText(a1, ...), nil, r, g, b)
 
 end
-
 function aObj:add2Table(table, value)
 
 	table[#table + 1] = value
@@ -313,7 +90,6 @@ function aObj:Debug(a1, ...)
 	printIt(output.." "..makeText(a1, ...), self.debugFrame)
 
 end
-
 function aObj:LevelDebug(lvl, a1, ...) if lvl <= self.debugLevel then self:Debug(a1, ...) end end
 --@end-debug@
 --[===[@non-debug@
@@ -321,6 +97,267 @@ function aObj:Debug() end
 function aObj:LevelDebug() end
 --@end-non-debug@]===]
 
+-- Beta Mapping functions
+local function GetMapNameByID(id)
+	if _G.C_Map.GetMapInfo(id) then
+		return _G.C_Map.GetMapInfo(id)["name"]
+	else
+		aObj:LevelDebug(1, "GetMapNameByID", id)
+	end
+end
+local function GetCurrentMapAreaID()
+	return _G.C_Map.GetBestMapForUnit("player") or nil
+end
+
+-- Get Locale
+local L = LibStub("AceLocale-3.0"):GetLocale(aName)
+local SZL = LibStub("LibBabble-SubZone-3.0"):GetLookupTable()
+
+local prdb, inHub, onTaxi, exitedInst, inScenario, inGarrison, inOrderHall, inVehicle
+
+local mGs = {
+	["MONSTER_YELL"] = false,
+	["TRADESKILLS"] = false,
+	["PET_INFO"] = false,
+	["ACHIEVEMENT"] = false,
+	["GUILD_ACHIEVEMENT"] = false,
+}
+local function getMGSettings()
+
+	for group, _ in pairs(mGs) do
+		if _G.tContains(ChatFrame1.messageTypeList, group) then
+			mGs[group] = true
+		end
+	end
+
+end
+-- Map IDs can be found here: http://wowpedia.org/MapID
+-- These have been changed in BfA and a transitional list can be found here:
+-- AddOns/Blizzard_Deprecated/UIMapIDToWorldMapAreaID.lua
+local nullHubs, checkZones, garrisonZones, orderHalls
+if not aObj.isClassic then
+	nullHubs = {
+		-- Kalimdor
+		[GetMapNameByID(85)] = true, -- Orgrimmar
+		[GetMapNameByID(88)] = true, -- Thunder Bluff
+		[GetMapNameByID(89)] = true, -- Darnassus
+		[GetMapNameByID(103)] = true, -- The Exodar
+		-- Eastern Kingdoms
+		[GetMapNameByID(84)] = true, -- Stormwind City
+		[GetMapNameByID(87)] = true, -- Ironforge
+		[GetMapNameByID(998)] = true, -- Undercity
+		[GetMapNameByID(110)] = true, -- Silvermoon City
+		-- Outland (TBC)
+		[GetMapNameByID(111)] = true, -- Shattrath City
+		-- Northrend (WotLK)
+		[GetMapNameByID(125)] = true, -- Dalaran
+		-- Pandaria (MoP)
+		[GetMapNameByID(391)--[[392]]] = true, -- Shrine of Two Moons (Horde)
+		[GetMapNameByID(393)--[[394]]] = true, -- Shrine of Seven Stars (Alliance)
+		-- Ashran (Draenor)
+		[GetMapNameByID(622)] = true, -- Stormshield (Alliance)
+		[GetMapNameByID(624)] = true, -- Warspear (Horde)
+		-- Boralus (BfA)
+		["Boralus Harbor"] = true, -- (Alliance)
+		["Stormsong Monastery"] = true, -- (Alliance)
+	}
+	checkZones = {
+		-- used for smaller area changes
+		[GetMapNameByID(10)] = true, -- Northern Barrens (for Ratchet)
+		[GetMapNameByID(37)] = true, -- Elwynn Forest (for Goldshire)
+		[GetMapNameByID(42)] = true, -- Deadwind Pass (for Karazhan)
+		[GetMapNameByID(65)] = true, -- Stonetalon Mountains (for Krom'gar Fortess)
+		[GetMapNameByID(70)] = true, -- Dustwallow Marsh (for Theramore Isle)
+		[GetMapNameByID(71)] = true, -- Tanaris (for Gadgetzan)
+		[GetMapNameByID(83)] = true, -- Winterspring (for Everlook)
+		[GetMapNameByID(100)] = true, -- Hellfire Peninsula (for Honor Hold)
+		[GetMapNameByID(109)] = true, -- Netherstorm (for Area 52)
+		[GetMapNameByID(114)] = true, -- Borean Tundra (for Valiance Keep/Warsong Hold)
+		[GetMapNameByID(117)] = true, -- Howling Fjord (for Valgarde/Vengeance Landing)
+		[GetMapNameByID(210)] = true, -- The Cape of Stranglethorn (for Booty Bay)
+		[GetMapNameByID(194)] = true, -- Kezan (for KTC Headquarters)
+		[GetMapNameByID(554)] = true, -- Timeless Isle
+	}
+	garrisonZones = {
+		[582] = true, -- Lunarfall (Alliance)
+		[590] = true, -- Frostwall (Horde)
+	}
+	orderHalls = {
+		[695] = true, -- Skyhold (Warrior)
+		[702] = true, -- Netherlight Temple (Priest)
+		[709] = true, -- The Wandering Isle (Monk)
+		[719] = true, -- Mardum, the Shattered Abyss (Demon Hunter)
+		-- [726] = true, -- The Heart of Azeroth (Shaman)
+		[734] = true, -- Hall of the Guardian (Mage)
+		[739] = true, -- Trueshot Lodge (Hunter)
+		[747] = true, -- The Dreamgrove (Druid)
+	}
+else
+	nullHubs = {
+		-- Kalimdor
+		[GetMapNameByID(1454)] = true, -- Orgrimmar
+		[GetMapNameByID(1456)] = true, -- Thunder Bluff
+		[GetMapNameByID(1457)] = true, -- Darnassus
+		-- Eastern Kingdoms
+		[GetMapNameByID(1453)] = true, -- Stormwind City
+		[GetMapNameByID(1455)] = true, -- Ironforge
+		[GetMapNameByID(1458)] = true, -- Undercity
+	}
+	checkZones = {
+		-- used for smaller area changes
+		[GetMapNameByID(1413)] = true, -- Northern Barrens (for Ratchet)
+		[GetMapNameByID(1429)] = true, -- Elwynn Forest (for Goldshire)
+		[GetMapNameByID(1430)] = true, -- Deadwind Pass (for Karazhan)
+		[GetMapNameByID(1442)] = true, -- Stonetalon Mountains (for Krom'gar Fortess)
+		[GetMapNameByID(1445)] = true, -- Dustwallow Marsh (for Theramore Isle)
+		[GetMapNameByID(1448)] = true, -- Tanaris (for Gadgetzan)
+		[GetMapNameByID(1452)] = true, -- Winterspring (for Everlook)
+	}
+end
+local checkZonesByID = {
+	[862] = true, -- Zuldazar (Horde)
+	[895] = true, -- Tiragarde Sound (Alliance)
+	[1161] = true, -- Boralus (Alliance)
+	[1165] = true, -- Dazar'alor (Horde)
+}
+local nullTowns = {
+	-- Kalimdor
+	[SZL["Booty Bay"]]         = true,
+	[SZL["Everlook"]]          = true,
+	[SZL["Gadgetzan"]]         = true,
+	[SZL["Ratchet"]]           = true,
+	[SZL["Theramore Isle"]]    = true,
+	[SZL["Mudsprocket"]]       = true,
+	-- Eastern Kingdoms
+	[SZL["Goldshire"]]         = true, -- in Elwynn Forest
+	-- Outland (TBC)
+	[SZL["Thrallmar"]]         = true, -- Hellfire Peninsula (Horde)
+	[SZL["Honor Hold"]]        = true, -- Hellfire Peninsula (Alliance)
+	[SZL["Area 52"]]           = true, -- Netherstorm
+	-- Northrend (WotLK)
+	[SZL["Warsong Hold"]]      = true, -- Borean Tundra (Horde)
+	[SZL["Valiance Keep"]]     = true, -- Borean Tundra (Alliance)
+	[SZL["Vengeance Landing"]] = true, -- Howling Fjord (Horde)
+	[SZL["Valgarde"]]          = true, -- Howling Fjord (Alliance)
+}
+local nullTownsByID = {
+	-- Kul Tiras (BfA)
+	[1161] = true, -- Boralus, Tiragarde Sound (Alliance)
+	-- Zandalar (BfA)
+	[1163] = true, -- Dazar'alor [The Great Seal], Zuldazar (Horde)
+	[1165] = true, -- Dazar'alor, Zuldazar (Horde)
+	-- Nazjatar
+	[1355] = true,
+	-- Mechagon
+	[1462] = true,
+}
+local nullAreas = {
+	[SZL["The Old Port Authority"]]  = true, -- in BB
+	[SZL["The Salty Sailor Tavern"]] = true, -- in BB
+	[SZL["Foothold Citadel"]]        = true, -- in Theramore Isle
+	[SZL["The Darkmoon Faire"]]      = true, -- Darkmoon Island (patch 4.3)
+	[SZL["KTC Headquarters"]]        = true, -- Goblin starting area (Cataclysm)
+	[SZL["Karazhan"]]                = true, -- Karazhan
+	[SZL["Krom'gar Fortress"]]       = true, -- Horde Base in Stonetalon Mts (Cataclysm)
+	[SZL["The Celestial Court"]]     = true, -- Timeless Isle (MoP)
+	[SZL["The Vindicaar"]]           = true, -- The Vindicaar (Legion [Argus])
+	["Upton Borough"]                = true, -- Boralus Hub (BfA)
+}
+local checkEvent = {
+	["ZONE_CHANGED_INDOORS"]  = true, -- for tunnel into Booty Bay
+	["ZONE_CHANGED"]          = true, -- used to handle boat trips
+	["ZONE_CHANGED_NEW_AREA"] = true, -- used to handle most changes of area
+	["PLAYER_CONTROL_GAINED"] = true, -- this is for taxi check
+	["SCENARIO_UPDATE"]       = true, -- this is for scenario check
+	["UNIT_EXITED_VEHICLE"]   = false, -- this is used when in a vehicle
+}
+local trackEvent = {
+	["ZONE_CHANGED_INDOORS"]  = false, -- for tunnel into Booty Bay & Boralus Harbor
+	["ZONE_CHANGED"]		  = false, -- this is for changes of sub area
+	["ZONE_CHANGED_NEW_AREA"] = true, -- this is for changes of area
+	["PLAYER_LEAVING_WORLD"]  = true, -- this is for boat trips
+	["PLAYER_CONTROL_LOST"]   = true, -- this is for taxi check
+	["PLAYER_CONTROL_GAINED"] = false, -- this is for taxi check
+	["PLAYER_ENTERING_WORLD"] = true, -- this is for garrison check
+}
+if not aObj.isClassic then
+	trackEvent["SCENARIO_UPDATE"] = true -- this is for scenario check
+	trackEvent["UNIT_ENTERED_VEHICLE"] = true -- this is used when in a vehicle
+	trackEvent["UNIT_EXITED_VEHICLE"] = false -- this is used when in a vehicle
+end
+local bodyguardNames = {
+	-- Tormmok [193]
+	-- Defender Illona (A) [207]
+	-- Aeda Brightdawn (H) [207]
+	-- Delvar Ironfist (A) [216]
+	-- Vivianne (H) [216]
+	-- Talonpriest Ishaal [218]
+	-- Leorajh [219]
+}
+local getBGNames
+if not aObj.isClassic then
+	function getBGNames()
+
+		if prdb.noBguard then
+			local info
+			for _, id in _G.pairs{193, 207, 216, 218, 219} do
+				info = _G.C_Garrison.GetFollowerInfo(id)
+				bodyguardNames[info.name] = true
+				aObj:LevelDebug(5, "Bodyguard:", info.name)
+			end
+			info = nil
+		end
+
+	end
+else
+	getBGNames = _G.nop
+end
+local function enableEvents()
+
+	if not aObj.isClassic then
+		aObj:LevelDebug(5, "enableEvents:", onTaxi, _G.UnitOnTaxi("player"), inVehicle, _G.UnitInVehicle("player"))
+	else
+		aObj:LevelDebug(5, "enableEvents:", onTaxi, _G.UnitOnTaxi("player"))
+	end
+
+	-- on Taxi
+	if not onTaxi
+	and _G.UnitOnTaxi("player")
+	then
+		aObj:LevelDebug(3, "on Taxi")
+		aObj:RegisterEvent("PLAYER_CONTROL_GAINED", "CheckMode")
+		onTaxi = true
+	-- in Vehicle
+	elseif not inVehicle
+	and not aObj.isClassic
+	and _G.UnitInVehicle("player")
+	then
+		aObj:LevelDebug(3, "in Vehicle")
+		aObj:RegisterEvent("UNIT_EXITED_VEHICLE", "CheckMode")
+		inVehicle = true
+	else
+		aObj:LevelDebug(3, "registering normal events")
+		-- register required events
+		for tEvent, enable in pairs(trackEvent) do
+			if enable then aObj:RegisterEvent(tEvent, "CheckMode") end
+		end
+	end
+
+end
+local function updateDBtext()
+
+	local status =  onTaxi and L["Taxi"]
+	or inVehicle and L["Vehicle"]
+	or prdb.inInst and L["Instance"]
+	or inScenario and L["Scenario"]
+	or inGarrison and L["Garrison"]
+	or inOrderHall and L["OrderHall"]
+	or inHub and L["City"]
+	or L["Off"]
+
+	return prdb.shrink and status:sub(1, 1) or status
+
+end
 -- message filters & groups
 local function msgFilter1(self, event, msg, charFrom, ...)
 	aObj:LevelDebug(5, "msgFilter1:", ...)
@@ -414,25 +451,30 @@ local function msgFilter6(self, event, msg, charFrom, ...)
 	end
 
 end
+local msgFilter7
+if not aObj.isClassic then
 -- stop messages from followers who are Bodyguards including Faction gains
-local function msgFilter7(self, event, msg, charFrom, ...)
-	aObj:LevelDebug(5, "msgFilter7:", ...)
-	aObj:LevelDebug(3, "mf7:[%s][%s][%s]", event, msg, charFrom)
+	function msgFilter7(self, event, msg, charFrom, ...)
+		aObj:LevelDebug(5, "msgFilter7:", ...)
+		aObj:LevelDebug(3, "mf7:[%s][%s][%s]", event, msg, charFrom)
 
-	-- ignore Bodyguard's chat or Reputation gains
-	if bodyguardNames[charFrom]
-	or bodyguardNames[msg:match(L["Reputation with"] .. "%s(.*)%s" .. L["increased by"])]
-	then
-		return true
-	else
-		return false
+		-- ignore Bodyguard's chat or Reputation gains
+		if bodyguardNames[charFrom]
+		or bodyguardNames[msg:match(L["Reputation with"] .. "%s(.*)%s" .. L["increased by"])]
+		then
+			return true
+		else
+			return false
+		end
+
 	end
-
+else
+	msgFilter7 = _G.nop
 end
 local function addMFltrs()
 
 	if InCombatLockdown() then
-		aObj:add2Table(aObj.oocTab, {addMFltrs, {allFilters}})
+		aObj:add2Table(aObj.oocTab, {addMFltrs, {}})
 		return
 	end
 
@@ -467,7 +509,7 @@ end
 local function removeMFltrs(upd)
 
 	if InCombatLockdown() then
-		aObj:add2Table(aObj.oocTab, {removeMFltrs, {allFilters}})
+		aObj:add2Table(aObj.oocTab, {removeMFltrs, {upd}})
 		return
 	end
 
@@ -582,25 +624,30 @@ function aObj:OnInitialize()
 	self:Print("Debugging is enabled")
 	self:LevelDebug(1, "Debugging is enabled")
 --@end-debug@
+--@alpha@
+	if self.isClassic then self:Debug("Classic detected") end
+	if self.isPTR then self:Debug("PTR detected") end
+--@end-alpha@
 
 	local defaults = { profile = {
-		chatback	  = true,
+		chatback      = true,
+		shrink        = false,
 		achFilterType = 0,
-		noDiscovery	  = true,
-		noDrunk		  = true,
-		noDuel		  = true,
-		noEmote		  = false,
-		noNPC		  = false,
-		noPetInfo	  = false,
+		noDiscovery   = true,
+		noDrunk       = true,
+		noDuel        = true,
+		noEmote       = false,
+		noNPC         = false,
+		noPetInfo     = false,
 		noTradeskill  = false,
-		noMYell		  = false,
-		noPYell		  = false,
-		gChat		  = false,
-		noBguard	  = false,
-		noOrderHall	  = false,
-		iChat		  = true,
-		inInst		  = false,
-		shrink		  = false,
+		noMYell       = false,
+		noPYell       = false,
+		gChat         = false,
+		noBguard      = false,
+		noOrderHall   = false,
+		iChat         = true,
+		inInst        = false,
+		shrink        = false,
 		-- ChatFrame1 channel settings
 		cf1Channels = {
 			[L["General"]]          = false,
@@ -657,7 +704,10 @@ function aObj:OnInitialize()
 			type = "group",
 			name = aName,
 			get = function(info) return prdb[info[#info]] end,
-			set = function(info, value) prdb[info[#info]] = value end,
+			set = function(info, value)
+				prdb[info[#info]] = value
+				if info[#info] == "shrink" then aObj.DBObj.text = updateDBtext() end
+			end,
 			args = {
 				desc = {
 					type = "description",
@@ -674,6 +724,12 @@ function aObj:OnInitialize()
 					order = 3,
 					name = L["Chat Feedback"],
 					desc = L["Print chat message when toggling mute."],
+				},
+				shrink = {
+					type = 'toggle',
+					order = 3,
+					name = L["Shrink label"],
+					desc = L["Abbreviate the Data Broker label."],
 				},
 			},
 		},
@@ -694,7 +750,7 @@ function aObj:OnInitialize()
 					name = L["Global Settings"],
 					desc = L["Change the Global settings"],
 					args = {
-						achFilterType = {
+						achFilterType = not self.isClassic and {
 							type = 'select',
 							order = -1,
 							name = L["Achievement Filter"],
@@ -705,7 +761,7 @@ function aObj:OnInitialize()
 								[1] = L["All"],
 								[2] = L["All except Guild/Party/Raid"]
 							},
-						},
+						} or nil,
 						noDuel = {
 							type = 'toggle',
 							name = L["Duels"],
@@ -726,11 +782,11 @@ function aObj:OnInitialize()
 							name = L["NPC/Mob Yells"],
 							desc = L["Mute NPC/Mob Yells."],
 						},
-						noOrderHall = {
+						noOrderHall = not self.isClassic and {
 							type = 'toggle',
 							name = L["OrderHall Chat"],
 							desc = L["Mute OrderHall NPC Chat"],
-						},
+						} or nil,
 					},
 				},
 				city = {
@@ -739,11 +795,11 @@ function aObj:OnInitialize()
 					name = L["City/Town Settings"],
 					desc = L["Change the City/Town settings"],
 					args = {
-						noDiscovery = {
+						noDiscovery = not self.isClassic and {
 							type = 'toggle',
 							name = L["Discoveries"],
 							desc = L["Mute Discovery info."],
-						},
+						} or nil,
 						noDrunk = {
 							type = 'toggle',
 							name = L["Drunks"],
@@ -766,7 +822,7 @@ function aObj:OnInitialize()
 						},
 					},
 				},
-				instance = {
+				instance = not self.isClassic and {
 					type = "group",
 					order = 3,
 					name = L["Instance Settings"],
@@ -779,8 +835,8 @@ function aObj:OnInitialize()
 							desc = L["Mute General chat in Instances."],
 						},
 					},
-				},
-				garrison = {
+				} or nil,
+				garrison = not self.isClassic and {
 					type = "group",
 					order = 4,
 					name = L["Garrison Settings"],
@@ -798,7 +854,7 @@ function aObj:OnInitialize()
 							desc = L["Mute Bodyguard Chat & Faction updates"],
 						},
 					},
-				},
+				} or nil,
 			},
 		},
 	}
@@ -847,8 +903,11 @@ function aObj:OnInitialize()
 			_G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame[optCheck[input:lower()]])
 			_G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame[optCheck[input:lower()]])
 		elseif input:lower() == "status" then
-			aObj:Print("City mode:", inHub, "Taxi:", onTaxi, "Vehicle:", inVehicle, "Scenario:", inScenario, "Instance:", prdb.inInst)
-			aObj:Print("Garrison:", inGarrison, "Bodyguard mode:", prdb.noBguard, "OrderHall mode:", prdb.noOrderHall)
+			aObj:Print("City mode:", inHub, "Taxi:", onTaxi)
+			if not aObj.isClassic then
+				aObj:Print("Vehicle:", inVehicle, "Scenario:", inScenario, "Instance:", prdb.inInst)
+				aObj:Print("Garrison:", inGarrison, "Bodyguard mode:", prdb.noBguard, "OrderHall mode:", prdb.noOrderHall)
+			end
 		elseif input:lower() == "loud" then
 			aObj.debugLevel = 5
 			aObj:Print("Debug messages ON")
@@ -859,14 +918,11 @@ function aObj:OnInitialize()
 			_G.C_Map.GetBestMapForUnit("player")
 			aObj:Print("You Are Here: [", _G.GetRealZoneText(), "][", _G.GetSubZoneText(), "][", GetCurrentMapAreaID(), "]")
 		elseif input:lower() == "mapinfo" then
-			uiMapID = _G.C_Map.GetBestMapForUnit("player")
-			mapinfo = _G.C_Map.GetMapInfo(uiMapID)
-			posn = _G.C_Map.GetPlayerMapPosition(uiMapID, "player")
-			areaName= _G.MapUtil.FindBestAreaNameAtMouse(uiMapID, posn["x"], posn["y"])
+			local uiMapID = _G.C_Map.GetBestMapForUnit("player")
+			local mapinfo = _G.C_Map.GetMapInfo(uiMapID)
+			local posn = _G.C_Map.GetPlayerMapPosition(uiMapID, "player")
+			local areaName= _G.MapUtil.FindBestAreaNameAtMouse(uiMapID, posn["x"], posn["y"])
 			aObj:Print("Map Info:", mapinfo["mapID"], mapinfo["name"], mapinfo["mapType"], mapinfo["parentMapID"], posn["x"], posn["y"], areaName)
-		elseif input:lower() == "shrink" then
-			prdb.shrink = true
-			self.DBObj.text = updateDBtext()
 		else
 			LibStub("AceConfigCmd-3.0"):HandleCommand(aName, aName, input)
 		end
@@ -992,8 +1048,10 @@ function aObj:CheckMode(event, ...)
 		self:LevelDebug(5, "PLAYER_CONTROL_LOST", _G.UnitOnTaxi("player"), _G.UnitIsCharmed("player"), _G.UnitIsPossessed("player"), prdb.inInst)
 		self:UnregisterAllEvents()
 		self:RegisterEvent("PLAYER_CONTROL_GAINED", "CheckMode")
-		onTaxi = true
-		self.DBObj.text = updateDBtext()
+		if _G.UnitOnTaxi("player") then
+			onTaxi = true
+			self.DBObj.text = updateDBtext()
+		end
 		return
 	-- if finished flying then enable events
 	elseif event == "PLAYER_CONTROL_GAINED"
@@ -1015,7 +1073,7 @@ function aObj:CheckMode(event, ...)
 		inVehicle = true
 		self.DBObj.text = updateDBtext()
 		return
-	-- if finished flying then enable events
+	-- if exited from vehicle then enable events
 	elseif event == "UNIT_EXITED_VEHICLE"
 	then
 		self:LevelDebug(5, "UNIT_EXITED_VEHICLE", GetCurrentMapAreaID())
@@ -1024,8 +1082,6 @@ function aObj:CheckMode(event, ...)
 		inVehicle = false
 	end
 
-	-- force map change to get correct info
-	-- _G.SetMapToCurrentZone()
 	local rZone, rSubZone = _G.GetRealZoneText(), _G.GetSubZoneText()
 	self:LevelDebug(3, "You Are Here: [%s:%s, %s]", rZone or "<Anon>", rSubZone or "<Anon>", GetCurrentMapAreaID())
 	local instInfo = {_G.GetInstanceInfo()}
@@ -1045,7 +1101,7 @@ function aObj:CheckMode(event, ...)
 	end
 
 	-- handle this for the tunnel into Booty Bay & Harbormaster's Office
-	if rZone == GetMapNameByID(210) -- The Cape of Stranglethorn
+	if GetCurrentMapAreaID() == 210 -- The Cape of Stranglethorn
 	then
 		self:LevelDebug(4, "checkZone - ZONE_CHANGED_INDOORS event registered")
 		trackEvent["ZONE_CHANGED_INDOORS"] = true
@@ -1096,58 +1152,60 @@ function aObj:CheckMode(event, ...)
 		end
 	end
 
-	--> Instance/Scenario Handler <--
-	self:LevelDebug(4, "Instance/Scenario Handler", instInfo[2] ~= "none", isGarrison(instInfo[1]), prdb.inInst, exitedInst, inScenario)
-	if instInfo[2] ~= "none"
-	and not isGarrison(instInfo[1])
-	then
-		if instInfo[2] == "scenario" then
-			if not inScenario then
-				inScenario = true
-				if prdb.chatback then self:Print(L["Scenario mode enabled"]) end
+	if not self.isClassic then
+		--> Instance/Scenario Handler <--
+		self:LevelDebug(4, "Instance/Scenario Handler", instInfo[2] ~= "none", isGarrison(instInfo[1]), prdb.inInst, exitedInst, inScenario)
+		if instInfo[2] ~= "none"
+		and not isGarrison(instInfo[1])
+		then
+			if instInfo[2] == "scenario" then
+				if not inScenario then
+					inScenario = true
+					if prdb.chatback then self:Print(L["Scenario mode enabled"]) end
+				end
+			else
+				if not prdb.inInst then
+					prdb.inInst = true
+					if prdb.chatback then self:Print(L["Instance mode enabled"]) end
+				end
 			end
 		else
-			if not prdb.inInst then
-				prdb.inInst = true
-				if prdb.chatback then self:Print(L["Instance mode enabled"]) end
-			end
-		end
-	else
-		if exitedInst
-		and prdb.chatback
-		then
-			if prdb.inInst
-			or inScenario
+			if exitedInst
+			and prdb.chatback
 			then
-				self:Print(L["Instance/Scenario mode disabled"])
+				if prdb.inInst
+				or inScenario
+				then
+					self:Print(L["Instance/Scenario mode disabled"])
+				end
 			end
+			prdb.inInst = false
+			inScenario = false
 		end
-		prdb.inInst = false
-		inScenario = false
-	end
 
-	--> Garrison Handler <--
-	self:LevelDebug(4, "Garrison Handler", garrisonZones[GetCurrentMapAreaID()], isGarrison(instInfo[1]))
-	if garrisonZones[GetCurrentMapAreaID()]
-	or isGarrison(instInfo[1])
-	then
-		if not inGarrison then
-			inGarrison = true
-			if prdb.chatback then self:Print(L["Garrison mode enabled"]) end
+		--> Garrison Handler <--
+		self:LevelDebug(4, "Garrison Handler", garrisonZones[GetCurrentMapAreaID()], isGarrison(instInfo[1]))
+		if garrisonZones[GetCurrentMapAreaID()]
+		or isGarrison(instInfo[1])
+		then
+			if not inGarrison then
+				inGarrison = true
+				if prdb.chatback then self:Print(L["Garrison mode enabled"]) end
+			end
+		else
+			inGarrison = false
 		end
-	else
-		inGarrison = false
-	end
 
-	--> OrderHall Handler <--
-	self:LevelDebug(4, "OrderHall Handler", orderHalls[GetCurrentMapAreaID()])
-	if orderHalls[GetCurrentMapAreaID()] then
-		if not inOrderHall then
-			inOrderHall = true
-			if prdb.chatback then self:Print(L["OrderHall mode enabled"]) end
+		--> OrderHall Handler <--
+		self:LevelDebug(4, "OrderHall Handler", orderHalls[GetCurrentMapAreaID()])
+		if orderHalls[GetCurrentMapAreaID()] then
+			if not inOrderHall then
+				inOrderHall = true
+				if prdb.chatback then self:Print(L["OrderHall mode enabled"]) end
+			end
+		else
+			inOrderHall = false
 		end
-	else
-		inOrderHall = false
 	end
 
 	-- update message filters
