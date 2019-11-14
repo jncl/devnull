@@ -1,6 +1,7 @@
 local aName, aObj = ...
 local _G = _G
 
+local type, select = _G..type, _G.select
 local InCombatLockdown, ChatFrame1 = _G.InCombatLockdown, _G.ChatFrame1
 
 -- Mapping functions
@@ -68,7 +69,7 @@ function aObj:enableEvents()
 	else
 		aObj:LevelDebug(3, "registering normal events")
 		-- register required events
-		for tEvent, enable in pairs(self.trackEvent) do
+		for tEvent, enable in _G.pairs(self.trackEvent) do
 			if enable then
 				aObj:RegisterEvent(tEvent, "CheckMode")
 			end
@@ -94,7 +95,7 @@ end
 function aObj:msgFilter1(self, event, msg, charFrom, ...)
 	aObj:LevelDebug(5, "msgFilter1:", ...)
 
-	local charTo = select(7, ...)
+	local charTo = _G.select(7, ...)
 	aObj:LevelDebug(3, "mf1:[%s],[%s],[%s]", msg, charFrom, charTo)
 
 	-- allow emotes/says to/from the player/pet
@@ -425,14 +426,14 @@ end
 local function makeString(t)
 
 	if type(t) == "table" then
-		if type(rawget(t, 0)) == "userdata"
+		if type(_G.rawget(t, 0)) == "userdata"
 		and type(t.GetObjectType) == "function"
 		then
 			return ("<%s:%s>"):format(t:GetObjectType(), t:GetName() or "<Anon>")
 		end
 	end
 
-	return tostring(t)
+	return _G.tostring(t)
 
 end
 local function makeText(a1, ...)
@@ -444,14 +445,14 @@ local function makeText(a1, ...)
 		for i = 1, select('#', ...) do
 			tmpTab[i] = makeString(select(i, ...))
 		end
-		output = output .. " " .. a1:format(unpack(tmpTab))
+		output = output .. " " .. a1:format(_G.unpack(tmpTab))
 	else
 		tmpTab[1] = output
 		tmpTab[2] = a1
 		for i = 1, select('#', ...) do
 			tmpTab[i+2] = makeString(select(i, ...))
 		end
-		output = table.concat(tmpTab, " ")
+		output = _G.table.concat(tmpTab, " ")
 	end
 
 	return output
@@ -465,9 +466,7 @@ end
 
 function aObj:CustomPrint(r, g, b, a1, ...)
 
-	output = ("|cffffff78"..aName..":|r")
-
-	printIt(output.." "..makeText(a1, ...), nil, r, g, b)
+	printIt("|cffffff78" .. aName .. ":|r" .. " " .. makeText(a1, ...), nil, r, g, b)
 
 end
 function aObj:add2Table(table, value)
@@ -482,7 +481,7 @@ aObj.debugFrame = ChatFrame10
 aObj.debugLevel = 1
 function aObj:Debug(a1, ...)
 
-	local output = ("|cff7fff7f(DBG) %s:[%s.%3d]|r"):format(aName, date("%H:%M:%S"), (_G.GetTime() % 1) * 1000)
+	local output = ("|cff7fff7f(DBG) %s:[%s.%3d]|r"):format(aName, _G.date("%H:%M:%S"), (_G.GetTime() % 1) * 1000)
 
 	printIt(output.." "..makeText(a1, ...), self.debugFrame)
 

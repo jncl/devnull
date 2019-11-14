@@ -1,6 +1,8 @@
 local aName, aObj = ...
 local _G = _G
 
+local LibStub = _G.LibStub
+
 function aObj:SetupDefaults()
 
 	-- get Locale

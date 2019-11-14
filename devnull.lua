@@ -126,8 +126,8 @@ function aObj:OnEnable()
 	-- handle profile changes
 	_G.StaticPopupDialogs[aName .. "_Reload_UI"] = {
 		text = self.L["Confirm reload of UI to activate profile changes"],
-		button1 = OKAY,
-		button2 = CANCEL,
+		button1 = _G.OKAY,
+		button2 = _G.CANCEL,
 		OnAccept = function()
 			_G.ReloadUI()
 		end,
@@ -201,7 +201,7 @@ function aObj:CheckMode(event, ...)
 		_G.C_Timer.After(0.5, function() -- add delay before UnitOnTaxi check
 			if _G.UnitOnTaxi("player") then
 				self.onTaxi = true
-				self.DBObj.text = updateDBtext()
+				self.DBObj.text = self:updateDBtext()
 			end
 		end)
 		return
@@ -213,7 +213,7 @@ function aObj:CheckMode(event, ...)
 		self:UnregisterEvent(event)
 		self.onTaxi = false
 		_G.C_Timer.After(0.5, function() -- add delay before UnitOnTaxi check
-			enableEvents()
+			self:enableEvents()
 		end)
 	end
 
@@ -226,14 +226,14 @@ function aObj:CheckMode(event, ...)
 			self:UnregisterAllEvents()
 			self:RegisterEvent("UNIT_EXITED_VEHICLE", "CheckMode")
 			self.inVehicle = true
-			self.DBObj.text = updateDBtext()
+			self.DBObj.text = self:updateDBtext()
 			return
 		-- if exited from vehicle then enable events
 		elseif event == "UNIT_EXITED_VEHICLE"
 		then
 			self:LevelDebug(5, "UNIT_EXITED_VEHICLE", self:GetCurrentMapAreaID())
 			self:UnregisterEvent(event)
-			enableEvents()
+			self:enableEvents()
 			self.inVehicle = false
 		end
 	end

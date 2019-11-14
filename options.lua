@@ -1,6 +1,7 @@
 local aName, aObj = ...
 local _G = _G
 
+local LibStub = _G.LibStub
 
 function aObj:SetupOptions()
 
@@ -12,7 +13,7 @@ function aObj:SetupOptions()
 			get = function(info) return self.prdb[info[#info]] end,
 			set = function(info, value)
 				self.prdb[info[#info]] = value
-				if info[#info] == "shrink" then aObj.DBObj.text = updateDBtext() end
+				if info[#info] == "shrink" then aObj.DBObj.text = aObj:updateDBtext() end
 			end,
 			args = {
 				desc = {
@@ -179,7 +180,7 @@ function aObj:SetupOptions()
 
 	-- register the options, add them to the Blizzard Options
 	local optCheck = {}
-	for _, v in ipairs(optNames) do
+	for _, v in _G.ipairs(optNames) do
 		local optTitle = (" "):join(aName, v)
 		ACR:RegisterOptionsTable(optTitle, optTables[v])
 		self.optionsFrame[self.L[v]] = ACD:AddToBlizOptions(optTitle, self.L[v], aName)
@@ -208,10 +209,10 @@ function aObj:SetupOptions()
 			_G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame[optCheck[input:lower()]])
 			_G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame[optCheck[input:lower()]])
 		elseif input:lower() == "status" then
-			aObj:Print("City mode:", inHub, "Taxi:", onTaxi)
+			aObj:Print("City mode:", self.inHub, "Taxi:", self.onTaxi)
 			if not aObj.isClassic then
-				aObj:Print("Vehicle:", inVehicle, "Scenario:", inScenario, "Instance:", self.prdb.inInst)
-				aObj:Print("Garrison:", inGarrison, "Bodyguard mode:", self.prdb.noBguard, "OrderHall mode:", self.prdb.noOrderHall)
+				aObj:Print("Vehicle:", self.inVehicle, "Scenario:", self.inScenario, "Instance:", self.prdb.inInst)
+				aObj:Print("Garrison:", self.inGarrison, "Bodyguard mode:", self.prdb.noBguard, "OrderHall mode:", self.prdb.noOrderHall)
 			end
 		elseif input:lower() == "loud" then
 			aObj.debugLevel = 5
