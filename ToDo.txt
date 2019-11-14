@@ -7,4 +7,5 @@ Legend:
 	¶ is Alt+7	- indicates localisation changes required
 	I/O			- Issue(Bug)/Other change
 
-√	O	Add support for Classic, requested by amey0, 14.08.12
+	I	reported by amey0, 12.11.19
+√		- devnull\devnull-beta8.31599.1.lua:10: devnull requires LibBabble-SubZone-3.0
