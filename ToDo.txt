@@ -6,6 +6,3 @@ Legend:
 	x			- indicates nothing to change
 	¶ is Alt+7	- indicates localisation changes required
 	I/O			- Issue(Bug)/Other change
-
-	I	reported by amey0, 12.11.19
-√		- devnull\devnull-beta8.31599.1.lua:10: devnull requires LibBabble-SubZone-3.0
