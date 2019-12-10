@@ -133,7 +133,7 @@ function aObj:OnEnable()
 		end,
 		OnCancel = function(this, data, reason)
 			if reason == "timeout" or reason == "clicked" then
-				aObj:CustomPrint(1, 1, 0, "The profile '"..aObj.db:GetCurrentProfile().."' will be activated next time you Login or Reload the UI")
+				aObj.CustomPrint(1, 1, 0, "The profile '" .. aObj.db:GetCurrentProfile() .. "' will be activated next time you Login or Reload the UI")
 			end
 		end,
 		timeout = 0,
@@ -145,7 +145,7 @@ function aObj:OnEnable()
 		aObj:LevelDebug(5, "ReloadAddon:[%s]", callback)
 
 		-- store shortcut
-		aObj.self.prdb = aObj.db.profile
+		aObj.prdb = aObj.db.profile
 		-- prompt for reload
 		_G.StaticPopup_Show(aName .. "_Reload_UI")
 

@@ -1,7 +1,7 @@
 local aName, aObj = ...
 local _G = _G
 
-local type, select = _G..type, _G.select
+local type, select = _G.type, _G.select
 local InCombatLockdown, ChatFrame1 = _G.InCombatLockdown, _G.ChatFrame1
 
 -- Mapping functions
@@ -92,10 +92,11 @@ function aObj:updateDBtext()
 
 end
 -- message filters & groups
-function aObj:msgFilter1(self, event, msg, charFrom, ...)
-	aObj:LevelDebug(5, "msgFilter1:", ...)
-
-	local charTo = _G.select(7, ...)
+function aObj:msgFilter1(event, ...)
+	aObj:LevelDebug(5, "msgFilter1:", event, ...)
+	local msg = select(1, ...)
+	local charFrom = select(2, ...)
+	local charTo = select(7, ...)
 	aObj:LevelDebug(3, "mf1:[%s],[%s],[%s]", msg, charFrom, charTo)
 
 	-- allow emotes/says to/from the player/pet
@@ -106,27 +107,29 @@ function aObj:msgFilter1(self, event, msg, charFrom, ...)
 	or charTo == aObj.pet))
 	then
 		aObj:LevelDebug(3, "Emote/Say to/from player/pet")
-		return false
+		return false, ...
 	else
 		return true
 	end
 
 end
-function aObj:msgFilter2(self, event, msg, charFrom, ...)
-	aObj:LevelDebug(5, "msgFilter2:", ...)
+function aObj:msgFilter2(event, ...)
+	aObj:LevelDebug(5, "msgFilter2:", event, ...)
+	local charFrom = select(2, ...)
 	aObj:LevelDebug(3, "mf2:[%s]", charFrom)
 
 	-- allow yells from the player
 	if charFrom == aObj.player then
 		aObj:LevelDebug(3, "Player Yell")
-		return false
+		return false, ...
 	else
 		return true
 	end
 
 end
-function aObj:msgFilter3(self, event, msg, ...)
-	aObj:LevelDebug(5, "msgFilter3:", ...)
+function aObj:msgFilter3(event, ...)
+	aObj:LevelDebug(5, "msgFilter3:", event, ...)
+	local msg = select(1, ...)
 	aObj:LevelDebug(3, "mf3:[%s]", msg)
 
 	-- ignore Duelling messages
@@ -134,12 +137,13 @@ function aObj:msgFilter3(self, event, msg, ...)
 		aObj:LevelDebug(3, "Duel")
 		return true
 	else
-		return false
+		return false, ...
 	end
 
 end
-function aObj:msgFilter4(self, event, msg, ...)
-	aObj:LevelDebug(5, "msgFilter4:", ...)
+function aObj:msgFilter4(event, ...)
+	aObj:LevelDebug(5, "msgFilter4:", event, ...)
+	local msg = select(1, ...)
 	aObj:LevelDebug(3, "mf4:[%s]", msg)
 
 	-- ignore Drunken messages
@@ -151,12 +155,13 @@ function aObj:msgFilter4(self, event, msg, ...)
 		aObj:LevelDebug(3, "Drunken")
 		return true
 	else
-		return false
+		return false, ...
 	end
 
 end
-function aObj:msgFilter5(self, event, msg, ...)
-	aObj:LevelDebug(5, "msgFilter5:", ...)
+function aObj:msgFilter5(event, ...)
+	aObj:LevelDebug(5, "msgFilter5:", event, ...)
+	local msg = select(1, ...)
 	aObj:LevelDebug(3, "mf5:[%s]", msg)
 
 	-- ignore discovery messages
@@ -164,12 +169,14 @@ function aObj:msgFilter5(self, event, msg, ...)
 		aObj:LevelDebug(3, "Discovery")
 		return true
 	else
-		return false
+		return false, ...
 	end
 
 end
-function aObj:msgFilter6(self, event, msg, charFrom, ...)
-	aObj:LevelDebug(5, "msgFilter6:", ...)
+function aObj:msgFilter6(event, ...)
+	aObj:LevelDebug(5, "msgFilter6:", event, ...)
+	local msg = select(1, ...)
+	local charFrom = select(2, ...)
 	aObj:LevelDebug(3, "mf6:[%s][%s]", msg, charFrom)
 
 	-- ignore Achievement messages if not from Guild/Party/Raid members
@@ -178,7 +185,7 @@ function aObj:msgFilter6(self, event, msg, charFrom, ...)
 	or _G.UnitInRaid(charFrom)
 	then
 		aObj:LevelDebug(3, "Guild/Party/Raid Achievement")
-		return false
+		return false, ...
 	else
 		return true
 	end
@@ -186,9 +193,11 @@ function aObj:msgFilter6(self, event, msg, charFrom, ...)
 end
 if not aObj.isClassic then
 -- stop messages from followers who are Bodyguards including Faction gains
-	function aObj:msgFilter7(self, event, msg, charFrom, ...)
-		aObj:LevelDebug(5, "msgFilter7:", ...)
-		aObj:LevelDebug(3, "mf7:[%s][%s][%s]", event, msg, charFrom)
+	function aObj:msgFilter7(event, ...)
+		aObj:LevelDebug(5, "msgFilter7:", event, ...)
+		local msg = select(1, ...)
+		local charFrom = select(2, ...)
+		aObj:LevelDebug(3, "mf7:[%s][%s]", msg, charFrom)
 
 		-- ignore Bodyguard's chat or Reputation gains
 		if bodyguardNames[charFrom]
@@ -196,7 +205,7 @@ if not aObj.isClassic then
 		then
 			return true
 		else
-			return false
+			return false, ...
 		end
 
 	end
@@ -460,13 +469,13 @@ local function makeText(a1, ...)
 end
 local function printIt(text, frame, r, g, b)
 
-	(frame or _G.DEFAULT_CHAT_FRAME):AddMessage(text, r, g, b, 1, 5)
+	(frame or _G.DEFAULT_CHAT_FRAME):AddMessage(text, r, g, b)
 
 end
 
-function aObj:CustomPrint(r, g, b, a1, ...)
+function aObj:CustomPrint(r, g, b, fstr, ...)
 
-	printIt("|cffffff78" .. aName .. ":|r" .. " " .. makeText(a1, ...), nil, r, g, b)
+	printIt(_G.WrapTextInColorCode(aName, "ffffff78") .. " " .. makeText(fstr, ...), nil, r, g, b)
 
 end
 function aObj:add2Table(table, value)
@@ -479,14 +488,20 @@ end
 -- specify where debug messages go
 aObj.debugFrame = ChatFrame10
 aObj.debugLevel = 1
-function aObj:Debug(a1, ...)
+function aObj:Debug(fstr, ...)
 
-	local output = ("|cff7fff7f(DBG) %s:[%s.%3d]|r"):format(aName, _G.date("%H:%M:%S"), (_G.GetTime() % 1) * 1000)
-
-	printIt(output.." "..makeText(a1, ...), self.debugFrame)
+	local output = ("(DBG) %s:[%s.%3d]"):format(aName, _G.date("%H:%M:%S"), (_G.GetTime() % 1) * 1000)
+	printIt(_G.WrapTextInColorCode(output, "ff7fff7f") .. " " .. makeText(fstr, ...), self.debugFrame)
+	output = nil
 
 end
-function aObj:LevelDebug(lvl, a1, ...) if lvl <= self.debugLevel then self:Debug(a1, ...) end end
+function aObj:LevelDebug(lvl, a1, ...)
+
+	if lvl <= self.debugLevel then
+		self:Debug(a1, ...)
+	end
+
+end
 --@end-debug@
 --[===[@non-debug@
 function aObj:Debug() end
