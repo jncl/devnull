@@ -1,4 +1,4 @@
-﻿## Interface: 80205
+﻿## Interface: 90002
 ## Title: /dev/null
 ## Notes: Mutes various chat related annoyances while in capital cities and instances.
 ## Notes-deDE: Unterdr\195\188ckt diverse st\195\182rende Meldungen - w\195\164hrend man sich in Hauptst\195\164dten oder Instanzen befindet.
@@ -41,7 +41,7 @@ locales\Locale_zhCN.lua
 locales\Locale_zhTW.lua
 #
 # Main files
+utilFuncs.lua
 devnull.lua
 defaults.lua
 options.lua
-utilFuncs.lua

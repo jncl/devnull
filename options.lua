@@ -57,7 +57,7 @@ function aObj:SetupOptions()
 					name = self.L["Global Settings"],
 					desc = self.L["Change the Global settings"],
 					args = {
-						achFilterType = not self.isClassic and {
+						achFilterType = not self.isClsc and {
 							type = 'select',
 							order = -1,
 							name = self.L["Achievement Filter"],
@@ -89,11 +89,6 @@ function aObj:SetupOptions()
 							name = self.L["NPC/Mob Yells"],
 							desc = self.L["Mute NPC/Mob Yells."],
 						},
-						noOrderHall = not self.isClassic and {
-							type = 'toggle',
-							name = self.L["OrderHall Chat"],
-							desc = self.L["Mute OrderHall NPC Chat"],
-						} or nil,
 					},
 				},
 				city = {
@@ -102,7 +97,7 @@ function aObj:SetupOptions()
 					name = self.L["City/Town Settings"],
 					desc = self.L["Change the City/Town settings"],
 					args = {
-						noDiscovery = not self.isClassic and {
+						noDiscovery = not self.isClsc and {
 							type = 'toggle',
 							name = self.L["Discoveries"],
 							desc = self.L["Mute Discovery info."],
@@ -129,7 +124,7 @@ function aObj:SetupOptions()
 						},
 					},
 				},
-				instance = not self.isClassic and {
+				instance = not self.isClsc and {
 					type = "group",
 					order = 3,
 					name = self.L["Instance Settings"],
@@ -143,17 +138,17 @@ function aObj:SetupOptions()
 						},
 					},
 				} or nil,
-				garrison = not self.isClassic and {
+				garrison = not self.isClsc and {
 					type = "group",
 					order = 4,
-					name = self.L["Garrison Settings"],
-					desc = self.L["Change the Garrison Settings"],
+					name = self.L["Garrison/Order Hall Settings"],
+					desc = self.L["Change the Garrison/Order Hall Settings"],
 					args = {
 						gChat = {
 							type = 'toggle',
 							width = "double",
-							name = self.L["General chat in Garrisons"],
-							desc = self.L["Mute General chat in Garrisons."],
+							name = self.L["General chat"],
+							desc = self.L["Mute General chat."],
 						},
 						noBguard = {
 							type = 'toggle',
@@ -210,9 +205,9 @@ function aObj:SetupOptions()
 			_G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame[optCheck[input:lower()]])
 		elseif input:lower() == "status" then
 			aObj:Print("City mode:", self.inHub, "Taxi:", self.onTaxi)
-			if not aObj.isClassic then
+			if not aObj.isClsc then
 				aObj:Print("Vehicle:", self.inVehicle, "Scenario:", self.inScenario, "Instance:", self.prdb.inInst)
-				aObj:Print("Garrison:", self.inGarrison, "Bodyguard mode:", self.prdb.noBguard, "OrderHall mode:", self.prdb.noOrderHall)
+				aObj:Print("Garrison:", self.inGarrison, "Bodyguard mode:", self.prdb.noBguard)--, "OrderHall mode:", self.prdb.noOrderHall)
 			end
 		elseif input:lower() == "loud" then
 			aObj.debugLevel = 5
@@ -222,7 +217,7 @@ function aObj:SetupOptions()
 			aObj:Print("Debug messages OFF")
 		elseif input:lower() == "locate" then
 			_G.C_Map.GetBestMapForUnit("player")
-			aObj:Print("You Are Here: [", _G.GetRealZoneText(), "][", _G.GetSubZoneText(), "][", self.GetCurrentMapAreaID(), "]")
+			aObj:Print("You Are Here: [", _G.GetRealZoneText(), "][", _G.GetSubZoneText(), "][", self.getCurrentMapAreaID(), "]")
 		elseif input:lower() == "mapinfo" then
 			local uiMapID = _G.C_Map.GetBestMapForUnit("player")
 			local mapinfo = _G.C_Map.GetMapInfo(uiMapID)
@@ -245,7 +240,15 @@ function aObj:SetupOptions()
 		type = "data source",
 		text = aObj:updateDBtext(),
 		icon = [[Interface\Icons\Spell_Holy_Silence]],
-		OnClick = function() _G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame) end,
+		OnClick = function()
+			-- do twice to overcome Blizzard bug
+			_G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame)
+			_G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame)
+		end,
+		OnTooltipShow = function(tooltip)
+			tooltip:AddLine(self.L[aName] .. " - " .. self.L[self:updateDBtext(true)])
+			tooltip:AddLine(self.L["Click to open config panel"], 1, 1, 1)
+		end,
 	})
 
 end

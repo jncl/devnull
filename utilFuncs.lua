@@ -1,16 +1,63 @@
 local aName, aObj = ...
 local _G = _G
 
-local type, select = _G.type, _G.select
-local InCombatLockdown, ChatFrame1 = _G.InCombatLockdown, _G.ChatFrame1
+local buildInfo = {
+	beta        = {"9.0.2", 36165},
+	classic_ptr = {"1.13.6", 36149},
+	retail_ptr  = {"9.0.1", 36163},
+	classic     = {"1.13.5", 36035},
+	retail      = {"9.0.1", 36230},
+	curr        = {_G.GetBuildInfo()},
+}
+function aObj:checkVersion()
+
+	local agentUID = _G.GetCVar("agentUID")
+	-- check to see which WoW version we are running on
+	self.isBeta = agentUID:find("_beta") and true
+	self.isClsc = agentUID:find("_classic") and true
+	self.isPTR  = agentUID:find("_ptr") and true
+
+	local isRetail = not self.isBeta and not self.isClsc and not self.isPTR and true
+
+	-- check for Classic PTR
+	if self.isClsc and self.isPTR then
+		self.isClscPTR = true
+		self.isPTR = nil
+	end
+	-- check current build number against Beta, if greater then it's a patch
+	self.isPatch = self.isBeta and _G.tonumber(buildInfo.curr[2]) > buildInfo.beta[2] and true
+	-- check current build number against Classic, if greater then it's a patch
+	self.isPatch = self.isPatch or not self.isClscPTR and self.isClsc and _G.tonumber(buildInfo.curr[2]) > buildInfo.classic[2] and true
+	-- check current build number against Retail, if greater then it's a patch
+	self.isPatch = self.isPatch or isRetail and _G.tonumber(buildInfo.curr[2]) > buildInfo.retail[2] and true
+
+--@alpha@
+	local vType = self.isBeta and "Beta" or self.isPTR and "Retail_PTR" or self.isClscPTR and "Classic_PTR" or self.isClsc and "Classic" or "Retail"
+	self:Printf("%s, %d, %s, %d, %s, %d, %s", buildInfo[vType:lower()][1], buildInfo[vType:lower()][2], buildInfo.curr[1], buildInfo.curr[2], buildInfo.curr[3], buildInfo.curr[4] , agentUID)
+	vType = self.isPatch and vType .. " (Patched)" or vType
+	_G.DEFAULT_CHAT_FRAME:AddMessage(aName .. ": Detected that we're running on a " .. vType .. " version", 0.75, 0.5, 0.25, nil, true)
+	vType = nil
+--@end-alpha@
+	agentUID = nil
+
+	-- handle PTR changes going Live
+	self.isClscPTR = self.isClscPTR or self.isPatch and self.isClsc and buildInfo.curr[1] > buildInfo.classic[1] and true
+	self.isPTR = self.isPTR or self.isPatch and isRetail and buildInfo.curr[1] > buildInfo.retail[1] and true
+	-- handle Beta changes in PTR or Live
+	self.isBeta = self.isBeta or self.isPTR and buildInfo.curr[4] > 90000
+
+	isRetail, buildInfo = nil, nil
+
+end
 
 -- Mapping functions
-function aObj:GetCurrentMapAreaID()
+function aObj:getCurrentMapAreaID()
 
 	return _G.C_Map.GetBestMapForUnit("player") or nil
 
 end
 
+-- Garrison functions
 local bodyguardNames = {
 	-- Tormmok [193]
 	-- Defender Illona (A) [207]
@@ -20,7 +67,7 @@ local bodyguardNames = {
 	-- Talonpriest Ishaal [218]
 	-- Leorajh [219]
 }
-if not aObj.isClassic then
+if not aObj.isClsc then
 	function aObj:isGarrison(str)
 
 		return str and str:find("Garrison Level") and true or false
@@ -43,60 +90,12 @@ else
 	aObj.getBGNames = _G.nop
 end
 
-function aObj:enableEvents()
-
-	if not aObj.isClassic then
-		aObj:LevelDebug(5, "enableEvents:", self.onTaxi, _G.UnitOnTaxi("player"), self.inVehicle, _G.UnitInVehicle("player"))
-	else
-		aObj:LevelDebug(5, "enableEvents:", self.onTaxi, _G.UnitOnTaxi("player"))
-	end
-
-	-- on Taxi
-	if not self.onTaxi
-	and _G.UnitOnTaxi("player")
-	then
-		aObj:LevelDebug(3, "on Taxi")
-		aObj:RegisterEvent("PLAYER_CONTROL_GAINED", "CheckMode")
-		self.onTaxi = true
-	-- in Vehicle
-	elseif not self.inVehicle
-	and not aObj.isClassic
-	and _G.UnitInVehicle("player")
-	then
-		aObj:LevelDebug(3, "in Vehicle")
-		aObj:RegisterEvent("UNIT_EXITED_VEHICLE", "CheckMode")
-		self.inVehicle = true
-	else
-		aObj:LevelDebug(3, "registering normal events")
-		-- register required events
-		for tEvent, enable in _G.pairs(self.trackEvent) do
-			if enable then
-				aObj:RegisterEvent(tEvent, "CheckMode")
-			end
-		end
-	end
-
-end
-function aObj:updateDBtext()
-
-	local status = self.onTaxi and self.L["Taxi"]
-	or self.inVehicle and self.L["Vehicle"]
-	or self.prdb.inInst and self.L["Instance"]
-	or self.inScenario and self.L["Scenario"]
-	or self.inGarrison and self.L["Garrison"]
-	or self.inOrderHall and self.L["OrderHall"]
-	or self.inHub and self.L["City"]
-	or self.L["Off"]
-
-	return self.prdb.shrink and status:sub(1, 1) or status
-
-end
 -- message filters & groups
-function aObj:msgFilter1(event, ...)
+function aObj.msgFilter1(event, ...)
 	aObj:LevelDebug(5, "msgFilter1:", event, ...)
-	local msg = select(1, ...)
-	local charFrom = select(2, ...)
-	local charTo = select(7, ...)
+	local msg = _G.select(1, ...)
+	local charFrom = _G.select(2, ...)
+	local charTo = _G.select(7, ...)
 	aObj:LevelDebug(3, "mf1:[%s],[%s],[%s]", msg, charFrom, charTo)
 
 	-- allow emotes/says to/from the player/pet
@@ -113,9 +112,9 @@ function aObj:msgFilter1(event, ...)
 	end
 
 end
-function aObj:msgFilter2(event, ...)
+function aObj.msgFilter2(event, ...)
 	aObj:LevelDebug(5, "msgFilter2:", event, ...)
-	local charFrom = select(2, ...)
+	local charFrom = _G.select(2, ...)
 	aObj:LevelDebug(3, "mf2:[%s]", charFrom)
 
 	-- allow yells from the player
@@ -127,9 +126,9 @@ function aObj:msgFilter2(event, ...)
 	end
 
 end
-function aObj:msgFilter3(event, ...)
+function aObj.msgFilter3(event, ...)
 	aObj:LevelDebug(5, "msgFilter3:", event, ...)
-	local msg = select(1, ...)
+	local msg = _G.select(1, ...)
 	aObj:LevelDebug(3, "mf3:[%s]", msg)
 
 	-- ignore Duelling messages
@@ -141,9 +140,9 @@ function aObj:msgFilter3(event, ...)
 	end
 
 end
-function aObj:msgFilter4(event, ...)
+function aObj.msgFilter4(event, ...)
 	aObj:LevelDebug(5, "msgFilter4:", event, ...)
-	local msg = select(1, ...)
+	local msg = _G.select(1, ...)
 	aObj:LevelDebug(3, "mf4:[%s]", msg)
 
 	-- ignore Drunken messages
@@ -159,9 +158,9 @@ function aObj:msgFilter4(event, ...)
 	end
 
 end
-function aObj:msgFilter5(event, ...)
+function aObj.msgFilter5(event, ...)
 	aObj:LevelDebug(5, "msgFilter5:", event, ...)
-	local msg = select(1, ...)
+	local msg = _G.select(1, ...)
 	aObj:LevelDebug(3, "mf5:[%s]", msg)
 
 	-- ignore discovery messages
@@ -173,10 +172,10 @@ function aObj:msgFilter5(event, ...)
 	end
 
 end
-function aObj:msgFilter6(event, ...)
+function aObj.msgFilter6(event, ...)
 	aObj:LevelDebug(5, "msgFilter6:", event, ...)
-	local msg = select(1, ...)
-	local charFrom = select(2, ...)
+	local msg = _G.select(1, ...)
+	local charFrom = _G.select(2, ...)
 	aObj:LevelDebug(3, "mf6:[%s][%s]", msg, charFrom)
 
 	-- ignore Achievement messages if not from Guild/Party/Raid members
@@ -191,12 +190,12 @@ function aObj:msgFilter6(event, ...)
 	end
 
 end
-if not aObj.isClassic then
+if not aObj.isClsc then
 -- stop messages from followers who are Bodyguards including Faction gains
-	function aObj:msgFilter7(event, ...)
+	function aObj.msgFilter7(event, ...)
 		aObj:LevelDebug(5, "msgFilter7:", event, ...)
-		local msg = select(1, ...)
-		local charFrom = select(2, ...)
+		local msg = _G.select(1, ...)
+		local charFrom = _G.select(2, ...)
 		aObj:LevelDebug(3, "mf7:[%s][%s]", msg, charFrom)
 
 		-- ignore Bodyguard's chat or Reputation gains
@@ -212,10 +211,11 @@ if not aObj.isClassic then
 else
 	aObj.msgFilter7 = _G.nop
 end
+
 function aObj:addMFltrs()
 
-	if InCombatLockdown() then
-		aObj:add2Table(aObj.oocTab, {self.addMFltrs, {self}})
+	if _G. InCombatLockdown() then
+		self:add2Table(self.oocTab, {self.addMFltrs, {self}})
 		return
 	end
 
@@ -239,7 +239,6 @@ function aObj:addMFltrs()
 
 	if self.inHub
 	or (self.inGarrison and self.prdb.gChat)
-	or (self.inOrderHall and self.prdb.noOrderHall)
 	then
 		if self.prdb.noNPC then
 			_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", self.msgFilter1)
@@ -262,7 +261,7 @@ function aObj:addMFltrs()
 end
 function aObj:removeMFltrs(upd)
 
-	if InCombatLockdown() then
+	if _G. InCombatLockdown() then
 		aObj:add2Table(aObj.oocTab, {self.removeMFltrs, {self, upd}})
 		return
 	end
@@ -314,7 +313,7 @@ end
 function aObj:updateMFltrs()
 	-- called by CheckMode function when events trigger changes
 
-	if InCombatLockdown() then
+	if _G. InCombatLockdown() then
 		aObj:add2Table(aObj.oocTab, {self.updateMFltrs, {self}})
 		return
 	end
@@ -362,7 +361,6 @@ function aObj:updateMFltrs()
 
 	if self.inHub
 	or (self.inGarrison and self.prdb.gChat)
-	or (self.inOrderHall and self.prdb.noOrderHall)
 	then
 		if self.prdb.noNPC then
 			_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", self.msgFilter1)
@@ -376,57 +374,111 @@ function aObj:updateMFltrs()
 end
 function aObj:filterMGs()
 
-	if InCombatLockdown() then
+	if _G. InCombatLockdown() then
 		aObj:add2Table(aObj.oocTab, {self.filterMGs, {self}})
 		return
 	end
 
 	-- remove message groups
 	if self.prdb.noMYell then
-		_G.ChatFrame_RemoveMessageGroup(ChatFrame1, "MONSTER_YELL")
+		_G.ChatFrame_RemoveMessageGroup(_G. ChatFrame1, "MONSTER_YELL")
 	end
 
 	if self.prdb.noTradeskill then
-		_G.ChatFrame_RemoveMessageGroup(ChatFrame1, "TRADESKILLS")
+		_G.ChatFrame_RemoveMessageGroup(_G. ChatFrame1, "TRADESKILLS")
 	end
 
 	if self.prdb.noPetInfo then
-		_G.ChatFrame_RemoveMessageGroup(ChatFrame1, "PET_INFO")
+		_G.ChatFrame_RemoveMessageGroup(_G. ChatFrame1, "PET_INFO")
 	end
 
 	if self.prdb.achFilterType == 1 then
-		_G.ChatFrame_RemoveMessageGroup(ChatFrame1, "ACHIEVEMENT")
-		_G.ChatFrame_RemoveMessageGroup(ChatFrame1, "GUILD_ACHIEVEMENT")
+		_G.ChatFrame_RemoveMessageGroup(_G. ChatFrame1, "ACHIEVEMENT")
+		_G.ChatFrame_RemoveMessageGroup(_G. ChatFrame1, "GUILD_ACHIEVEMENT")
 	end
 
 end
 function aObj:unfilterMGs()
 
-	if InCombatLockdown() then
+	if _G. InCombatLockdown() then
 		aObj:add2Table(aObj.oocTab, {self.unfilterMGs, {self}})
 		return
 	end
 
 	-- re-add message groups if they were originally enabled
 	if not self.prdb.noMYell and self.mGs["MONSTER_YELL"] then
-		_G.ChatFrame_AddMessageGroup(ChatFrame1, "MONSTER_YELL")
+		_G.ChatFrame_AddMessageGroup(_G. ChatFrame1, "MONSTER_YELL")
 	end
 
 	if not self.prdb.noTradeskill and self.mGs["TRADESKILLS"] then
-		_G.ChatFrame_AddMessageGroup(ChatFrame1, "TRADESKILLS")
+		_G.ChatFrame_AddMessageGroup(_G. ChatFrame1, "TRADESKILLS")
 	end
 
 	if not self.prdb.noPetInfo and self.mGs["PET_INFO"] then
-		_G.ChatFrame_AddMessageGroup(ChatFrame1, "PET_INFO")
+		_G.ChatFrame_AddMessageGroup(_G. ChatFrame1, "PET_INFO")
 	end
 
 	if self.prdb.achFilterType == 0 then
 		if self.mGs["ACHIEVEMENT"] then
-			_G.ChatFrame_AddMessageGroup(ChatFrame1, "ACHIEVEMENT")
+			_G.ChatFrame_AddMessageGroup(_G. ChatFrame1, "ACHIEVEMENT")
 		end
 		if self.mGs["GUILD_ACHIEVEMENT"] then
-			_G.ChatFrame_AddMessageGroup(ChatFrame1, "GUILD_ACHIEVEMENT")
+			_G.ChatFrame_AddMessageGroup(_G. ChatFrame1, "GUILD_ACHIEVEMENT")
 		end
+	end
+
+end
+
+function aObj:enableEvents()
+
+	if not aObj.isClsc then
+		aObj:LevelDebug(5, "enableEvents:", self.onTaxi, _G.UnitOnTaxi("player"), self.inVehicle, _G.UnitInVehicle("player"))
+	else
+		aObj:LevelDebug(5, "enableEvents:", self.onTaxi, _G.UnitOnTaxi("player"))
+	end
+
+	-- on Taxi
+	if not self.onTaxi
+	and _G.UnitOnTaxi("player")
+	then
+		aObj:LevelDebug(3, "on Taxi")
+		aObj:RegisterEvent("PLAYER_CONTROL_GAINED", "CheckMode")
+		self.onTaxi = true
+	-- in Vehicle
+	elseif not self.inVehicle
+	and not aObj.isClsc
+	and _G.UnitInVehicle("player")
+	then
+		aObj:LevelDebug(3, "in Vehicle")
+		aObj:RegisterEvent("UNIT_EXITED_VEHICLE", "CheckMode")
+		self.inVehicle = true
+	else
+		aObj:LevelDebug(3, "registering normal events")
+		-- register required events
+		for tEvent, enable in _G.pairs(self.trackEvent) do
+			if enable then
+				aObj:RegisterEvent(tEvent, "CheckMode")
+			end
+		end
+	end
+
+end
+function aObj:updateDBtext(noShrink)
+
+	local status = self.onTaxi and self.L["Taxi"]
+	or self.inVehicle and self.L["Vehicle"]
+	or self.prdb.inInst and self.L["Instance"]
+	or self.inScenario and self.L["Scenario"]
+	or self.inGarrison and self.L["Garrison"]
+	or self.inHub and self.L["City"]
+	or self.L["Off"]
+
+	if not self.prdb.shrink
+	or noShrink
+	then
+		return status
+	else
+		return status:sub(1, 1)
 	end
 
 end
@@ -434,9 +486,9 @@ end
 -- Printing Functions
 local function makeString(t)
 
-	if type(t) == "table" then
-		if type(_G.rawget(t, 0)) == "userdata"
-		and type(t.GetObjectType) == "function"
+	if _G.type(t) == "table" then
+		if _G.type(_G.rawget(t, 0)) == "userdata"
+		and _G.type(t.GetObjectType) == "function"
 		then
 			return ("<%s:%s>"):format(t:GetObjectType(), t:GetName() or "<Anon>")
 		end
@@ -450,16 +502,16 @@ local function makeText(a1, ...)
 	local tmpTab = {}
 	local output = ""
 
-	if a1:find("%%") and select('#', ...) >= 1 then
-		for i = 1, select('#', ...) do
-			tmpTab[i] = makeString(select(i, ...))
+	if a1:find("%%") and _G.select('#', ...) >= 1 then
+		for i = 1, _G.select('#', ...) do
+			tmpTab[i] = makeString(_G.select(i, ...))
 		end
 		output = output .. " " .. a1:format(_G.unpack(tmpTab))
 	else
 		tmpTab[1] = output
 		tmpTab[2] = a1
-		for i = 1, select('#', ...) do
-			tmpTab[i+2] = makeString(select(i, ...))
+		for i = 1, _G.select('#', ...) do
+			tmpTab[i+2] = makeString(_G.select(i, ...))
 		end
 		output = _G.table.concat(tmpTab, " ")
 	end
@@ -486,7 +538,7 @@ end
 
 --@debug@
 -- specify where debug messages go
-aObj.debugFrame = ChatFrame10
+aObj.debugFrame = _G.ChatFrame10
 aObj.debugLevel = 1
 function aObj:Debug(fstr, ...)
 

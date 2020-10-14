@@ -1,34 +1,21 @@
 local aName, aObj = ...
 local _G = _G
 
-local pairs, ipairs, type, rawget, tostring, select, unpack, table, output, date, wipe = _G.pairs, _G.ipairs, _G.type, _G.rawget, _G.tostring, _G.select, _G.unpack, _G.table, _G.output, _G.date, _G.wipe
-local LibStub, ChatFrame1 = _G.LibStub, _G.ChatFrame1
-
 do
 	-- check to see if required libraries are loaded
-	assert(LibStub, aName .. " requires LibStub")
+	assert(_G.LibStub, aName .. " requires LibStub")
 	local lTab = {"CallbackHandler-1.0", "LibDataBroker-1.1", "AceAddon-3.0", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0", "AceDB-3.0", "AceDBOptions-3.0", "AceLocale-3.0", "AceGUI-3.0",  "AceConfig-3.0", "AceConfigRegistry-3.0", "AceConfigCmd-3.0", "AceConfigDialog-3.0", "LibBabble-SubZone-3.0"}
 	local hasError
-	for _, lib in pairs(lTab) do
-		hasError = not assert(LibStub:GetLibrary(lib, true), aName .. " requires " .. lib)
+	for _, lib in _G.pairs(lTab) do
+		hasError = not assert(_G.LibStub:GetLibrary(lib, true), aName .. " requires " .. lib)
 	end
 	lTab = nil
 	if hasError then return end
 
 	-- create the addon
-	LibStub:GetLibrary("AceAddon-3.0"):NewAddon(aObj, aName, "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
+	_G.LibStub:GetLibrary("AceAddon-3.0"):NewAddon(aObj, aName, "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
 
-	local agentUID = _G.GetCVar("agentUID")
-	aObj.isClassic = agentUID:find("wow_classic") and true or false
-	aObj.isPTR = agentUID:find("wow_ptr") and true or false
-
---@alpha@
-	local vType = aObj.isClassic and "Classic" or aObj.isPTR and "PTR" or "Retail"
-	aObj:Printf("%s, %s", vType, agentUID)
-	_G.DEFAULT_CHAT_FRAME:AddMessage(aName .. ": Detected that we're running on a " .. vType .. " version", 0.75, 0.5, 0.25, nil, true)
-	vType = nil
---@end-alpha@
-	agentUID = nil
+	aObj:checkVersion()
 
 end
 
@@ -40,8 +27,13 @@ function aObj:OnInitialize()
 	self:LevelDebug(1, "Debugging is enabled")
 --@end-debug@
 --@alpha@
-	if self.isClassic then self:Debug("Classic detected") end
-	if self.isPTR then self:Debug("PTR detected") end
+	if self.isClsc then
+		self:Debug("Classic detected")
+	elseif self.isPTR then
+		self:Debug("PTR detected")
+	else
+		self:Debug("Retail detected")
+	end
 --@end-alpha@
 
 	-- setup default values in table
@@ -87,14 +79,18 @@ function aObj:OnInitialize()
 		self.prdb.achFilterType = 1
 		self.prdb.noAchievement = nil
 	end
+	-- removed OrderHall option
+	if self.prdb.noOrderHall then
+		self.prdb.noOrderHall = nil
+	end
 
 	-- handle InCombat issues
 	self.oocTab = {}
 	self:RegisterEvent("PLAYER_REGEN_ENABLED", function()
-		for _, v in pairs(self.oocTab) do
-			v[1](unpack(v[2]))
+		for _, v in _G.pairs(self.oocTab) do
+			v[1](_G.unpack(v[2]))
 		end
-		wipe(self.oocTab)
+		_G.wipe(self.oocTab)
 	end)
 
 end
@@ -103,8 +99,8 @@ function aObj:OnEnable()
 	self:LevelDebug(5, "OnEnable")
 
 	-- get existing Message Group settings
-	for group, _ in pairs(self.mGs) do
-		if _G.tContains(ChatFrame1.messageTypeList, group) then
+	for group, _ in _G.pairs(self.mGs) do
+		if _G.tContains(_G.ChatFrame1.messageTypeList, group) then
 			self.mGs[group] = true
 		end
 	end
@@ -167,9 +163,9 @@ function aObj:OnDisable()
 	self.removeMFltrs()
 
 	-- turn channels back on
-	for channel, on in pairs(self.prdb.cf1Channels) do
+	for channel, on in _G.pairs(self.prdb.cf1Channels) do
 		if on then
-			_G.ChatFrame_AddChannel(ChatFrame1, channel)
+			_G.ChatFrame_AddChannel(_G.ChatFrame1, channel)
 		end
 	end
 
@@ -217,12 +213,14 @@ function aObj:CheckMode(event, ...)
 		end)
 	end
 
-	if not aObj.isClassic then
+	local cMAID = self:getCurrentMapAreaID()
+
+	if not aObj.isClsc then
 		-- if in a vehicle then disable events
 		if event == "UNIT_ENTERED_VEHICLE"
 		and _G.select(1, ...) == " "
 		then
-			self:LevelDebug(5, "UNIT_ENTERED_VEHICLE", self:GetCurrentMapAreaID())
+			self:LevelDebug(5, "UNIT_ENTERED_VEHICLE", cMAID)
 			self:UnregisterAllEvents()
 			self:RegisterEvent("UNIT_EXITED_VEHICLE", "CheckMode")
 			self.inVehicle = true
@@ -231,7 +229,7 @@ function aObj:CheckMode(event, ...)
 		-- if exited from vehicle then enable events
 		elseif event == "UNIT_EXITED_VEHICLE"
 		then
-			self:LevelDebug(5, "UNIT_EXITED_VEHICLE", self:GetCurrentMapAreaID())
+			self:LevelDebug(5, "UNIT_EXITED_VEHICLE", cMAID)
 			self:UnregisterEvent(event)
 			self:enableEvents()
 			self.inVehicle = false
@@ -239,7 +237,8 @@ function aObj:CheckMode(event, ...)
 	end
 
 	local rZone, rSubZone = _G.GetRealZoneText(), _G.GetSubZoneText()
-	self:LevelDebug(3, "You Are Here: [%s:%s, %s]", rZone or "<Anon>", rSubZone or "<Anon>", self:GetCurrentMapAreaID())
+	self:LevelDebug(3, "You Are Here: [%s:%s, %s]", rZone or "<Anon>", rSubZone or "<Anon>", cMAID)
+
 	local instInfo = {_G.GetInstanceInfo()}
 	self:LevelDebug(4, "inInstance#1: [%s, %s, %s, %s, %s]", self.prdb.inInst, instInfo[2], instInfo[1], instInfo[9], instInfo[8])
 
@@ -254,7 +253,7 @@ function aObj:CheckMode(event, ...)
 		else
 			-- otherwise save the current channel settings for Chat Frame 1
 			self.exitedInst = false
-			for key, _ in pairs(self.prdb.cf1Channels) do
+			for key, _ in _G.pairs(self.prdb.cf1Channels) do
 				self.prdb.cf1Channels[key] = false
 			end
 			local cwc = {_G.GetChatWindowChannels(1)}
@@ -267,10 +266,11 @@ function aObj:CheckMode(event, ...)
 	end
 
 	--> Event Handler <--
-	self:LevelDebug(4, "Event Handler", self.nullHubs[rZone], self.nullTowns[rSubZone], self.nullTownsByID[self:GetCurrentMapAreaID()], self.nullAreas[rSubZone])
+	self:LevelDebug(4, "Event Handler", self.nullHubs[rZone], self.nullTowns[rSubZone], self.nullTownsByID[cMAID], self.nullAreas[rSubZone])
 	if self.nullHubs[rZone]
+	or self.nullHubsByID[cMAID]
 	or self.nullTowns[rSubZone]
-	or self.nullTownsByID[self:GetCurrentMapAreaID()]
+	or self.nullTownsByID[cMAID]
 	or self.nullAreas[rSubZone]
 	then
 		if not self.inHub then
@@ -284,13 +284,16 @@ function aObj:CheckMode(event, ...)
 		end
 	end
 
-	if not self.isClassic then
+	if not self.isClsc then
 		--> Instance/Scenario Handler <--
-		self:LevelDebug(4, "Instance/Scenario Handler", instInfo[2] ~= "none", self.isGarrison(instInfo[1]), self.prdb.inInst, self.exitedInst, self.inScenario)
+		self:LevelDebug(4, "Instance/Scenario Handler", instInfo[2] ~= "none", self:isGarrison(instInfo[1]), self.prdb.inInst, self.exitedInst, self.inScenario)
 		if instInfo[2] ~= "none"
-		and not self.isGarrison(instInfo[1])
+		and not self:isGarrison(instInfo[1])
 		then
-			if instInfo[2] == "scenario" then
+			if instInfo[2] == "scenario"
+			or (instInfo[2] == "party"
+			and instInfo[1]:find("Boost Experience"))
+			then
 				if not self.inScenario then
 					self.inScenario = true
 					if self.prdb.chatback then self:Print(self.L["Scenario mode enabled"]) end
@@ -315,29 +318,22 @@ function aObj:CheckMode(event, ...)
 			self.inScenario = false
 		end
 
-		--> Garrison Handler <--
-		self:LevelDebug(4, "Garrison Handler", self.garrisonZones[self:GetCurrentMapAreaID()], self.isGarrison(instInfo[1]))
-		if self.garrisonZones[self:GetCurrentMapAreaID()]
-		or self.isGarrison(instInfo[1])
-		then
+		--> Garrison/Order Hall Handler <--
+		local inGarrison = _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_6_0)
+		inGarrison = inGarrison or _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_7_0)
+		self:LevelDebug(4, "Garrison/Order Hall Handler", inGarrison)
+		if inGarrison then
 			if not self.inGarrison then
 				self.inGarrison = true
-				if self.prdb.chatback then self:Print(self.L["Garrison mode enabled"]) end
+				if self.prdb.chatback then
+					self:Print(self.L["Garrison/Order Hall mode enabled"])
+				end
 			end
 		else
 			self.inGarrison = false
 		end
+		inGarrison = nil
 
-		--> OrderHall Handler <--
-		self:LevelDebug(4, "OrderHall Handler", self.orderHalls[self:GetCurrentMapAreaID()])
-		if self.orderHalls[self:GetCurrentMapAreaID()] then
-			if not self.inOrderHall then
-				self.inOrderHall = true
-				if self.prdb.chatback then self:Print(self.L["OrderHall mode enabled"]) end
-			end
-		else
-			self.inOrderHall = false
-		end
 	end
 
 	-- update message filters
@@ -353,20 +349,22 @@ function aObj:CheckMode(event, ...)
 		if self.prdb.iChat
 		and self.prdb.inInst
 		then
-			for _, channel in pairs{self.L["General"], self.L["LocalDefense"], self.L["WorldDefense"]} do
-				_G.ChatFrame_RemoveChannel(ChatFrame1, channel)
+			for _, channel in _G.pairs{self.L["General"], self.L["LocalDefense"], self.L["WorldDefense"]} do
+				_G.ChatFrame_RemoveChannel(_G.ChatFrame1, channel)
 				self:LevelDebug(2, "Removed CF1 Channel: [%s]", channel)
 			end
 		elseif self.prdb.iChat
 		and self.exitedInst
 		then
-			for channel, on in pairs(self.prdb.cf1Channels) do
+			for channel, on in _G.pairs(self.prdb.cf1Channels) do
 				if on then
-					_G.ChatFrame_AddChannel(ChatFrame1, channel)
+					_G.ChatFrame_AddChannel(_G.ChatFrame1, channel)
 					self:LevelDebug(2, "Added CF1 Channel: [%s]", channel)
 				end
 			end
 		end
 	end
+
+	cMAID = nil
 
 end
