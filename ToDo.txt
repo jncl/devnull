@@ -6,7 +6,3 @@ Legend:
 	x			- indicates nothing to change
 	¶ is Alt+7	- indicates localisation changes required
 	I/O			- Issue(Bug)/Other change
-
-√	I	Handle Boost Experience
-
-¶√	I	Update Garrison & OrderHall checks
