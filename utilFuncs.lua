@@ -2,11 +2,11 @@ local aName, aObj = ...
 local _G = _G
 
 local buildInfo = {
-	beta        = {"9.0.2", 36165},
-	classic_ptr = {"1.13.6", 36149},
-	retail_ptr  = {"9.0.1", 36163},
+	beta        = {"9.0.2", 36206},
+	classic_ptr = {"1.13.6", 36231},
+	retail_ptr  = {"9.0.1", 36247},
 	classic     = {"1.13.5", 36035},
-	retail      = {"9.0.1", 36230},
+	retail      = {"9.0.1", 36247},
 	curr        = {_G.GetBuildInfo()},
 }
 function aObj:checkVersion()
@@ -91,7 +91,7 @@ else
 end
 
 -- message filters & groups
-function aObj.msgFilter1(event, ...)
+function aObj.msgFilter1(_, event, ...)
 	aObj:LevelDebug(5, "msgFilter1:", event, ...)
 	local msg = _G.select(1, ...)
 	local charFrom = _G.select(2, ...)
@@ -112,7 +112,7 @@ function aObj.msgFilter1(event, ...)
 	end
 
 end
-function aObj.msgFilter2(event, ...)
+function aObj.msgFilter2(_, event, ...)
 	aObj:LevelDebug(5, "msgFilter2:", event, ...)
 	local charFrom = _G.select(2, ...)
 	aObj:LevelDebug(3, "mf2:[%s]", charFrom)
@@ -126,7 +126,7 @@ function aObj.msgFilter2(event, ...)
 	end
 
 end
-function aObj.msgFilter3(event, ...)
+function aObj.msgFilter3(_, event, ...)
 	aObj:LevelDebug(5, "msgFilter3:", event, ...)
 	local msg = _G.select(1, ...)
 	aObj:LevelDebug(3, "mf3:[%s]", msg)
@@ -140,7 +140,7 @@ function aObj.msgFilter3(event, ...)
 	end
 
 end
-function aObj.msgFilter4(event, ...)
+function aObj.msgFilter4(_, event, ...)
 	aObj:LevelDebug(5, "msgFilter4:", event, ...)
 	local msg = _G.select(1, ...)
 	aObj:LevelDebug(3, "mf4:[%s]", msg)
@@ -158,7 +158,7 @@ function aObj.msgFilter4(event, ...)
 	end
 
 end
-function aObj.msgFilter5(event, ...)
+function aObj.msgFilter5(_, event, ...)
 	aObj:LevelDebug(5, "msgFilter5:", event, ...)
 	local msg = _G.select(1, ...)
 	aObj:LevelDebug(3, "mf5:[%s]", msg)
@@ -172,7 +172,7 @@ function aObj.msgFilter5(event, ...)
 	end
 
 end
-function aObj.msgFilter6(event, ...)
+function aObj.msgFilter6(_, event, ...)
 	aObj:LevelDebug(5, "msgFilter6:", event, ...)
 	local msg = _G.select(1, ...)
 	local charFrom = _G.select(2, ...)
@@ -192,7 +192,7 @@ function aObj.msgFilter6(event, ...)
 end
 if not aObj.isClsc then
 -- stop messages from followers who are Bodyguards including Faction gains
-	function aObj.msgFilter7(event, ...)
+	function aObj.msgFilter7(_, event, ...)
 		aObj:LevelDebug(5, "msgFilter7:", event, ...)
 		local msg = _G.select(1, ...)
 		local charFrom = _G.select(2, ...)
@@ -539,7 +539,7 @@ end
 --@debug@
 -- specify where debug messages go
 aObj.debugFrame = _G.ChatFrame10
-aObj.debugLevel = 1
+aObj.debugLevel = 5
 function aObj:Debug(fstr, ...)
 
 	local output = ("(DBG) %s:[%s.%3d]"):format(aName, _G.date("%H:%M:%S"), (_G.GetTime() % 1) * 1000)
