@@ -152,8 +152,8 @@ function aObj:SetupOptions()
 						},
 						noBguard = {
 							type = 'toggle',
-							name = self.L["Bodyguard Chat"],
-							desc = self.L["Mute Bodyguard Chat & Faction updates"],
+							name = self.L["Bodyguard chat"],
+							desc = self.L["Mute Bodyguard chat & Faction updates"],
 						},
 					},
 				} or nil,

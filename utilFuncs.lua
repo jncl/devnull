@@ -193,7 +193,7 @@ function aObj.msgFilter6(_, event, ...)
 
 end
 if not aObj.isClsc then
--- stop messages from followers who are Bodyguards including Faction gains
+	-- stop messages from followers who are Bodyguards including Faction gains
 	function aObj.msgFilter7(_, event, ...)
 		aObj:LevelDebug(5, "msgFilter7:", event, ...)
 		local msg = _G.select(1, ...)
