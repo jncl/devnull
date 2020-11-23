@@ -93,6 +93,8 @@ function aObj:SetupDefaults()
 		[SZL["Undercity"]]      = true,
 	}
 	self.nullHubsByID = {}
+	self.sanctums = {}
+	self.sanctumsByID = {}
 	self.checkZones = {
 		-- used for smaller area changes
 		[SZL["Northern Barrens"]]          = true, -- (for Ratchet)
@@ -156,15 +158,19 @@ function aObj:SetupDefaults()
 		-- Boralus (BfA)
 		self.nullHubs[SZL["Boralus Harbor"]]        = true -- (Alliance)
 		self.nullHubs[SZL["Stormsong Monastery"]]   = true -- (Alliance)
-		if aObj.isBeta then
-			-- Oribos (SL)
-			self.nullHubs[SZL["Oribos"]]            = true
-			-- TODO: Covenant Sanctums ?
-		end
+		-- Oribos (SL)
+		self.nullHubs[SZL["Oribos"]]                = true
+		-- Covenant Sanctums
+		self.sanctums[SZL["Heart of the Forest"]]   = true -- Ardenweald [Night Fae] (1565)
+		self.sanctums[SZL["Seat of the Primus"]]    = true -- Maldraxxus [Necrolord] (1698)
+		self.sanctums[SZL["Sinfall"]]               = true -- Revendreth [Venthyr] (1699)
+		self.sanctumsByID[1707]                     = true -- Bastion [Kyrian] (Elysian Hold/Valiant's Path/Archon's Rise/The Eternal Watch)
+		self.sanctumsByID[1708]                     = true -- Bastion [Kyrian] (Sanctum of Binding)
 
 		-- Kul Tiras (BfA)
 		self.nullHubsByID[1161]                     = true -- Boralus, Tiragarde Sound (Alliance)
 		-- Zandalar (BfA)
+		self.nullHubsByID[862]                      = true -- Dazar'alor [The Royal Treasury], Zuldazar (Horde)
 		self.nullHubsByID[1163]                     = true -- Dazar'alor [The Great Seal], Zuldazar (Horde)
 		self.nullHubsByID[1164]                     = true -- Dazar'alor [The Great Seal], Zuldazar (Horde)
 		self.nullHubsByID[1165]                     = true -- Dazar'alor, Zuldazar (Horde)

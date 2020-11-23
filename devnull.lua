@@ -322,6 +322,24 @@ function aObj:CheckMode(event, ...)
 	end
 
 	if not self.isClsc then
+		--> Garrison/Order Hall/Sanctum Handler <--
+		local inGarrison = _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_6_0)
+		inGarrison = inGarrison or _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_7_0)
+		inGarrison = inGarrison or self.sanctums[rSubZone]
+		inGarrison = inGarrison or self.sanctumsByID[cMAID]
+		self:LevelDebug(4, "Garrison/Order Hall/Sanctum Handler", inGarrison)
+		if inGarrison then
+			if not self.inGarrison then
+				self.inGarrison = true
+				if self.prdb.chatback then
+					self:Print(self.L["Garrison/Order Hall/Sanctum mode enabled"])
+				end
+			end
+		else
+			self.inGarrison = false
+		end
+		inGarrison = nil
+
 		--> Instance/Scenario Handler <--
 		self:LevelDebug(4, "Instance/Scenario Handler", instInfo[2] ~= "none", self:isGarrison(instInfo[1]), self.prdb.inInst, self.exitedInst, self.inScenario)
 		if instInfo[2] ~= "none"
@@ -354,22 +372,6 @@ function aObj:CheckMode(event, ...)
 			self.prdb.inInst = false
 			self.inScenario = false
 		end
-
-		--> Garrison/Order Hall Handler <--
-		local inGarrison = _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_6_0)
-		inGarrison = inGarrison or _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_7_0)
-		self:LevelDebug(4, "Garrison/Order Hall Handler", inGarrison)
-		if inGarrison then
-			if not self.inGarrison then
-				self.inGarrison = true
-				if self.prdb.chatback then
-					self:Print(self.L["Garrison/Order Hall mode enabled"])
-				end
-			end
-		else
-			self.inGarrison = false
-		end
-		inGarrison = nil
 
 	end
 

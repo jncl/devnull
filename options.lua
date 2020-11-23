@@ -141,8 +141,8 @@ function aObj:SetupOptions()
 				garrison = not self.isClsc and {
 					type = "group",
 					order = 4,
-					name = self.L["Garrison/Order Hall Settings"],
-					desc = self.L["Change the Garrison/Order Hall Settings"],
+					name = self.L["Garrison/Order Hall/Sanctum Settings"],
+					desc = self.L["Change the Garrison/Order Hall/Sanctum Settings"],
 					args = {
 						gChat = {
 							type = 'toggle',
@@ -207,7 +207,7 @@ function aObj:SetupOptions()
 			aObj:Print("City mode:", self.inHub, "Taxi:", self.onTaxi)
 			if not aObj.isClsc then
 				aObj:Print("Vehicle:", self.inVehicle, "Scenario:", self.inScenario, "Instance:", self.prdb.inInst)
-				aObj:Print("Garrison:", self.inGarrison, "Bodyguard mode:", self.prdb.noBguard)--, "OrderHall mode:", self.prdb.noOrderHall)
+				aObj:Print("Garrison:", self.inGarrison, "Bodyguard mode:", self.prdb.noBguard)
 			end
 		elseif input:lower() == "loud" then
 			aObj.debugLevel = 5
