@@ -273,12 +273,6 @@ function aObj:CheckMode(event, ...)
 		end
 	end
 
-	local rZone, rSubZone = _G.GetRealZoneText(), _G.GetSubZoneText()
-	self:LevelDebug(3, "You Are Here: [%s:%s, %s]", rZone or "<Anon>", rSubZone or "<Anon>", cMAID)
-
-	local instInfo = {_G.GetInstanceInfo()}
-	self:LevelDebug(4, "inInstance#1: [%s, %s, %s, %s, %s]", self.prdb.inInst, instInfo[2], instInfo[1], instInfo[9], instInfo[8])
-
 	--> Pre Event Handler <--
 	-- if entering a new area or just been loaded or come out of standby
 	self:LevelDebug(4, "Pre-Event Handler", self.checkEvent[event], self.prdb.inInst)
@@ -301,6 +295,9 @@ function aObj:CheckMode(event, ...)
 			cwc = nil
 		end
 	end
+
+	local rZone, rSubZone = _G.GetRealZoneText(), _G.GetSubZoneText()
+	self:LevelDebug(3, "You Are Here: [%s:%s, %s]", rZone or "<Anon>", rSubZone or "<Anon>", cMAID)
 
 	--> Event Handler <--
 	self:LevelDebug(4, "Event Handler", self.nullHubs[rZone], self.nullTowns[rSubZone], self.nullTownsByID[cMAID], self.nullAreas[rSubZone])
@@ -341,7 +338,9 @@ function aObj:CheckMode(event, ...)
 		inGarrison = nil
 
 		--> Instance/Scenario Handler <--
-		self:LevelDebug(4, "Instance/Scenario Handler", instInfo[2] ~= "none", self:isGarrison(instInfo[1]), self.prdb.inInst, self.exitedInst, self.inScenario)
+		local instInfo = {_G.GetInstanceInfo()}
+		self:LevelDebug(4, "inInstance#1: [%s, %s, %s, %s, %s]", self.prdb.inInst, instInfo[2], instInfo[1], instInfo[9], instInfo[8])
+		self:LevelDebug(4, "Instance/Scenario Handler", instInfo[2] ~= "none", self:isGarrison(instInfo[1]), self.prdb.inInst, self.exitedInst, self.inScenario, _G.C_Scenario.IsInScenario())
 		if instInfo[2] ~= "none"
 		and not self:isGarrison(instInfo[1])
 		then
@@ -372,8 +371,10 @@ function aObj:CheckMode(event, ...)
 			self.prdb.inInst = false
 			self.inScenario = false
 		end
+		instInfo = nil
 
 	end
+	cMAID, rZone, rSubZone =nil, nil, nil
 
 	-- update message filters
 	self:updateMFltrs()
@@ -403,7 +404,5 @@ function aObj:CheckMode(event, ...)
 			end
 		end
 	end
-
-	cMAID = nil
 
 end
