@@ -99,11 +99,13 @@ function aObj.msgFilter1(_, event, ...)
 	aObj:LevelDebug(3, "mf1:[%s],[%s],[%s]", msg, charFrom, charTo)
 
 	-- allow emotes/says to/from the player/pet
-	if (msg:find(aObj.player)
+	if msg:find(aObj.player)
 	or charFrom == aObj.player
 	or (msg:find(aObj.L["[Yy]ou"])
 	and charTo == aObj.player
-	or charTo == aObj.pet))
+	or charTo == aObj.pet)
+	or charFrom == aObj.NPC
+	or aObj.questNPC[charFrom]
 	then
 		aObj:LevelDebug(3, "Emote/Say to/from player/pet")
 		return false, ...

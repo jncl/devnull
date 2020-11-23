@@ -57,6 +57,8 @@ function aObj:SetupDefaults()
 		["ACHIEVEMENT"]       = false,
 		["GUILD_ACHIEVEMENT"] = false,
 	}
+	-- remember quest NPC's
+	self.questNPC = {}
 
 	-- pointer to LibBabble-SubZone-3.0 library
 	local SZL = LibStub:GetLibrary("LibBabble-SubZone-3.0"):GetLookupTable()
@@ -115,6 +117,10 @@ function aObj:SetupDefaults()
 		["ZONE_CHANGED_NEW_AREA"] = true, -- this is for changes of area
 		["PLAYER_CONTROL_LOST"]   = true, -- this is for taxi check
 		["PLAYER_LEAVING_WORLD"]  = true, -- this is for boat trips
+		["GOSSIP_SHOW"]           = true, -- this is for NPC name checks
+		["QUEST_GREETING"]        = true, -- this is for NPC name checks
+		["QUEST_DETAIL"]          = true, -- this is for NPC name checks
+		["QUEST_PROGRESS"]        = true, -- this is for NPC name checks
 	}
 
 	if not aObj.isClsc then

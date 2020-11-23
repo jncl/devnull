@@ -171,6 +171,13 @@ function aObj:OnDisable()
 
 end
 
+local function saveNPC(NPC)
+	if NPC
+	and not aObj.questNPC[NPC] then
+		aObj.questNPC[NPC] = true
+	end
+	aObj:LevelDebug(4, "Saved Gossip/Quest NPC: [%s]", NPC)
+end
 function aObj:CheckMode(event, ...)
 
 	-- local event = select(1, ...)
@@ -211,6 +218,36 @@ function aObj:CheckMode(event, ...)
 		_G.C_Timer.After(0.5, function() -- add delay before UnitOnTaxi check
 			self:enableEvents()
 		end)
+	end
+
+	-- get NPC name and remember it, if they have any quests
+	if event == "GOSSIP_SHOW" then
+		if not self.isClsc then
+			if _G.GossipFrame_GetTitleButtonCount() > 0 then
+				saveNPC(_G.UnitName("Target"))
+			end
+		else
+			if _G.select("#", _G.GetGossipAvailableQuests()) > 0
+			or _G.GossipFrame.hasActiveQuests
+			then
+				saveNPC(_G.UnitName("Target"))
+			end
+		end
+		return
+	end
+	if event == "QUEST_GREETING" then
+		if _G.GetNumActiveQuests() > 0
+		or _G.GetNumAvailableQuests() > 0
+		then
+			saveNPC(_G.UnitName("Target"))
+		end
+		return
+	end
+	if event == "QUEST_DETAIL"
+	or event == "QUEST_PROGRESS"
+	then
+		saveNPC(_G.UnitName("Target"))
+		return
 	end
 
 	local cMAID = self:getCurrentMapAreaID()
