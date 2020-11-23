@@ -6,3 +6,11 @@ Legend:
 	x			- indicates nothing to change
 	¶ is Alt+7	- indicates localisation changes required
 	I/O			- Issue(Bug)/Other change
+
+?	O	Hide or disable ChatBubbles when NPC filter is on
+
+	O	Allow chat from Quest/Gossip NPC when other messages are suppressed
+		--> track the following events and use UnitName("Target") to get the NPC's name which can then be checked in the message filter
+		-->	store them in a table, do we need to keep the table between sessions?
+			- GOSSIP_SHOW
+			- QUEST_GREETING
