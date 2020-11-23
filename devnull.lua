@@ -15,7 +15,7 @@ do
 	-- create the addon
 	_G.LibStub:GetLibrary("AceAddon-3.0"):NewAddon(aObj, aName, "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
 
-	aObj:checkVersion()
+	aObj.isClsc = _G.GetCVar("agentUID"):find("_classic") and true
 
 end
 

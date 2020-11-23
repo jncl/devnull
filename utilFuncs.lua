@@ -1,55 +1,6 @@
 local aName, aObj = ...
 local _G = _G
 
-local buildInfo = {
-	beta        = {"9.0.2", 36206},
-	classic_ptr = {"1.13.6", 36231},
-	retail_ptr  = {"9.0.1", 36247},
-	classic     = {"1.13.5", 36035},
-	retail      = {"9.0.1", 36247},
-	curr        = {_G.GetBuildInfo()},
-}
-function aObj:checkVersion()
-
-	local agentUID = _G.GetCVar("agentUID")
-	-- check to see which WoW version we are running on
-	self.isBeta = agentUID:find("_beta") and true
-	self.isClsc = agentUID:find("_classic") and true
-	self.isPTR  = agentUID:find("_ptr") and true
-
-	local isRetail = not self.isBeta and not self.isClsc and not self.isPTR and true
-
-	-- check for Classic PTR
-	if self.isClsc and self.isPTR then
-		self.isClscPTR = true
-		self.isPTR = nil
-	end
-	-- check current build number against Beta, if greater then it's a patch
-	self.isPatch = self.isBeta and _G.tonumber(buildInfo.curr[2]) > buildInfo.beta[2] and true
-	-- check current build number against Classic, if greater then it's a patch
-	self.isPatch = self.isPatch or not self.isClscPTR and self.isClsc and _G.tonumber(buildInfo.curr[2]) > buildInfo.classic[2] and true
-	-- check current build number against Retail, if greater then it's a patch
-	self.isPatch = self.isPatch or isRetail and _G.tonumber(buildInfo.curr[2]) > buildInfo.retail[2] and true
-
---@alpha@
-	local vType = self.isBeta and "Beta" or self.isPTR and "Retail_PTR" or self.isClscPTR and "Classic_PTR" or self.isClsc and "Classic" or "Retail"
-	self:Printf("%s, %d, %s, %d, %s, %d, %s", buildInfo[vType:lower()][1], buildInfo[vType:lower()][2], buildInfo.curr[1], buildInfo.curr[2], buildInfo.curr[3], buildInfo.curr[4] , agentUID)
-	vType = self.isPatch and vType .. " (Patched)" or vType
-	_G.DEFAULT_CHAT_FRAME:AddMessage(aName .. ": Detected that we're running on a " .. vType .. " version", 0.75, 0.5, 0.25, nil, true)
-	vType = nil
---@end-alpha@
-	agentUID = nil
-
-	-- handle PTR changes going Live
-	self.isClscPTR = self.isClscPTR or self.isPatch and self.isClsc and buildInfo.curr[1] > buildInfo.classic[1] and true
-	self.isPTR = self.isPTR or self.isPatch and isRetail and buildInfo.curr[1] > buildInfo.retail[1] and true
-	-- handle Beta changes in PTR or Live
-	self.isBeta = self.isBeta or self.isPTR and buildInfo.curr[4] > 90000
-
-	isRetail, buildInfo = nil, nil
-
-end
-
 -- Mapping functions
 function aObj:getCurrentMapAreaID()
 
