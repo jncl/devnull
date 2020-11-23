@@ -492,7 +492,7 @@ end
 --@debug@
 -- specify where debug messages go
 aObj.debugFrame = _G.ChatFrame10
-aObj.debugLevel = 5
+aObj.debugLevel = 1
 function aObj:Debug(fstr, ...)
 
 	local output = ("(DBG) %s:[%s.%3d]"):format(aName, _G.date("%H:%M:%S"), (_G.GetTime() % 1) * 1000)
