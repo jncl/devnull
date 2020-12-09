@@ -1,12 +1,6 @@
 local aName, aObj = ...
+
 local _G = _G
-
--- Mapping functions
-function aObj:getCurrentMapAreaID()
-
-	return _G.C_Map.GetBestMapForUnit("player") or nil
-
-end
 
 -- Garrison functions
 local bodyguardNames = {

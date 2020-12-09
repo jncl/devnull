@@ -1,12 +1,13 @@
 local aName, aObj = ...
+
 local _G = _G
 
 do
 	-- check to see if required libraries are loaded
 	assert(_G.LibStub, aName .. " requires LibStub")
-	local lTab = {"CallbackHandler-1.0", "LibDataBroker-1.1", "AceAddon-3.0", "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0", "AceDB-3.0", "AceDBOptions-3.0", "AceLocale-3.0", "AceGUI-3.0",  "AceConfig-3.0", "AceConfigRegistry-3.0", "AceConfigCmd-3.0", "AceConfigDialog-3.0", "LibBabble-SubZone-3.0"}
+	local lTab = {"AceAddon-3.0", "AceConfig-3.0", "AceConfigCmd-3.0", "AceConfigDialog-3.0", "AceConfigRegistry-3.0", "AceConsole-3.0", "AceDB-3.0", "AceDBOptions-3.0", "AceEvent-3.0", "AceGUI-3.0", "AceHook-3.0", "AceLocale-3.0", "CallbackHandler-1.0", "LibBabble-SubZone-3.0", "LibDataBroker-1.1"}
 	local hasError
-	for _, lib in _G.pairs(lTab) do
+	for _, lib in _G.ipairs(lTab) do
 		hasError = not assert(_G.LibStub:GetLibrary(lib, true), aName .. " requires " .. lib)
 	end
 	lTab = nil
@@ -250,7 +251,7 @@ function aObj:CheckMode(event, ...)
 		return
 	end
 
-	local cMAID = self:getCurrentMapAreaID()
+	local cMAID = _G.C_Map.GetBestMapForUnit("player")
 
 	if not aObj.isClsc then
 		-- if in a vehicle then disable events

@@ -1,4 +1,5 @@
 local aName, aObj = ...
+
 local _G = _G
 
 local LibStub = _G.LibStub
@@ -125,7 +126,8 @@ function aObj:SetupDefaults()
 		["QUEST_PROGRESS"]        = true, -- this is for NPC name checks
 	}
 
-	if not aObj.isClsc then
+	if not self.isClsc then
+		--
 		self.nullTowns[SZL["Mudsprocket"]]          = true
 		-- Outland (TBC)
 		self.nullTowns[SZL["Thrallmar"]]            = true -- Hellfire Peninsula (Horde)
@@ -136,15 +138,15 @@ function aObj:SetupDefaults()
 		self.nullTowns[SZL["Valiance Keep"]]        = true -- Borean Tundra (Alliance)
 		self.nullTowns[SZL["Vengeance Landing"]]    = true -- Howling Fjord (Horde)
 		self.nullTowns[SZL["Valgarde"]]             = true -- Howling Fjord (Alliance)
-
+		--
 		self.nullAreas[SZL["The Darkmoon Faire"]]   = true -- Darkmoon Island (patch 4.3)
+		-- (Cata)
 		self.nullAreas[SZL["KTC Headquarters"]]     = true -- Goblin starting area (Cataclysm)
 		self.nullAreas[SZL["Karazhan"]]             = true
 		self.nullAreas[SZL["Krom'gar Fortress"]]    = true -- Horde Base in Stonetalon Mts (Cataclysm)
 		self.nullAreas[SZL["The Celestial Court"]]  = true -- Timeless Isle (MoP)
 		self.nullAreas[SZL["The Vindicaar"]]        = true -- Argus (Legion)
 		self.nullAreas[SZL["Upton Borough"]]        = true -- Boralus Hub (BfA)
-
 		-- Outland (TBC)
 		self.nullHubs[SZL["Shattrath City"]]        = true
 		-- Northrend (WotLK)
@@ -166,7 +168,6 @@ function aObj:SetupDefaults()
 		self.sanctums[SZL["Sinfall"]]               = true -- Revendreth [Venthyr] (1699)
 		self.sanctumsByID[1707]                     = true -- Bastion [Kyrian] (Elysian Hold/Valiant's Path/Archon's Rise/The Eternal Watch)
 		self.sanctumsByID[1708]                     = true -- Bastion [Kyrian] (Sanctum of Binding)
-
 		-- Kul Tiras (BfA)
 		self.nullHubsByID[1161]                     = true -- Boralus, Tiragarde Sound (Alliance)
 		-- Zandalar (BfA)
@@ -178,28 +179,28 @@ function aObj:SetupDefaults()
 		self.nullHubsByID[1355]                     = true
 		-- Mechagon (BfA)
 		self.nullHubsByID[1462]                     = true
-
+		-- Outland (TBC)
 		self.checkZones[SZL["Hellfire Peninsula"]]  = true -- (for Honor Hold)
 		self.checkZones[SZL["Netherstorm"]]         = true -- (for Area 52)
+		-- Northrend (WotLK)
 		self.checkZones[SZL["Borean Tundra"]]       = true -- (for Valiance Keep/Warsong Hold)
 		self.checkZones[SZL["Howling Fjord"]]       = true -- (for Valgarde/Vengeance Landing)
+		-- (Cata)
 		self.checkZones[SZL["Kezan"]]               = true -- (for KTC Headquarters)
 		self.checkZones[SZL["Timeless Isle"]]       = true
-
 		-- BfA
 		self.checkZonesByID[862]                    = true -- Zuldazar (Horde)
 		self.checkZonesByID[895]                    = true -- Tiragarde Sound (Alliance)
 		self.checkZonesByID[1161]                   = true -- Boralus (Alliance)
 		self.checkZonesByID[1165]                   = true -- Dazar'alor (Horde)
-
+		--
 		self.checkEvent["SCENARIO_UPDATE"]          = true -- this is for scenario check
 		self.checkEvent["UNIT_EXITED_VEHICLE"]      = false -- this is used when in a vehicle
-
+		--
 		self.trackEvent["SCENARIO_UPDATE"]          = true -- this is for scenario check
 		self.trackEvent["UNIT_ENTERED_VEHICLE"]     = true -- this is used when in a vehicle
 		self.trackEvent["PLAYER_ENTERING_WORLD"]    = true -- this is for garrison check
 		-- self.trackEvent["UNIT_EXITED_VEHICLE"]   = false -- this is used when in a vehicle
-
 	end
 
 end

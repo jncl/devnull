@@ -1,4 +1,5 @@
 local aName, aObj = ...
+
 local _G = _G
 
 local LibStub = _G.LibStub
@@ -217,7 +218,7 @@ function aObj:SetupOptions()
 			aObj:Print("Debug messages OFF")
 		elseif input:lower() == "locate" then
 			_G.C_Map.GetBestMapForUnit("player")
-			aObj:Print("You Are Here: [", _G.GetRealZoneText(), "][", _G.GetSubZoneText(), "][", self.getCurrentMapAreaID(), "]")
+			aObj:Print("You Are Here: [", _G.GetRealZoneText(), "][", _G.GetSubZoneText(), "][", _G.C_Map.GetBestMapForUnit("player"), "]")
 		elseif input:lower() == "mapinfo" then
 			local uiMapID = _G.C_Map.GetBestMapForUnit("player")
 			local mapinfo = _G.C_Map.GetMapInfo(uiMapID)
