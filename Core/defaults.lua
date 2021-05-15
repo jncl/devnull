@@ -126,81 +126,94 @@ function aObj:SetupDefaults()
 		["QUEST_PROGRESS"]        = true, -- this is for NPC name checks
 	}
 
-	if not self.isClsc then
-		--
-		self.nullTowns[SZL["Mudsprocket"]]          = true
-		-- Outland (TBC)
-		self.nullTowns[SZL["Thrallmar"]]            = true -- Hellfire Peninsula (Horde)
-		self.nullTowns[SZL["Honor Hold"]]           = true -- Hellfire Peninsula (Alliance)
-		self.nullTowns[SZL["Area 52"]]              = true -- Netherstorm
-		-- Northrend (WotLK)
-		self.nullTowns[SZL["Warsong Hold"]]         = true -- Borean Tundra (Horde)
-		self.nullTowns[SZL["Valiance Keep"]]        = true -- Borean Tundra (Alliance)
-		self.nullTowns[SZL["Vengeance Landing"]]    = true -- Howling Fjord (Horde)
-		self.nullTowns[SZL["Valgarde"]]             = true -- Howling Fjord (Alliance)
-		--
-		self.nullAreas[SZL["The Darkmoon Faire"]]   = true -- Darkmoon Island (patch 4.3)
-		-- (Cata)
-		self.nullAreas[SZL["KTC Headquarters"]]     = true -- Goblin starting area (Cataclysm)
-		self.nullAreas[SZL["Karazhan"]]             = true
-		self.nullAreas[SZL["Krom'gar Fortress"]]    = true -- Horde Base in Stonetalon Mts (Cataclysm)
-		self.nullAreas[SZL["The Celestial Court"]]  = true -- Timeless Isle (MoP)
-		self.nullAreas[SZL["The Vindicaar"]]        = true -- Argus (Legion)
-		self.nullAreas[SZL["Upton Borough"]]        = true -- Boralus Hub (BfA)
-		-- Outland (TBC)
-		self.nullHubs[SZL["Shattrath City"]]        = true
-		-- Northrend (WotLK)
-		self.nullHubs[SZL["Dalaran"]]               = true
-		-- Pandaria (MoP)
-		self.nullHubs[SZL["Shrine of Two Moons"]]   = true -- (Horde)
-		self.nullHubs[SZL["Shrine of Seven Stars"]] = true -- (Alliance)
-		-- Ashran (WoD)
-		self.nullHubs[SZL["Warspear"]]              = true -- (Horde)
-		self.nullHubs[SZL["Stormshield"]]           = true -- (Alliance)
-		-- Boralus (BfA)
-		self.nullHubs[SZL["Boralus Harbor"]]        = true -- (Alliance)
-		self.nullHubs[SZL["Stormsong Monastery"]]   = true -- (Alliance)
-		-- Oribos (SL)
-		self.nullHubs[SZL["Oribos"]]                = true
-		-- Covenant Sanctums
-		self.sanctums[SZL["Heart of the Forest"]]   = true -- Ardenweald [Night Fae] (1565)
-		self.sanctums[SZL["Seat of the Primus"]]    = true -- Maldraxxus [Necrolord] (1698)
-		self.sanctums[SZL["Sinfall"]]               = true -- Revendreth [Venthyr] (1699)
-		self.sanctumsByID[1707]                     = true -- Bastion [Kyrian] (Elysian Hold/Valiant's Path/Archon's Rise/The Eternal Watch)
-		self.sanctumsByID[1708]                     = true -- Bastion [Kyrian] (Sanctum of Binding)
-		-- Kul Tiras (BfA)
-		self.nullHubsByID[1161]                     = true -- Boralus, Tiragarde Sound (Alliance)
-		-- Zandalar (BfA)
-		self.nullHubsByID[862]                      = true -- Dazar'alor [The Royal Treasury], Zuldazar (Horde)
-		self.nullHubsByID[1163]                     = true -- Dazar'alor [The Great Seal], Zuldazar (Horde)
-		self.nullHubsByID[1164]                     = true -- Dazar'alor [The Great Seal], Zuldazar (Horde)
-		self.nullHubsByID[1165]                     = true -- Dazar'alor, Zuldazar (Horde)
-		-- Nazjatar (BfA)
-		self.nullHubsByID[1355]                     = true
-		-- Mechagon (BfA)
-		self.nullHubsByID[1462]                     = true
-		-- Outland (TBC)
-		self.checkZones[SZL["Hellfire Peninsula"]]  = true -- (for Honor Hold)
-		self.checkZones[SZL["Netherstorm"]]         = true -- (for Area 52)
-		-- Northrend (WotLK)
-		self.checkZones[SZL["Borean Tundra"]]       = true -- (for Valiance Keep/Warsong Hold)
-		self.checkZones[SZL["Howling Fjord"]]       = true -- (for Valgarde/Vengeance Landing)
-		-- (Cata)
-		self.checkZones[SZL["Kezan"]]               = true -- (for KTC Headquarters)
-		self.checkZones[SZL["Timeless Isle"]]       = true
-		-- BfA
-		self.checkZonesByID[862]                    = true -- Zuldazar (Horde)
-		self.checkZonesByID[895]                    = true -- Tiragarde Sound (Alliance)
-		self.checkZonesByID[1161]                   = true -- Boralus (Alliance)
-		self.checkZonesByID[1165]                   = true -- Dazar'alor (Horde)
-		--
-		self.checkEvent["SCENARIO_UPDATE"]          = true -- this is for scenario check
-		self.checkEvent["UNIT_EXITED_VEHICLE"]      = false -- this is used when in a vehicle
-		--
-		self.trackEvent["SCENARIO_UPDATE"]          = true -- this is for scenario check
-		self.trackEvent["UNIT_ENTERED_VEHICLE"]     = true -- this is used when in a vehicle
-		self.trackEvent["PLAYER_ENTERING_WORLD"]    = true -- this is for garrison check
-		-- self.trackEvent["UNIT_EXITED_VEHICLE"]   = false -- this is used when in a vehicle
+	if self.isClsc
+	and not self.isClscBC
+	then
+		return
 	end
+	
+	-- Outland (TBC)
+	self.nullTowns[SZL["Honor Hold"]]           = true -- Hellfire Peninsula (Alliance)
+	self.nullTowns[SZL["Thrallmar"]]            = true -- Hellfire Peninsula (Horde)
+	self.nullTowns[SZL["Area 52"]]              = true -- Netherstorm
+	self.nullHubs[SZL["Shattrath City"]]        = true -- Terokkar Forest
+	self.checkZones[SZL["Hellfire Peninsula"]]  = true -- (for Honor Hold & Thrallmar)
+	self.checkZones[SZL["Netherstorm"]]         = true -- (for Area 52)
+
+	if self.isClscBC then return end
+
+	--
+	self.nullTowns[SZL["Mudsprocket"]]          = true -- Dustwallow Marsh (Neutral)
+	-- Northrend (WotLK)
+	self.nullTowns[SZL["Warsong Hold"]]         = true -- Borean Tundra (Horde)
+	self.nullTowns[SZL["Valiance Keep"]]        = true -- Borean Tundra (Alliance)
+	self.nullTowns[SZL["Vengeance Landing"]]    = true -- Howling Fjord (Horde)
+	self.nullTowns[SZL["Valgarde"]]             = true -- Howling Fjord (Alliance)
+
+	--
+	self.nullAreas[SZL["The Darkmoon Faire"]]   = true -- Darkmoon Island (patch 4.3)
+	self.nullAreas[SZL["KTC Headquarters"]]     = true -- Goblin starting area (Cata)
+	self.nullAreas[SZL["Karazhan"]]             = true -- Deadwind Pass (Cata)
+	self.nullAreas[SZL["Krom'gar Fortress"]]    = true -- Horde Base in Stonetalon Mts (Cata)
+	self.nullAreas[SZL["The Celestial Court"]]  = true -- Timeless Isle (MoP)
+	self.nullAreas[SZL["The Vindicaar"]]        = true -- Argus (Legion)
+	self.nullAreas[SZL["Upton Borough"]]        = true -- Boralus Hub (BfA)
+
+	-- Northrend (WotLK)
+	self.nullHubs[SZL["Dalaran"]]               = true
+	-- Pandaria (MoP)
+	self.nullHubs[SZL["Shrine of Two Moons"]]   = true -- (Horde)
+	self.nullHubs[SZL["Shrine of Seven Stars"]] = true -- (Alliance)
+	-- Ashran (WoD)
+	self.nullHubs[SZL["Warspear"]]              = true -- (Horde)
+	self.nullHubs[SZL["Stormshield"]]           = true -- (Alliance)
+	-- Boralus (BfA)
+	self.nullHubs[SZL["Boralus Harbor"]]        = true -- (Alliance)
+	self.nullHubs[SZL["Stormsong Monastery"]]   = true -- (Alliance)
+	-- Oribos (SL)
+	self.nullHubs[SZL["Oribos"]]                = true
+
+	-- Covenant Sanctums (SL)
+	self.sanctums[SZL["Heart of the Forest"]]   = true -- Ardenweald [Night Fae] (1565)
+	self.sanctums[SZL["Seat of the Primus"]]    = true -- Maldraxxus [Necrolord] (1698)
+	self.sanctums[SZL["Sinfall"]]               = true -- Revendreth [Venthyr] (1699)
+	--
+	self.sanctumsByID[1707]                     = true -- Bastion [Kyrian] (Elysian Hold/Valiant's Path/Archon's Rise/The Eternal Watch)
+	self.sanctumsByID[1708]                     = true -- Bastion [Kyrian] (Sanctum of Binding)
+
+	-- Kul Tiras (BfA)
+	self.nullHubsByID[1161]                     = true -- Boralus, Tiragarde Sound (Alliance)
+	-- Zandalar (BfA)
+	self.nullHubsByID[862]                      = true -- Dazar'alor [The Royal Treasury], Zuldazar (Horde)
+	self.nullHubsByID[1163]                     = true -- Dazar'alor [The Great Seal], Zuldazar (Horde)
+	self.nullHubsByID[1164]                     = true -- Dazar'alor [The Great Seal], Zuldazar (Horde)
+	self.nullHubsByID[1165]                     = true -- Dazar'alor, Zuldazar (Horde)
+	-- Nazjatar (BfA)
+	self.nullHubsByID[1355]                     = true
+	-- Mechagon (BfA)
+	self.nullHubsByID[1462]                     = true
+
+	-- Northrend (WotLK)
+	self.checkZones[SZL["Borean Tundra"]]       = true -- (for Valiance Keep/Warsong Hold)
+	self.checkZones[SZL["Howling Fjord"]]       = true -- (for Valgarde/Vengeance Landing)
+	-- (Cata)
+	self.checkZones[SZL["Kezan"]]               = true -- (for KTC Headquarters)
+	self.checkZones[SZL["Timeless Isle"]]       = true
+
+	-- BfA
+	self.checkZonesByID[862]                    = true -- Zuldazar (Horde)
+	self.checkZonesByID[895]                    = true -- Tiragarde Sound (Alliance)
+	self.checkZonesByID[1161]                   = true -- Boralus (Alliance)
+	self.checkZonesByID[1165]                   = true -- Dazar'alor (Horde)
+
+	--
+	self.checkEvent["SCENARIO_UPDATE"]          = true -- this is for scenario check
+	self.checkEvent["UNIT_EXITED_VEHICLE"]      = false -- this is used when in a vehicle
+
+	--
+	self.trackEvent["SCENARIO_UPDATE"]          = true -- this is for scenario check
+	self.trackEvent["UNIT_ENTERED_VEHICLE"]     = true -- this is used when in a vehicle
+	self.trackEvent["PLAYER_ENTERING_WORLD"]    = true -- this is for garrison check
+	-- self.trackEvent["UNIT_EXITED_VEHICLE"]   = false -- this is used when in a vehicle
 
 end

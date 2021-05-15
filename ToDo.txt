@@ -7,4 +7,5 @@ Legend:
 	¶ is Alt+7	- indicates localisation changes required
 	I/O			- Issue(Bug)/Other change
 
-?	O	Hide or disable ChatBubbles when NPC filter is on
+≈	O	Add support for Burning Crusade Classic version
+	

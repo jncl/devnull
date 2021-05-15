@@ -16,26 +16,27 @@ do
 	-- create the addon
 	_G.LibStub:GetLibrary("AceAddon-3.0"):NewAddon(aObj, aName, "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
 
-	aObj.isClsc = _G.GetCVar("agentUID"):find("_classic") and true
-
+	aObj.isClscBC = _G.GetCVar("agentUID"):find("wow_classic_beta") and true
+	aObj.isClsc   = _G.GetCVar("agentUID"):find("wow_classic") and true
+	
 end
 
 function aObj:OnInitialize()
 	self:LevelDebug(5, "OnInitialize")
 
---@debug@
+	--@debug@
 	self:Print("Debugging is enabled")
 	self:LevelDebug(1, "Debugging is enabled")
---@end-debug@
---@alpha@
-	if self.isClsc then
+	--@end-debug@
+	--@alpha@
+	if self.isClscBC then
+		self:Debug("Classic BC detected")
+	elseif self.isClsc then
 		self:Debug("Classic detected")
-	elseif self.isPTR then
-		self:Debug("PTR detected")
 	else
 		self:Debug("Retail detected")
 	end
---@end-alpha@
+	--@end-alpha@
 
 	-- setup default values in table
 	self:SetupDefaults()
