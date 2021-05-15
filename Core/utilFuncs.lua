@@ -15,7 +15,7 @@ local bodyguardNames = {
 if not aObj.isClsc then
 	function aObj:isGarrison(str)
 
-		return str and str:find("Garrison Level") and true or false
+		return str and str:find("Garrison Level") and true
 
 	end
 	function aObj:getBGNames()
@@ -38,6 +38,7 @@ end
 -- message filters & groups
 function aObj.msgFilter1(_, event, ...)
 	aObj:LevelDebug(5, "msgFilter1:", event, ...)
+
 	local msg = _G.select(1, ...)
 	local charFrom = _G.select(2, ...)
 	local charTo = _G.select(7, ...)
@@ -61,6 +62,7 @@ function aObj.msgFilter1(_, event, ...)
 end
 function aObj.msgFilter2(_, event, ...)
 	aObj:LevelDebug(5, "msgFilter2:", event, ...)
+
 	local charFrom = _G.select(2, ...)
 	aObj:LevelDebug(3, "mf2:[%s]", charFrom)
 
@@ -75,6 +77,7 @@ function aObj.msgFilter2(_, event, ...)
 end
 function aObj.msgFilter3(_, event, ...)
 	aObj:LevelDebug(5, "msgFilter3:", event, ...)
+
 	local msg = _G.select(1, ...)
 	aObj:LevelDebug(3, "mf3:[%s]", msg)
 
@@ -89,6 +92,7 @@ function aObj.msgFilter3(_, event, ...)
 end
 function aObj.msgFilter4(_, event, ...)
 	aObj:LevelDebug(5, "msgFilter4:", event, ...)
+
 	local msg = _G.select(1, ...)
 	aObj:LevelDebug(3, "mf4:[%s]", msg)
 
@@ -107,6 +111,7 @@ function aObj.msgFilter4(_, event, ...)
 end
 function aObj.msgFilter5(_, event, ...)
 	aObj:LevelDebug(5, "msgFilter5:", event, ...)
+
 	local msg = _G.select(1, ...)
 	aObj:LevelDebug(3, "mf5:[%s]", msg)
 
@@ -121,6 +126,7 @@ function aObj.msgFilter5(_, event, ...)
 end
 function aObj.msgFilter6(_, event, ...)
 	aObj:LevelDebug(5, "msgFilter6:", event, ...)
+
 	local msg = _G.select(1, ...)
 	local charFrom = _G.select(2, ...)
 	aObj:LevelDebug(3, "mf6:[%s][%s]", msg, charFrom)
@@ -141,6 +147,7 @@ if not aObj.isClsc then
 	-- stop messages from followers who are Bodyguards including Faction gains
 	function aObj.msgFilter7(_, event, ...)
 		aObj:LevelDebug(5, "msgFilter7:", event, ...)
+
 		local msg = _G.select(1, ...)
 		local charFrom = _G.select(2, ...)
 		aObj:LevelDebug(3, "mf7:[%s][%s]", msg, charFrom)
@@ -209,7 +216,7 @@ end
 function aObj:removeMFltrs(upd)
 
 	if _G. InCombatLockdown() then
-		aObj:add2Table(aObj.oocTab, {self.removeMFltrs, {self, upd}})
+		self:add2Table(aObj.oocTab, {self.removeMFltrs, {self, upd}})
 		return
 	end
 
