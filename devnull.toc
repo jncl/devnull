@@ -1,23 +1,21 @@
-﻿#@retail@
-## Interface: 90002
-#@end-retail@
-#@non-retail@
-# ## Interface: 11306
-#@end-non-retail@
+﻿## Interface: 90005
+## Interface-Retail: 90005
+## Interface-Classic: 11307
+## Interface-BC: 20501
 ## Title: /dev/null
 ## Notes: Mutes various chat related annoyances while in capital cities and instances.
 ## Notes-deDE: Unterdr\195\188ckt diverse st\195\182rende Meldungen - w\195\164hrend man sich in Hauptst\195\164dten oder Instanzen befindet.
 ## Notes-zhTW: 當你在主城或是副本時，關掉各種惱人的聊天對話內容
 ## Author: Jncl
 ## Version: @project-version@
-## OptionalDeps: Ace3, LibBabble-SubZone-3.0
 ## DefaultState: Enabled
 ## LoadOnDemand: 0
 ## SavedVariables: devnullDB
 ## Globe: check-classic
+## X-Curse-Project-ID: 14979
 ## X-Credits: Many thanks to Zalkalin for the original code and Tekkub for various changes.
 ## X-Category: Chat/Communication
-## X-Curse-Project-ID: 14979
+## OptionalDeps: Ace3, LibBabble-SubZone-3.0
 #
 Libs\_RequiredLibs.xml
 Libs\_OptionalLibs.xml
