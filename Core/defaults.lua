@@ -130,6 +130,11 @@ function aObj:SetupDefaults()
 		return
 	end
 	
+	-- Eversong Woods (TBC)
+	self.nullHubs[SZL["Silvermoon City"]]		= true -- Blood Elf starting area (Horde)
+	-- Azuremyst Isle (TBC)
+	self.nullHubs[SZL["The Exodar"]]			= true -- Draenei starting area (Alliance)
+	
 	-- Outland (TBC)
 	self.nullTowns[SZL["Honor Hold"]]           = true -- Hellfire Peninsula (Alliance)
 	self.nullTowns[SZL["Thrallmar"]]            = true -- Hellfire Peninsula (Horde)
@@ -140,15 +145,14 @@ function aObj:SetupDefaults()
 
 	if self.isClscBC then return end
 
-	--
 	self.nullTowns[SZL["Mudsprocket"]]          = true -- Dustwallow Marsh (Neutral)
+
 	-- Northrend (WotLK)
 	self.nullTowns[SZL["Warsong Hold"]]         = true -- Borean Tundra (Horde)
 	self.nullTowns[SZL["Valiance Keep"]]        = true -- Borean Tundra (Alliance)
 	self.nullTowns[SZL["Vengeance Landing"]]    = true -- Howling Fjord (Horde)
 	self.nullTowns[SZL["Valgarde"]]             = true -- Howling Fjord (Alliance)
 
-	--
 	self.nullAreas[SZL["The Darkmoon Faire"]]   = true -- Darkmoon Island (patch 4.3)
 	self.nullAreas[SZL["KTC Headquarters"]]     = true -- Goblin starting area (Cata)
 	self.nullAreas[SZL["Karazhan"]]             = true -- Deadwind Pass (Cata)
@@ -175,7 +179,7 @@ function aObj:SetupDefaults()
 	self.sanctums[SZL["Heart of the Forest"]]   = true -- Ardenweald [Night Fae] (1565)
 	self.sanctums[SZL["Seat of the Primus"]]    = true -- Maldraxxus [Necrolord] (1698)
 	self.sanctums[SZL["Sinfall"]]               = true -- Revendreth [Venthyr] (1699)
-	--
+
 	self.sanctumsByID[1707]                     = true -- Bastion [Kyrian] (Elysian Hold/Valiant's Path/Archon's Rise/The Eternal Watch)
 	self.sanctumsByID[1708]                     = true -- Bastion [Kyrian] (Sanctum of Binding)
 
@@ -198,17 +202,15 @@ function aObj:SetupDefaults()
 	self.checkZones[SZL["Kezan"]]               = true -- (for KTC Headquarters)
 	self.checkZones[SZL["Timeless Isle"]]       = true
 
-	-- BfA
+	-- (BfA)
 	self.checkZonesByID[862]                    = true -- Zuldazar (Horde)
 	self.checkZonesByID[895]                    = true -- Tiragarde Sound (Alliance)
 	self.checkZonesByID[1161]                   = true -- Boralus (Alliance)
 	self.checkZonesByID[1165]                   = true -- Dazar'alor (Horde)
 
-	--
 	self.checkEvent["SCENARIO_UPDATE"]          = true -- this is for scenario check
 	self.checkEvent["UNIT_EXITED_VEHICLE"]      = false -- this is used when in a vehicle
 
-	--
 	self.trackEvent["SCENARIO_UPDATE"]          = true -- this is for scenario check
 	self.trackEvent["UNIT_ENTERED_VEHICLE"]     = true -- this is used when in a vehicle
 	self.trackEvent["PLAYER_ENTERING_WORLD"]    = true -- this is for garrison check
