@@ -2,8 +2,6 @@ local aName, aObj = ...
 
 local _G = _G
 
-local LibStub = _G.LibStub
-
 function aObj:SetupDefaults()
 
 	self.inHub       = false
@@ -19,7 +17,7 @@ function aObj:SetupDefaults()
 	self.pet         = _G.UnitName("pet")
 
 	-- get Locale
-	self.L = LibStub:GetLibrary("AceLocale-3.0"):GetLocale(aName)
+	self.L = _G.LibStub:GetLibrary("AceLocale-3.0"):GetLocale(aName)
 
 	local defaults = { profile = {
 		chatback      = true,
@@ -48,7 +46,7 @@ function aObj:SetupDefaults()
 		},
 	}}
 
-	self.db = LibStub:GetLibrary("AceDB-3.0"):New(aName .. "DB", defaults, "Default")
+	self.db = _G.LibStub:GetLibrary("AceDB-3.0"):New(aName .. "DB", defaults, "Default")
 
 	-- message groups to filter
 	self.mGs = {
@@ -62,7 +60,7 @@ function aObj:SetupDefaults()
 	self.questNPC = {}
 
 	-- pointer to LibBabble-SubZone-3.0 library
-	local SZL = LibStub:GetLibrary("LibBabble-SubZone-3.0"):GetLookupTable()
+	local SZL = _G.LibStub:GetLibrary("LibBabble-SubZone-3.0"):GetLookupTable()
 
 	-- Map IDs can be found here: http://wowpedia.org/MapID
 	-- These have been changed in BfA and a transitional list can be found here:
