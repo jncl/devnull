@@ -16,9 +16,8 @@ do
 	-- create the addon
 	_G.LibStub:GetLibrary("AceAddon-3.0"):NewAddon(aObj, aName, "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
 
-	aObj.isClscBC = _G.GetCVar("agentUID"):find("wow_classic_beta") and true
-	aObj.isClsc   = _G.GetCVar("agentUID"):find("wow_classic") and true
-	
+	aObj:checkVersion()
+
 end
 
 function aObj:OnInitialize()
@@ -29,10 +28,16 @@ function aObj:OnInitialize()
 	self:LevelDebug(1, "Debugging is enabled")
 	--@end-debug@
 	--@alpha@
-	if self.isClscBC then
-		self:Debug("Classic BC detected")
+	if self.isClscBeta then
+		self:Debug("Classic_Beta detected")
+	elseif self.isClscPTR then
+		self:Debug("Classic_PTR detected")
+	elseif self.isClscBC then
+		self:Debug("Classic_BC detected")
 	elseif self.isClsc then
 		self:Debug("Classic detected")
+	elseif self.isRetPTR then
+		self:Debug("Retail_PTR detected")
 	else
 		self:Debug("Retail detected")
 	end
@@ -141,12 +146,10 @@ function aObj:OnEnable()
 	}
 	local function reloadAddon(callback)
 		aObj:LevelDebug(5, "ReloadAddon:[%s]", callback)
-
 		-- store shortcut
 		aObj.prdb = aObj.db.profile
 		-- prompt for reload
 		_G.StaticPopup_Show(aName .. "_Reload_UI")
-
 	end
 	self.db.RegisterCallback(self, "OnProfileChanged", reloadAddon)
 	self.db.RegisterCallback(self, "OnProfileCopied", reloadAddon)

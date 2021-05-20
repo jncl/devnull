@@ -437,80 +437,16 @@ function aObj:updateDBtext(noShrink)
 
 end
 
--- Printing Functions
-local function makeString(t)
-
-	if _G.type(t) == "table" then
-		if _G.type(_G.rawget(t, 0)) == "userdata"
-		and _G.type(t.GetObjectType) == "function"
-		then
-			return ("<%s:%s>"):format(t:GetObjectType(), t:GetName() or "<Anon>")
-		end
-	end
-
-	return _G.tostring(t)
-
-end
-local function makeText(a1, ...)
-
-	local tmpTab = {}
-	local output = ""
-
-	if a1:find("%%") and _G.select('#', ...) >= 1 then
-		for i = 1, _G.select('#', ...) do
-			tmpTab[i] = makeString(_G.select(i, ...))
-		end
-		output = output .. " " .. a1:format(_G.unpack(tmpTab))
-	else
-		tmpTab[1] = output
-		tmpTab[2] = a1
-		for i = 1, _G.select('#', ...) do
-			tmpTab[i+2] = makeString(_G.select(i, ...))
-		end
-		output = _G.table.concat(tmpTab, " ")
-	end
-
-	return output
-
-end
-local function printIt(text, frame, r, g, b)
-
-	(frame or _G.DEFAULT_CHAT_FRAME):AddMessage(text, r, g, b)
-
-end
-
-function aObj:CustomPrint(r, g, b, fstr, ...)
-
-	printIt(_G.WrapTextInColorCode(aName, "ffffff78") .. " " .. makeText(fstr, ...), nil, r, g, b)
-
-end
-function aObj:add2Table(table, value)
-
-	table[#table + 1] = value
-
-end
-
 --@debug@
--- specify where debug messages go
-aObj.debugFrame = _G.ChatFrame10
 aObj.debugLevel = 1
-function aObj:Debug(fstr, ...)
-
-	local output = ("(DBG) %s:[%s.%3d]"):format(aName, _G.date("%H:%M:%S"), (_G.GetTime() % 1) * 1000)
-	printIt(_G.WrapTextInColorCode(output, "ff7fff7f") .. " " .. makeText(fstr, ...), self.debugFrame)
-	output = nil
-
-end
-function aObj:LevelDebug(lvl, a1, ...)
+function aObj:LevelDebug(lvl, fStr, ...)
 
 	if lvl <= self.debugLevel then
-		self:Debug(a1, ...)
+		self:Debug(fStr, ...)
 	end
 
 end
 --@end-debug@
 --[===[@non-debug@
-function aObj:Debug() end
 function aObj:LevelDebug() end
 --@end-non-debug@]===]
-
