@@ -3,15 +3,7 @@ local aName, aObj = ...
 local _G = _G
 
 -- Garrison functions
-local bodyguardNames = {
-	-- Tormmok [193]
-	-- Defender Illona (A) [207]
-	-- Aeda Brightdawn (H) [207]
-	-- Delvar Ironfist (A) [216]
-	-- Vivianne (H) [216]
-	-- Talonpriest Ishaal [218]
-	-- Leorajh [219]
-}
+local bodyguardNames = {}
 if not aObj.isClsc then
 	function aObj:isGarrison(str)
 
@@ -22,6 +14,13 @@ if not aObj.isClsc then
 
 		if self.prdb.noBguard then
 			local info
+			-- Tormmok [193]
+			-- Defender Illona (A) [207]
+			-- Aeda Brightdawn (H) [207]
+			-- Delvar Ironfist (A) [216]
+			-- Vivianne (H) [216]
+			-- Talonpriest Ishaal [218]
+			-- Leorajh [219]
 			for _, id in _G.pairs{193, 207, 216, 218, 219} do
 				info = _G.C_Garrison.GetFollowerInfo(id)
 				bodyguardNames[info.name] = true
