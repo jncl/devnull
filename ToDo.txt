@@ -6,6 +6,3 @@ Legend:
 	x			- indicates nothing to change
 	¶ is Alt+7	- indicates localisation changes required
 	I/O			- Issue(Bug)/Other change
-
-√	O	Add support for Burning Crusade Classic version
-	
