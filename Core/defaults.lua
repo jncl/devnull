@@ -129,12 +129,12 @@ function aObj:SetupDefaults()
 	then
 		return
 	end
-	
+
 	-- Eversong Woods (TBC)
 	self.nullHubs[SZL["Silvermoon City"]]		= true -- Blood Elf starting area (Horde)
 	-- Azuremyst Isle (TBC)
 	self.nullHubs[SZL["The Exodar"]]			= true -- Draenei starting area (Alliance)
-	
+
 	-- Outland (TBC)
 	self.nullTowns[SZL["Honor Hold"]]           = true -- Hellfire Peninsula (Alliance)
 	self.nullTowns[SZL["Thrallmar"]]            = true -- Hellfire Peninsula (Horde)
@@ -173,7 +173,7 @@ function aObj:SetupDefaults()
 	self.nullHubs[SZL["Boralus Harbor"]]        = true -- (Alliance)
 	self.nullHubs[SZL["Stormsong Monastery"]]   = true -- (Alliance)
 	-- Oribos (SL)
-	self.nullHubs[SZL["Oribos"]]                = true
+	self.nullHubs[SZL["Oribos"]]                = true -- Sanctuary
 
 	-- Covenant Sanctums (SL)
 	self.sanctums[SZL["Heart of the Forest"]]   = true -- Ardenweald [Night Fae] (1565)
