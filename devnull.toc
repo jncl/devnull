@@ -1,7 +1,7 @@
-﻿## Interface: 90005
-## Interface-Retail: 90005
-## Interface-Classic: 11307
-## Interface-BC: 20501
+﻿## Interface: 90100
+## Interface-Retail: 90100
+## Interface-Classic: 11400
+## Interface-BC: 20502
 ## Title: /dev/null
 ## Notes: Mutes various chat related annoyances while in capital cities and instances.
 ## Notes-deDE: Unterdr\195\188ckt diverse st\195\182rende Meldungen - w\195\164hrend man sich in Hauptst\195\164dten oder Instanzen befindet.
@@ -16,8 +16,10 @@
 ## X-Credits: Many thanks to Zalkalin for the original code and Tekkub for various changes.
 ## X-Category: Chat/Communication
 ## OptionalDeps: Ace3, LibBabble-SubZone-3.0
-#
+
 Libs\_RequiredLibs.xml
 Libs\_OptionalLibs.xml
+
 Locales\_Locales.xml
+
 Core\_Core.xml
