@@ -1,11 +1,11 @@
-local aName, aObj = ...
+local _, aObj = ...
 
 local _G = _G
 
 -- Garrison functions
 local bodyguardNames = {}
 if not aObj.isClsc then
-	function aObj:isGarrison(str)
+	function aObj:isGarrison(str) -- luacheck: ignore self
 
 		return str and str:find("Garrison Level") and true
 
@@ -26,7 +26,6 @@ if not aObj.isClsc then
 				bodyguardNames[info.name] = true
 				aObj:LevelDebug(5, "Bodyguard:", info.name)
 			end
-			info = nil
 		end
 
 	end

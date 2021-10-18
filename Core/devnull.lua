@@ -10,7 +10,6 @@ do
 	for _, lib in _G.ipairs(lTab) do
 		hasError = not assert(_G.LibStub:GetLibrary(lib, true), aName .. " requires " .. lib)
 	end
-	lTab = nil
 	if hasError then return end
 
 	-- create the addon
@@ -21,27 +20,12 @@ do
 end
 
 function aObj:OnInitialize()
-	self:LevelDebug(5, "OnInitialize")
-
 	--@debug@
 	self:Print("Debugging is enabled")
 	self:LevelDebug(1, "Debugging is enabled")
 	--@end-debug@
-	--@alpha@
-	if self.isClscBeta then
-		self:Debug("Classic_Beta detected")
-	elseif self.isClscPTR then
-		self:Debug("Classic_PTR detected")
-	elseif self.isClscBC then
-		self:Debug("Classic_BC detected")
-	elseif self.isClsc then
-		self:Debug("Classic detected")
-	elseif self.isRetPTR then
-		self:Debug("Retail_PTR detected")
-	else
-		self:Debug("Retail detected")
-	end
-	--@end-alpha@
+
+	self:LevelDebug(5, "OnInitialize")
 
 	-- setup default values in table
 	self:SetupDefaults()
@@ -134,8 +118,10 @@ function aObj:OnEnable()
 		OnAccept = function()
 			_G.ReloadUI()
 		end,
-		OnCancel = function(this, data, reason)
-			if reason == "timeout" or reason == "clicked" then
+		OnCancel = function(_, _, reason)
+			if reason == "timeout"
+			or reason == "clicked"
+			then
 				aObj.CustomPrint(1, 1, 0, "The profile '" .. aObj.db:GetCurrentProfile() .. "' will be activated next time you Login or Reload the UI")
 			end
 		end,
@@ -191,7 +177,7 @@ function aObj:CheckMode(event, ...)
 	-- if WorldMapFrame currently open defer check until it is closed
 	if _G.WorldMapFrame:IsShown() then
 		if not self:IsHooked(_G.WorldMapFrame, "OnHide") then
-			self:SecureHookScript(_G.WorldMapFrame, "OnHide", function(this)
+			self:SecureHookScript(_G.WorldMapFrame, "OnHide", function(_)
 				self:CheckMode("WorldMap closed")
 				self:Unhook(_G.WorldMapFrame, "OnHide")
 			end)
@@ -297,7 +283,6 @@ function aObj:CheckMode(event, ...)
 				self:LevelDebug(3, "cwc: [%s]", cwc[i])
 				self.prdb.cf1Channels[cwc[i]] = true
 			end
-			cwc = nil
 		end
 	end
 
@@ -340,7 +325,6 @@ function aObj:CheckMode(event, ...)
 		else
 			self.inGarrison = false
 		end
-		inGarrison = nil
 
 		--> Instance/Scenario Handler <--
 		local instInfo = {_G.GetInstanceInfo()}
@@ -376,10 +360,8 @@ function aObj:CheckMode(event, ...)
 			self.prdb.inInst = false
 			self.inScenario = false
 		end
-		instInfo = nil
 
 	end
-	cMAID, rZone, rSubZone =nil, nil, nil
 
 	-- update message filters
 	self:updateMFltrs()

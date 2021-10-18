@@ -194,9 +194,6 @@ function aObj:SetupOptions()
 
 	-- Slash command handler
 	local function chatCommand(input)
-
-		local cmds = { (" "):split(input) }
-
 		if not input or input:trim() == "" then
 			-- Open general panel if there are no parameters
 			_G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame)
@@ -208,7 +205,7 @@ function aObj:SetupOptions()
 			aObj:Print("City mode:", self.inHub, "Taxi:", self.onTaxi)
 			if not aObj.isClsc then
 				aObj:Print("Vehicle:", self.inVehicle, "Scenario:", self.inScenario, "Instance:", self.prdb.inInst)
-				aObj:Print("Garrison:", self.inGarrison, "Bodyguard mode:", self.prdb.noBguard)
+				aObj:Print("Garrison/Sanctum:", self.inGarrison, "Bodyguard mode:", self.prdb.noBguard)
 			end
 		elseif input:lower() == "loud" then
 			aObj.debugLevel = 5
@@ -225,11 +222,9 @@ function aObj:SetupOptions()
 			local posn = _G.C_Map.GetPlayerMapPosition(uiMapID, "player")
 			local areaName= _G.MapUtil.FindBestAreaNameAtMouse(uiMapID, posn["x"], posn["y"])
 			aObj:Print("Map Info:", mapinfo["mapID"], mapinfo["name"], mapinfo["mapType"], mapinfo["parentMapID"], posn["x"], posn["y"], areaName)
-			uiMapID, mapinfo, posn, areaName = nil, nil, nil, nil
 		else
 			LibStub:GetLibrary("AceConfigCmd-3.0"):HandleCommand(aName, aName, input)
 		end
-
 	end
 
 	-- Register slash command handlers

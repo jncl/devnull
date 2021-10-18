@@ -1,10 +1,10 @@
-
-local debug = false
+local aName, _ = ...
+local silent = false -- luacheck: ignore 311 (value overwritten before being used)
 --@debug@
-debug = true
+silent = true
 --@end-debug@
 
-local L = LibStub("AceLocale-3.0"):NewLocale("devnull", "enUS", true, debug)
+local L = _G.LibStub:GetLibrary("AceLocale-3.0", true):NewLocale(aName, "enUS", true, silent)
 
 if not L then return end
 
