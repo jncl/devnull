@@ -310,12 +310,12 @@ function aObj:CheckMode(event, ...)
 
 	if not self.isClsc then
 		--> Garrison/Order Hall/Sanctum Handler <--
-		local inGarrison = _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_6_0)
-		inGarrison = inGarrison or _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_7_0)
-		inGarrison = inGarrison or self.sanctums[rSubZone]
-		inGarrison = inGarrison or self.sanctumsByID[cMAID]
-		self:LevelDebug(4, "Garrison/Order Hall/Sanctum Handler", inGarrison)
-		if inGarrison then
+		self:LevelDebug(4, "Garrison/Sanctum Handler", _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_6_0), _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_7_0), self.sanctums[rSubZone], self.sanctumsByID[cMAID])
+		if _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_6_0)
+		or _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_7_0) -- Order Hall
+		or self.sanctums[rSubZone]
+		or self.sanctumsByID[cMAID]
+		then
 			if not self.inGarrison then
 				self.inGarrison = true
 				if self.prdb.chatback then
