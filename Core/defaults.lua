@@ -125,16 +125,12 @@ function aObj:SetupDefaults()
 		["QUEST_PROGRESS"]        = true, -- this is for NPC name checks
 	}
 
-	if self.isClsc
-	and not self.isClscBC
-	then
-		return
-	end
+	if self.isClscERA then return end
 
 	-- Eversong Woods (TBC)
-	self.nullHubs[SZL["Silvermoon City"]]		= true -- Blood Elf starting area (Horde)
+	self.nullHubs[SZL["Silvermoon City"]]       = true -- Blood Elf starting area (Horde)
 	-- Azuremyst Isle (TBC)
-	self.nullHubs[SZL["The Exodar"]]			= true -- Draenei starting area (Alliance)
+	self.nullHubs[SZL["The Exodar"]]            = true -- Draenei starting area (Alliance)
 
 	-- Outland (TBC)
 	self.nullTowns[SZL["Honor Hold"]]           = true -- Hellfire Peninsula (Alliance)
@@ -144,9 +140,7 @@ function aObj:SetupDefaults()
 	self.checkZones[SZL["Hellfire Peninsula"]]  = true -- (for Honor Hold & Thrallmar)
 	self.checkZones[SZL["Netherstorm"]]         = true -- (for Area 52)
 
-	if self.isClscBC then
-		return
-	end
+	if not self.isRtl then return end
 
 	self.nullTowns[SZL["Mudsprocket"]]          = true -- Dustwallow Marsh (Neutral)
 
@@ -175,7 +169,7 @@ function aObj:SetupDefaults()
 	-- Boralus (BfA)
 	self.nullHubs[SZL["Boralus Harbor"]]        = true -- (Alliance)
 	self.nullHubs[SZL["Stormsong Monastery"]]   = true -- (Alliance)
-	-- Oribos (SL)
+	-- (SL)
 	self.nullHubs[SZL["Oribos"]]                = true -- Sanctuary
 
 	-- Covenant Sanctums (SL)
