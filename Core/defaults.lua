@@ -157,6 +157,9 @@ function aObj:SetupDefaults()
 	self.nullAreas[SZL["The Celestial Court"]]  = true -- Timeless Isle (MoP)
 	self.nullAreas[SZL["The Vindicaar"]]        = true -- Argus (Legion)
 	self.nullAreas[SZL["Upton Borough"]]        = true -- Boralus Hub (BfA)
+	self.nullAreas[SZL["Hero's Rest"]]          = true -- Sanctuary [Bastion] (SL)
+	self.nullAreas[SZL["Ve'nari's Refuge"]]     = true -- Sanctuary [The Maw] (SL)
+	self.nullAreas[SZL["Keeper's Respite"]]     = true -- Sanctuary [Korthia] (SL)
 
 	-- Northrend (WotLK)
 	self.nullHubs[SZL["Dalaran"]]               = true
