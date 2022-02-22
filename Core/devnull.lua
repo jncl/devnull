@@ -348,17 +348,8 @@ function aObj:CheckMode(event, ...)
 				end
 			end
 		else
-			if self.exitedInst
-			and self.prdb.chatback
-			then
-				if self.prdb.inInst
-				or self.inScenario
-				then
-					self:Print(self.L["Instance/Scenario mode disabled"])
-				end
-			end
-			self.prdb.inInst = false
 			self.inScenario = false
+			self.prdb.inInst = false
 		end
 
 	end
