@@ -1,7 +1,7 @@
-﻿## Interface: 90100
-## Interface-Retail: 90100
-## Interface-Classic: 11400
-## Interface-BCC: 20502
+﻿## Interface: 90200
+## Interface-Retail: 90200
+## Interface-Classic: 11402
+## Interface-BCC: 20503
 ## Title: /dev/null
 ## Notes: Mutes various chat related annoyances while in capital cities and instances.
 ## Notes-deDE: Unterdr\195\188ckt diverse st\195\182rende Meldungen - w\195\164hrend man sich in Hauptst\195\164dten oder Instanzen befindet.
