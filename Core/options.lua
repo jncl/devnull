@@ -131,7 +131,7 @@ function aObj:SetupOptions()
 					name = self.L["Instance Settings"],
 					desc = self.L["Change the Instance settings"],
 					args = {
-						iChat = {
+						noIChat = {
 							type = 'toggle',
 							width = "double",
 							name = self.L["General chat in Instances"],
@@ -145,7 +145,7 @@ function aObj:SetupOptions()
 					name = self.L["Garrison/Order Hall/Sanctum Settings"],
 					desc = self.L["Change the Garrison/Order Hall/Sanctum Settings"],
 					args = {
-						gChat = {
+						noGChat = {
 							type = 'toggle',
 							width = "double",
 							name = self.L["General chat"],

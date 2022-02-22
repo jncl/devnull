@@ -20,22 +20,21 @@ function aObj:SetupDefaults()
 	self.L = _G.LibStub:GetLibrary("AceLocale-3.0"):GetLocale(aName)
 
 	local defaults = { profile = {
+		achFilterType = 0,
 		chatback      = true,
 		shrink        = false,
-		achFilterType = 0,
+		noBguard      = true,
 		noDiscovery   = true,
 		noDrunk       = true,
 		noDuel        = true,
-		noEmote       = false,
-		noNPC         = false,
-		noPetInfo     = false,
-		noTradeskill  = false,
-		noMYell       = false,
-		noPYell       = false,
-		gChat         = false,
-		noBguard      = false,
-		iChat         = true,
-		inInst        = false,
+		noEmote       = true,
+		noGChat       = true,
+		noIChat       = true,
+		noMYell       = true,
+		noNPC         = true,
+		noPetInfo     = true,
+		noPYell       = true,
+		noTradeskill  = true,
 		-- ChatFrame1 channel settings
 		cf1Channels = {
 			[self.L["General"]]          = false,
@@ -44,6 +43,8 @@ function aObj:SetupDefaults()
 			[self.L["WorldDefense"]]     = false,
 			[self.L["GuildRecruitment"]] = false,
 		},
+		-- stored inInstance setting
+		inInst        = false,
 	}}
 
 	self.db = _G.LibStub:GetLibrary("AceDB-3.0"):New(aName .. "DB", defaults, "Default")
@@ -143,7 +144,9 @@ function aObj:SetupDefaults()
 	self.checkZones[SZL["Hellfire Peninsula"]]  = true -- (for Honor Hold & Thrallmar)
 	self.checkZones[SZL["Netherstorm"]]         = true -- (for Area 52)
 
-	if self.isClscBC then return end
+	if self.isClscBC then
+		return
+	end
 
 	self.nullTowns[SZL["Mudsprocket"]]          = true -- Dustwallow Marsh (Neutral)
 

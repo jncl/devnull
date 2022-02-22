@@ -373,14 +373,14 @@ function aObj:CheckMode(event, ...)
 	-- if entering a new area or just been loaded or come out of standby
 	if self.checkEvent[event] then
 		-- Mute chat in Instances if required
-		if self.prdb.iChat
+		if self.prdb.noIChat
 		and self.prdb.inInst
 		then
 			for _, channel in _G.pairs{self.L["General"], self.L["LocalDefense"], self.L["WorldDefense"]} do
 				_G.ChatFrame_RemoveChannel(_G.ChatFrame1, channel)
 				self:LevelDebug(2, "Removed CF1 Channel: [%s]", channel)
 			end
-		elseif self.prdb.iChat
+		elseif self.prdb.noIChat
 		and self.exitedInst
 		then
 			for channel, on in _G.pairs(self.prdb.cf1Channels) do

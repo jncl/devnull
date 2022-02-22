@@ -187,7 +187,7 @@ function aObj:addMFltrs()
 	end
 
 	if self.inHub
-	or (self.inGarrison and self.prdb.gChat)
+	or (self.inGarrison and self.prdb.noGChat)
 	then
 		if self.prdb.noNPC then
 			_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", self.msgFilter1)
@@ -313,7 +313,7 @@ function aObj:updateMFltrs()
 	end
 
 	if self.inHub
-	or (self.inGarrison and self.prdb.gChat)
+	or (self.inGarrison and self.prdb.noGChat)
 	then
 		if self.prdb.noNPC then
 			_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", self.msgFilter1)
