@@ -4,33 +4,34 @@ local _G = _G
 
 -- Garrison functions
 local bodyguardNames = {}
-if not aObj.isClsc then
-	function aObj:isGarrison(str) -- luacheck: ignore self
+function aObj:isGarrison(str) -- luacheck: ignore self
 
-		return str and str:find("Garrison Level") and true
+	return str and str:find("Garrison Level") and true
 
+end
+function aObj:getBGNames()
+
+	if self.isClsc then
+		self.getBGNames = _G.nop
+		return
 	end
-	function aObj:getBGNames()
 
-		if self.prdb.noBguard then
-			local info
-			-- Tormmok [193]
-			-- Defender Illona (A) [207]
-			-- Aeda Brightdawn (H) [207]
-			-- Delvar Ironfist (A) [216]
-			-- Vivianne (H) [216]
-			-- Talonpriest Ishaal [218]
-			-- Leorajh [219]
-			for _, id in _G.pairs{193, 207, 216, 218, 219} do
-				info = _G.C_Garrison.GetFollowerInfo(id)
-				bodyguardNames[info.name] = true
-				aObj:LevelDebug(5, "Bodyguard:", info.name)
-			end
+	if self.prdb.noBguard then
+		local info
+		-- Tormmok [193]
+		-- Defender Illona (A) [207]
+		-- Aeda Brightdawn (H) [207]
+		-- Delvar Ironfist (A) [216]
+		-- Vivianne (H) [216]
+		-- Talonpriest Ishaal [218]
+		-- Leorajh [219]
+		for _, id in _G.pairs{193, 207, 216, 218, 219} do
+			info = _G.C_Garrison.GetFollowerInfo(id)
+			bodyguardNames[info.name] = true
+			aObj:LevelDebug(5, "Bodyguard:", info.name)
 		end
-
 	end
-else
-	aObj.getBGNames = _G.nop
+
 end
 
 -- message filters & groups
@@ -141,27 +142,23 @@ function aObj.msgFilter6(_, event, ...)
 	end
 
 end
-if not aObj.isClsc then
-	-- stop messages from followers who are Bodyguards including Faction gains
-	function aObj.msgFilter7(_, event, ...)
-		aObj:LevelDebug(5, "msgFilter7:", event, ...)
+-- stop messages from followers who are Bodyguards including Faction gains
+function aObj.msgFilter7(_, event, ...)
+	aObj:LevelDebug(5, "msgFilter7:", event, ...)
 
-		local msg = _G.select(1, ...)
-		local charFrom = _G.select(2, ...)
-		aObj:LevelDebug(3, "mf7:[%s][%s]", msg, charFrom)
+	local msg = _G.select(1, ...)
+	local charFrom = _G.select(2, ...)
+	aObj:LevelDebug(3, "mf7:[%s][%s]", msg, charFrom)
 
-		-- ignore Bodyguard's chat or Reputation gains
-		if bodyguardNames[charFrom]
-		or bodyguardNames[msg:match(aObj.L["Reputation with"] .. "%s(.*)%s" .. aObj.L["increased by"])]
-		then
-			return true
-		else
-			return false, ...
-		end
-
+	-- ignore Bodyguard's chat or Reputation gains
+	if bodyguardNames[charFrom]
+	or bodyguardNames[msg:match(aObj.L["Reputation with"] .. "%s(.*)%s" .. aObj.L["increased by"])]
+	then
+		return true
+	else
+		return false, ...
 	end
-else
-	aObj.msgFilter7 = _G.nop
+
 end
 
 function aObj:addMFltrs()
@@ -205,7 +202,9 @@ function aObj:addMFltrs()
 		_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_ACHIEVEMENT", self.msgFilter6)
 	end
 
-	if self.prdb.noBguard then
+	if self.prdb.noBguard
+	and not self.isClsc
+	then
 		_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", self.msgFilter7)
 		_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_COMBAT_FACTION_CHANGE", self.msgFilter7)
 	end
@@ -256,7 +255,9 @@ function aObj:removeMFltrs(upd)
 		_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_ACHIEVEMENT", self.msgFilter6)
 	end
 
-	if self.prdb.noBguard then
+	if self.prdb.noBguard
+	and not self.isClsc
+	then
 		_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_MONSTER_SAY", self.msgFilter7)
 		_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_COMBAT_FACTION_CHANGE", self.msgFilter7)
 	end
