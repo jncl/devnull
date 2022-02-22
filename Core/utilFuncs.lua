@@ -359,15 +359,21 @@ function aObj:unfilterMGs()
 	end
 
 	-- re-add message groups if they were originally enabled
-	if not self.prdb.noMYell and self.mGs["MONSTER_YELL"] then
+	if not self.prdb.noMYell
+	and self.mGs["MONSTER_YELL"]
+	then
 		_G.ChatFrame_AddMessageGroup(_G. ChatFrame1, "MONSTER_YELL")
 	end
 
-	if not self.prdb.noTradeskill and self.mGs["TRADESKILLS"] then
+	if not self.prdb.noTradeskill
+	and self.mGs["TRADESKILLS"]
+	then
 		_G.ChatFrame_AddMessageGroup(_G. ChatFrame1, "TRADESKILLS")
 	end
 
-	if not self.prdb.noPetInfo and self.mGs["PET_INFO"] then
+	if not self.prdb.noPetInfo
+	and self.mGs["PET_INFO"]
+	then
 		_G.ChatFrame_AddMessageGroup(_G. ChatFrame1, "PET_INFO")
 	end
 
@@ -384,33 +390,33 @@ end
 
 function aObj:enableEvents()
 
-	if not aObj.isClsc then
-		aObj:LevelDebug(5, "enableEvents:", self.onTaxi, _G.UnitOnTaxi("player"), self.inVehicle, _G.UnitInVehicle("player"))
+	if not self.isClsc then
+		self:LevelDebug(5, "enableEvents:", self.onTaxi, _G.UnitOnTaxi("player"), self.inVehicle, _G.UnitInVehicle("player"))
 	else
-		aObj:LevelDebug(5, "enableEvents:", self.onTaxi, _G.UnitOnTaxi("player"))
+		self:LevelDebug(5, "enableEvents:", self.onTaxi, _G.UnitOnTaxi("player"))
 	end
 
 	-- on Taxi
 	if not self.onTaxi
 	and _G.UnitOnTaxi("player")
 	then
-		aObj:LevelDebug(3, "on Taxi")
-		aObj:RegisterEvent("PLAYER_CONTROL_GAINED", "CheckMode")
+		self:LevelDebug(3, "on Taxi")
+		self:RegisterEvent("PLAYER_CONTROL_GAINED", "CheckMode")
 		self.onTaxi = true
 	-- in Vehicle
 	elseif not self.inVehicle
-	and not aObj.isClsc
+	and not self.isClsc
 	and _G.UnitInVehicle("player")
 	then
-		aObj:LevelDebug(3, "in Vehicle")
-		aObj:RegisterEvent("UNIT_EXITED_VEHICLE", "CheckMode")
+		self:LevelDebug(3, "in Vehicle")
+		self:RegisterEvent("UNIT_EXITED_VEHICLE", "CheckMode")
 		self.inVehicle = true
 	else
-		aObj:LevelDebug(3, "registering normal events")
+		self:LevelDebug(3, "registering normal events")
 		-- register required events
 		for tEvent, enable in _G.pairs(self.trackEvent) do
 			if enable then
-				aObj:RegisterEvent(tEvent, "CheckMode")
+				self:RegisterEvent(tEvent, "CheckMode")
 			end
 		end
 	end
