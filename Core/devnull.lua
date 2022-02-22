@@ -299,13 +299,10 @@ function aObj:CheckMode(event, ...)
 	then
 		if not self.inHub then
 			self.inHub = true
-			if self.prdb.chatback then self:Print(self.L["City/Town mode enabled"]) end
+			if self.prdb.chatback then self:Print(self.L["City/Town/Sanctuary mode enabled"]) end
 		end
 	else
-		if self.inHub then
-			self.inHub = false
-			if self.prdb.chatback then self:Print(self.L["City/Town mode disabled"]) end
-		end
+		self.inHub = false
 	end
 
 	if not self.isClsc then
