@@ -160,6 +160,9 @@ function aObj:SetupDefaults()
 	self.nullAreas[SZL["Hero's Rest"]]          = true -- Sanctuary [Bastion] (SL)
 	self.nullAreas[SZL["Ve'nari's Refuge"]]     = true -- Sanctuary [The Maw] (SL)
 	self.nullAreas[SZL["Keeper's Respite"]]     = true -- Sanctuary [Korthia] (SL)
+	self.nullAreas[SZL["Haven"]]                = true -- Sanctuary [ereth Mortis] (SL)
+	self.nullAreas[SZL["Exile's Hollow"]]       = true -- Sanctuary [ereth Mortis] (SL)
+	self.nullAreas[SZL["Pilgrim's Grace"]]      = true -- Sanctuary [ereth Mortis] (SL)
 
 	-- Northrend (WotLK)
 	self.nullHubs[SZL["Dalaran"]]               = true
