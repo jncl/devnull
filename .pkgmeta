@@ -25,9 +25,10 @@ externals:
 ignore:
     - ToDo.txt
 
+enable-toc-creation: yes
+
 tools-used:
     - findglobals
     # https://www.townlong-yak.com/globe/
     # luacheck
 
-enable-nolib-creation: no
