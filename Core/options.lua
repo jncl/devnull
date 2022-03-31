@@ -95,9 +95,14 @@ function aObj:SetupOptions()
 				city = {
 					type = "group",
 					order = 2,
-					name = self.L["City/Town Settings"],
-					desc = self.L["Change the City/Town settings"],
+					name = self.L["Hub Settings"],
+					desc = self.L["Change the Hub settings"],
 					args = {
+						h1 = {
+							type = "description",
+							order = 1,
+							name = self.L["These settings are used in Cities, Towns and Sanctuaries"] .. "\n\n",
+						},
 						noDiscovery = not self.isClsc and {
 							type = 'toggle',
 							name = self.L["Discoveries"],
@@ -142,9 +147,14 @@ function aObj:SetupOptions()
 				garrison = not self.isClsc and {
 					type = "group",
 					order = 4,
-					name = self.L["Garrison/Order Hall/Sanctum Settings"],
-					desc = self.L["Change the Garrison/Order Hall/Sanctum Settings"],
+					name = self.L["Garrison Settings"],
+					desc = self.L["Change the Garrison Settings"],
 					args = {
+						h1 = {
+							type = "description",
+							order = 1,
+							name = self.L["These settings are used in Garrisons, Order Halls and Sanctums"] .. "\n\n",
+						},
 						noGChat = {
 							type = 'toggle',
 							width = "double",
@@ -202,10 +212,10 @@ function aObj:SetupOptions()
 			_G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame[optCheck[input:lower()]])
 			_G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame[optCheck[input:lower()]])
 		elseif input:lower() == "status" then
-			aObj:Print("City mode:", self.inHub, "Taxi:", self.onTaxi)
+			aObj:Print("Hub:", self.inHub, "Taxi:", self.onTaxi)
 			if not aObj.isClsc then
 				aObj:Print("Vehicle:", self.inVehicle, "Scenario:", self.inScenario, "Instance:", self.prdb.inInst)
-				aObj:Print("Garrison/Sanctum:", self.inGarrison, "Bodyguard mode:", self.prdb.noBguard)
+				aObj:Print("Garrison:", self.inGarrison, "Bodyguard mode:", self.prdb.noBguard)
 			end
 		elseif input:lower() == "loud" then
 			aObj.debugLevel = 5

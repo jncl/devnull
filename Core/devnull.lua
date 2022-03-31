@@ -290,24 +290,27 @@ function aObj:CheckMode(event, ...)
 	self:LevelDebug(3, "You Are Here: [%s:%s, %s]", rZone or "<Anon>", rSubZone or "<Anon>", cMAID)
 
 	--> Event Handler <--
-	self:LevelDebug(4, "Event Handler", self.nullHubs[rZone], self.nullTowns[rSubZone], self.nullTownsByID[cMAID], self.nullAreas[rSubZone])
+	self:LevelDebug(4, "Event Handler", self.nullHubs[rZone], self.nullHubsByID[cMAID], self.nullTowns[rSubZone], self.nullTownsByID[cMAID], self.nullAreas[rSubZone], self.sanctuaries[rZone], self.sanctuaries[rSubZone], self.sanctuariesByID[cMAID])
 	if self.nullHubs[rZone]
 	or self.nullHubsByID[cMAID]
 	or self.nullTowns[rSubZone]
 	or self.nullTownsByID[cMAID]
 	or self.nullAreas[rSubZone]
+	or self.sanctuaries[rZone]
+	or self.sanctuaries[rSubZone]
+	or self.sanctuariesByID[cMAID]
 	then
 		if not self.inHub then
 			self.inHub = true
-			if self.prdb.chatback then self:Print(self.L["City/Town/Sanctuary mode enabled"]) end
+			if self.prdb.chatback then self:Print(self.L["Hub mode enabled"]) end
 		end
 	else
 		self.inHub = false
 	end
 
 	if not self.isClsc then
-		--> Garrison/Order Hall/Sanctum Handler <--
-		self:LevelDebug(4, "Garrison/Sanctum Handler", _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_6_0), _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_7_0), self.sanctums[rSubZone], self.sanctumsByID[cMAID])
+		--> Garrison Handler <--
+		self:LevelDebug(4, "Garrison Handler", _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_6_0), _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_7_0), self.sanctums[rSubZone], self.sanctumsByID[cMAID])
 		if _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_6_0)
 		or _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_7_0) -- Order Hall
 		or self.sanctums[rSubZone]
@@ -316,7 +319,7 @@ function aObj:CheckMode(event, ...)
 			if not self.inGarrison then
 				self.inGarrison = true
 				if self.prdb.chatback then
-					self:Print(self.L["Garrison/Order Hall/Sanctum mode enabled"])
+					self:Print(self.L["Garrison mode enabled"])
 				end
 			end
 		else

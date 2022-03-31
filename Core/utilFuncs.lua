@@ -429,7 +429,7 @@ function aObj:updateDBtext(noShrink)
 	or self.prdb.inInst and self.L["Instance"]
 	or self.inScenario and self.L["Scenario"]
 	or self.inGarrison and self.L["Garrison"]
-	or self.inHub and self.L["City"]
+	or self.inHub and self.L["Hub"]
 	or self.L["Off"]
 
 	if not self.prdb.shrink
