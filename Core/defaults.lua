@@ -21,7 +21,7 @@ function aObj:SetupDefaults()
 	self.L = _G.LibStub:GetLibrary("AceLocale-3.0"):GetLocale(aName)
 
 	local defaults = { profile = {
-		achFilterType = 0,
+		achFilterType = 1,
 		chatback      = true,
 		shrink        = false,
 		noBguard      = true,
@@ -113,7 +113,7 @@ function aObj:SetupDefaults()
 	self.checkEvent = {
 		["ZONE_CHANGED_INDOORS"]  = true, -- for tunnel into Booty Bay
 		["ZONE_CHANGED"]          = true, -- used to handle boat trips
-		["ZONE_CHANGED_NEW_AREA"] = true, -- used to handle most changes of area
+		["ZONE_CHANGED_NEW_AREA"] = true, -- used to handle changes of area
 		["PLAYER_CONTROL_GAINED"] = true, -- this is for taxi check
 	}
 	self.trackEvent = {
@@ -188,7 +188,8 @@ function aObj:SetupDefaults()
 	self.sanctuaries[SZL["The Frozen Halls"]]          = true -- Icecrown Citadel, Icecrown
 	-- Cataclysm
 	self.sanctuaries[SZL["Temple of Earth"]]           = true -- Deepholm
-	-- self.sanctuaries[SZL["Malfurion's Breach"]]        = true -- The Molten Front, Firelands ?
+	-- self.sanctuaries[SZL["Malfurion's Breach"]]     = true -- The Molten Front, Firelands ?
+	-- Darkmoon Island locations include the Darkmoon Faire, Darkmoon Island Cave, Cauldron of Rock, The Great Sea
 	self.sanctuaries[SZL["Darkmoon Island"]]           = true -- Darkmoon Island
 	-- Pandaria
 	self.sanctuaries[SZL["Cave of the Crane"]]         = true -- Kun-Lai Summit
