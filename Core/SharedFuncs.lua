@@ -15,14 +15,14 @@ end
 local buildInfo = {
 	-- Testing
 	wow_classic_beta    = {"3.0.0",  99999, "Classic TBC Beta"},
-	wow_classic_ptr     = {"2.5.4",  42940, "Classic TBC PTR"},
-	wow_classic_era_ptr = {"1.14.3", 42926, "Classic Era PTR"}, -- a.k.a. Season of Mastery Beta
+	wow_classic_ptr     = {"3.4.0",  45043, "Classic TBC PTR"},
+	wow_classic_era_ptr = {"1.14.3", 44834, "Classic Era PTR"}, -- a.k.a. Season of Mastery Beta
 	wow_beta            = {"10.0.0", 99999, "Retail Beta"},
-	wow_ptr             = {"9.2.5",  42850, "Retail PTR"},
+	wow_ptr             = {"9.2.7",  44981, "Retail PTR"},
 	-- Live
-	wow_classic         = {"2.5.4",  42940, "Classic TBC"},
-	wow_classic_era     = {"1.14.2", 42597, "Classic Era"},
-	wow                 = {"9.2.0",  42979, "Retail"},
+	wow_classic         = {"2.5.4",  44833, "Classic TBC"},
+	wow_classic_era     = {"1.14.3", 44834, "Classic Era"},
+	wow                 = {"9.2.5",  44908, "Retail"},
 	-- Currently playing
 	curr                = {_G.GetBuildInfo()},
 }
@@ -53,8 +53,8 @@ function aObj:checkVersion()
 		end
 	end
 
-	-- check current build number against wow version build number, if greater then it's a patch
-	self.isPatch = _G.tonumber(buildInfo.curr[2]) > _G.tonumber(buildInfo[agentUID][2])
+	-- check current version or build number against current wow version info, if greater then it's a patch
+	self.isPatch = (buildInfo.curr[1] ~= buildInfo[agentUID][1]) or (_G.tonumber(buildInfo.curr[2]) > _G.tonumber(buildInfo[agentUID][2]))
 
 	--@alpha@
 	self:Printf("%s, %d, %s, %d, %s, %d, %s", buildInfo[agentUID][1], buildInfo[agentUID][2], buildInfo.curr[1], buildInfo.curr[2], buildInfo.curr[3], buildInfo.curr[4] , agentUID)
@@ -111,7 +111,7 @@ local function makeText(fStr, ...)
 		for i = #tmpTab, varCnt do
 			tmpTab[i + 1] = "nil"
 		end
-		output = _G.string.join(" ", fStr:format(_G.unpack(tmpTab)))
+		output = _G.strjoin(" ", fStr:format(_G.unpack(tmpTab)))
 	else
 		tmpTab[1] = output
 		tmpTab[2] = fStr and _G.type(fStr) == "table" and makeString(fStr) or fStr or ""
