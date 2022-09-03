@@ -145,7 +145,7 @@ function aObj:SetupDefaults()
 	self.checkZones[SZL["Hellfire Peninsula"]]         = true -- (for Honor Hold & Thrallmar)
 	self.checkZones[SZL["Netherstorm"]]                = true -- (for Area 52)
 
-	if self.isClscBC then
+	if self.isClsc then
 		return
 	end
 

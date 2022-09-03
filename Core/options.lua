@@ -58,7 +58,7 @@ function aObj:SetupOptions()
 					name = self.L["Global Settings"],
 					desc = self.L["Change the Global settings"],
 					args = {
-						achFilterType = not self.isClsc and {
+						achFilterType = self.isRtl and {
 							type = 'select',
 							order = -1,
 							name = self.L["Achievement Filter"],
@@ -103,7 +103,7 @@ function aObj:SetupOptions()
 							order = 1,
 							name = self.L["These settings are used in Cities, Towns and Sanctuaries"] .. "\n\n",
 						},
-						noDiscovery = not self.isClsc and {
+						noDiscovery = self.isRtl and {
 							type = 'toggle',
 							name = self.L["Discoveries"],
 							desc = self.L["Mute Discovery info."],
@@ -130,7 +130,7 @@ function aObj:SetupOptions()
 						},
 					},
 				},
-				instance = not self.isClsc and {
+				instance = self.isRtl and {
 					type = "group",
 					order = 3,
 					name = self.L["Instance Settings"],
@@ -144,7 +144,7 @@ function aObj:SetupOptions()
 						},
 					},
 				} or nil,
-				garrison = not self.isClsc and {
+				garrison = self.isRtl and {
 					type = "group",
 					order = 4,
 					name = self.L["Garrison Settings"],
@@ -213,7 +213,7 @@ function aObj:SetupOptions()
 			_G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame[optCheck[input:lower()]])
 		elseif input:lower() == "status" then
 			aObj:Print("Hub:", self.inHub, "Taxi:", self.onTaxi)
-			if not aObj.isClsc then
+			if aObj.isRtl then
 				aObj:Print("Vehicle:", self.inVehicle, "Scenario:", self.inScenario, "Instance:", self.prdb.inInst)
 				aObj:Print("Garrison:", self.inGarrison, "Bodyguard mode:", self.prdb.noBguard)
 			end

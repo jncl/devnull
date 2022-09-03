@@ -213,7 +213,7 @@ function aObj:CheckMode(event, ...)
 
 	-- get NPC name and remember it, if they have any quests
 	if event == "GOSSIP_SHOW" then
-		if not self.isClsc then
+		if self.isRtl then
 			if _G.GossipFrame_GetTitleButtonCount() > 0 then
 				saveNPC(_G.UnitName("Target"))
 			end
@@ -243,7 +243,7 @@ function aObj:CheckMode(event, ...)
 
 	local cMAID = _G.C_Map.GetBestMapForUnit("player")
 
-	if not aObj.isClsc then
+	if aObj.isRtl then
 		-- if in a vehicle then disable events
 		if event == "UNIT_ENTERED_VEHICLE"
 		and _G.select(1, ...) == " "
@@ -308,7 +308,7 @@ function aObj:CheckMode(event, ...)
 		self.inHub = false
 	end
 
-	if not self.isClsc then
+	if self.isRtl then
 		--> Garrison Handler <--
 		self:LevelDebug(4, "Garrison Handler", _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_6_0), _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_7_0), self.sanctums[rSubZone], self.sanctumsByID[cMAID])
 		if _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_6_0)

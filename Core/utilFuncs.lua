@@ -11,7 +11,7 @@ function aObj:isGarrison(str) -- luacheck: ignore self
 end
 function aObj:getBGNames()
 
-	if self.isClsc then
+	if not self.isRtl then
 		self.getBGNames = _G.nop
 		return
 	end
@@ -390,7 +390,7 @@ end
 
 function aObj:enableEvents()
 
-	if not self.isClsc then
+	if self.isRtl then
 		self:LevelDebug(5, "enableEvents:", self.onTaxi, _G.UnitOnTaxi("player"), self.inVehicle, _G.UnitInVehicle("player"))
 	else
 		self:LevelDebug(5, "enableEvents:", self.onTaxi, _G.UnitOnTaxi("player"))
@@ -405,7 +405,7 @@ function aObj:enableEvents()
 		self.onTaxi = true
 	-- in Vehicle
 	elseif not self.inVehicle
-	and not self.isClsc
+	and self.isRtl
 	and _G.UnitInVehicle("player")
 	then
 		self:LevelDebug(3, "in Vehicle")
