@@ -26,6 +26,11 @@ local buildInfo = {
 	-- Currently playing
 	curr                = {_G.GetBuildInfo()},
 }
+
+local function getTOCVer(ver)
+	local n1, n2, n3 = _G.string.match(buildInfo[ver][1], "(%d+).(%d+).(%d)")
+	return n1 * 10000 + n2 * 100 + n3
+end
 function aObj:checkVersion()
 
 	local agentUID = _G.C_CVar.GetCVar("agentUID")
@@ -39,30 +44,40 @@ function aObj:checkVersion()
 			agentUID = "wow_classic"
 		end
 	end
-	-- self:Debug("checkVersion#0: [%s, %s, %s, %s, %s, %s, %s]", agentUID, _G.WOW_PROJECT_ID, _G.GetBuildInfo())
-	
+	--@debug@
+	self:Debug("checkVersion#0: [%s, %s, %s, %d, %s, %d, %s]", agentUID, _G.WOW_PROJECT_ID, _G.GetBuildInfo())
+	--@end-debug@
+
 	-- check to see which WoW version we are running on
 	self.isClscBeta   = agentUID == "wow_classic_beta" and true
 	self.isClscPTR    = agentUID == "wow_classic_ptr" and true
 	self.isClsc       = agentUID == "wow_classic" and true
-	self.isClscERAPTR = agentUID == "wow_classic_era_ptr" and true
+	-- self.isClscERAPTR = agentUID == "wow_classic_era_ptr" and true
+	self.isClscERAPTR = false
 	self.isClscERA    = agentUID == "wow_classic_era" and true
 	self.isRtlBeta    = agentUID == "wow_beta" and true
 	self.isRtlPTR     = agentUID == "wow_ptr" and true
+	self.isRtlPTR2    = agentUID == "wow_classic_era_ptr" and true
 	self.isRtl        = agentUID == "wow" and true
+	--@debug@
+	self:Debug("checkVersion#1: [%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s]", self.isClscBeta, self.isClscPTR, self.isClsc, self.isClscERAPTR, self.isClscERA, self.isRtlBeta, self.isRtlPTR, self.isRtlPTR2, self.isRtl, self.isPatch)
+	--@end-debug@
 
-	-- self:Debug("checkVersion#1: [%s, %s, %s, %s, %s, %s, %s, %s]", self.isClscBeta, self.isClscPTR, self.isClsc, self.isClscERAPTR, self.isClscERA, self.isRtlBeta, self.isRtlPTR, self.isRtl)
-
+	self.tocVer = getTOCVer(agentUID)
 	-- check current version or build number against current wow version info, if greater then it's a patch
-	self.isPatch = (buildInfo.curr[1] ~= buildInfo[agentUID][1]) or (_G.tonumber(buildInfo.curr[2]) > _G.tonumber(buildInfo[agentUID][2]))
+	self.isPatch = (buildInfo.curr[4] > self.tocVer) or (_G.tonumber(buildInfo.curr[2]) > _G.tonumber(buildInfo[agentUID][2]))
 
 	--@alpha@
-	self:Printf("%s, %d, %s, %d, %s, %d, %s", buildInfo[agentUID][1], buildInfo[agentUID][2], buildInfo.curr[1], buildInfo.curr[2], buildInfo.curr[3], buildInfo.curr[4] , agentUID)
+	self:Printf("%s, %d, %d, %s, %d, %s, %d, %s", buildInfo[agentUID][1], buildInfo[agentUID][2], self.tocVer, buildInfo.curr[1], buildInfo.curr[2], buildInfo.curr[3], buildInfo.curr[4] , agentUID)
 	local vType = self.isPatch and buildInfo[agentUID][3] .. " (Patched)" or buildInfo[agentUID][3]
 	_G.DEFAULT_CHAT_FRAME:AddMessage(aName .. ": Detected that we're running on a " .. vType .. " version", 0.75, 0.5, 0.25, nil, true)
-	self:Debug(vType .. " detected")
+	--@debug@
+	self:Debug(vType .. " detected, ")
+	--@end-debug@
 	--@end-alpha@
 
+	-- handle Beta changes in PTR or Live
+	self.isClscBeta   = self.isClscBeta or self.isClscPTR and self.isPatch
 	-- indicate we're on ClassicPTR if on Classic Beta
 	self.isClscPTR    = self.isClscPTR or self.isClscBeta
 	-- indicate we're on Classic if on Classic PTR
@@ -70,14 +85,19 @@ function aObj:checkVersion()
 	-- indicate we're on ClassicERA if on Classic ERA PTR
 	self.isClscERA    = self.isClscERA  or self.isClscERAPTR
 	-- handle Beta changes in PTR or Live
-	self.isClscBeta   = self.isClscBeta or self.isClscPTR and buildInfo.curr[1] > buildInfo.wow_classic_ptr[1]
-	self.isRtlBeta    = self.isRtlBeta or self.isRtlPTR and buildInfo.curr[1] > buildInfo.wow_ptr[1]
+	self.isRtlBeta    = self.isRtlBeta or self.isRtlPTR and self.isPatch
+	-- indicate we're on Retail PTR if on Retail Beta
+	self.isRtlPTR     = self.isRtlPTR or self.isRtlBeta
+	-- indicate we're on Retail if on Retail PTR
+	self.isRtl        = self.isRtl or self.isRtlPTR or self.isRtlPTR2
 	-- handle PTR changes going Live
-	self.isClscPTR    = self.isClscPTR or self.isPatch and self.isClsc and buildInfo.curr[1] > buildInfo.wow_classic[1]
-	self.isClscERAPTR = self.isClscERAPTR or self.isPatch and self.isClscERA and buildInfo.curr[1] > buildInfo.wow_classic_era[1]
-	self.isRtlPTR     = self.isRtlPTR or self.isPatch and self.isRtl and buildInfo.curr[1] > buildInfo.wow[1]
-
-	-- self:Debug("checkVersion#2: [%s, %s, %s, %s, %s, %s, %s, %s, %s, %s]", self.isClscBeta, self.isClscPTR, self.isClsc, self.isClscERAPTR, self.isClscERA, self.isRtlBeta, self.isRtlPTR, self.isRtl, self.isPatch)
+	self.isClscPTR    = self.isClscPTR or self.isClsc and (buildInfo.curr[4] == getTOCVer("wow_classic")) and self.isPatch
+	self.isClscERAPTR = self.isClscERAPTR or self.isClscERA and (buildInfo.curr[4] == getTOCVer("wow_classic_era")) and self.isPatch
+	self.isRtlPTR     = self.isRtlPTR or self.isRtl and (buildInfo.curr[4] == getTOCVer("wow_ptr")) and self.isPatch
+	self.isRtlPTR2    = self.isRtlPTR2 or self.isRtl and (buildInfo.curr[4] == getTOCVer("wow_classic_era_ptr")) and self.isPatch
+	--@debug@
+	self:Debug("checkVersion#2: [%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s]", self.isClscBeta, self.isClscPTR, self.isClsc, self.isClscERAPTR, self.isClscERA, self.isRtlBeta, self.isRtlPTR, self.isRtlPTR2, self.isRtl, self.isPatch)
+	--@end-debug@
 
 end
 
@@ -154,3 +174,90 @@ aObj.Debug = _G.nop
 aObj.Debug2 = _G.nop
 aObj.Debug3 = _G.nop
 --@end-non-debug@]===]
+
+function aObj:setupOptions(optNames, optIgnore, preLoadFunc, postLoadFunc)
+
+	local _
+	local db = self.db.profile
+	local dflts = self.db.defaults.profile
+
+	-- add DB profile options
+	self.optTables.Profiles = _G.LibStub:GetLibrary("AceDBOptions-3.0", true):GetOptionsTable(self.db)
+	self:add2Table(optNames, "Profiles")
+	self:add2Table(optIgnore, "Profiles")
+
+	self.optionsFrames = {}
+	-- register the options tables and add them to the blizzard frame
+	self.ACR:RegisterOptionsTable(aName, self.optTables.General)
+	self.optionsFrames[aName], _ = self.ACD:AddToBlizOptions(aName, self.L[aName]) -- N.B. display localised name
+	self.optionsFrames[aName].OnDefault = function()
+		for name, _ in _G.pairs(aObj.optTables.General.args) do
+			db[name] = dflts[name]
+		end
+		aObj.ACR:NotifyChange(aName)
+	end
+
+	self.optCheck = {}
+	for _, oName in _G.pairs(optNames) do
+		self.optCheck[oName:lower()] = oName -- store option name in table
+	end
+	-- only setup the options if the AddOn's Options panel/subpanel is chosen
+	local optTitle
+	local function setupOptionPanels()
+		for _, oName in _G.ipairs(optNames) do
+			optTitle = _G.strjoin("_", aName, oName)
+			aObj.ACR:RegisterOptionsTable(optTitle, aObj.optTables[oName])
+			aObj.optionsFrames[oName], _ = aObj.ACD:AddToBlizOptions(optTitle, aObj.L[oName], aObj.L[aName]) -- N.B. use localised name
+			if not _G.tContains(optIgnore, oName) then
+				aObj.optionsFrames[oName].OnDefault = function()
+					for name, _ in _G.pairs(aObj.optTables[oName].args) do
+						db[name] = dflts[name]
+					end
+					aObj.ACR:NotifyChange(optTitle)
+				end
+			end
+		end
+	end
+	local function categorySelected()
+		if preLoadFunc then
+			preLoadFunc()
+		end
+		setupOptionPanels()
+		if postLoadFunc then
+			postLoadFunc()
+		end
+		if not aObj.isRtl then
+			_G.InterfaceAddOnsList_Update()
+		else
+			-- toggle tabs to force refresh of Categories
+			_G.SettingsPanel.tabsGroup:SelectAtIndex(1)
+			_G.SettingsPanel.tabsGroup:SelectAtIndex(2)
+		end
+	end
+	self.RegisterCallback(aName, "Options_Selected", function()
+		self.UnregisterCallback(aName, "Options_Selected")
+		categorySelected()
+	end)
+	if not self.isRtl then
+		self:RawHook("InterfaceOptionsListButton_OnClick", function(bObj, mouseButton)
+			if bObj.element.name == aName then
+				if not bObj.element.hasChildren then
+					categorySelected()
+				end
+				self.hooks.InterfaceOptionsListButton_OnClick(bObj, mouseButton)
+				self:Unhook("InterfaceOptionsListButton_OnClick")
+				return
+			end
+			self.hooks.InterfaceOptionsListButton_OnClick(bObj, mouseButton)
+		end, true)
+	else
+		local function onCategorySelected(_, category)
+			if category.name == aName then
+				_G.SettingsPanel:GetCategoryList():UnregisterCallback(_G.SettingsCategoryListMixin.Event.OnCategorySelected, aObj)
+				categorySelected()
+			end
+		end
+		_G.SettingsPanel:GetCategoryList():RegisterCallback(_G.SettingsCategoryListMixin.Event.OnCategorySelected, onCategorySelected, self)
+	end
+
+end
