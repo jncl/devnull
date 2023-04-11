@@ -90,7 +90,7 @@ function aObj:SetupDefaults()
 		[SZL["Darnassus"]]      = true,
 		-- Eastern Kingdoms
 		[SZL["Stormwind City"]] = true,
-		[SZL["Ironforge"]]      = true,
+		[SZL["City of Ironforge"]] = true,
 		[SZL["Undercity"]]      = true,
 	}
 	self.nullHubsByID = {}
