@@ -213,7 +213,7 @@ end
 function aObj:removeMFltrs(upd)
 
 	if _G. InCombatLockdown() then
-		self:add2Table(aObj.oocTab, {self.removeMFltrs, {self, upd}})
+		self:add2Table(self.oocTab, {self.removeMFltrs, {self, upd}})
 		return
 	end
 
@@ -267,7 +267,7 @@ function aObj:updateMFltrs()
 	-- called by CheckMode function when events trigger changes
 
 	if _G. InCombatLockdown() then
-		aObj:add2Table(aObj.oocTab, {self.updateMFltrs, {self}})
+		self:add2Table(self.oocTab, {self.updateMFltrs, {self}})
 		return
 	end
 
@@ -328,7 +328,7 @@ end
 function aObj:filterMGs()
 
 	if _G. InCombatLockdown() then
-		aObj:add2Table(aObj.oocTab, {self.filterMGs, {self}})
+		self:add2Table(self.oocTab, {self.filterMGs, {self}})
 		return
 	end
 
@@ -354,7 +354,7 @@ end
 function aObj:unfilterMGs()
 
 	if _G. InCombatLockdown() then
-		aObj:add2Table(aObj.oocTab, {self.unfilterMGs, {self}})
+		self:add2Table(self.oocTab, {self.unfilterMGs, {self}})
 		return
 	end
 
