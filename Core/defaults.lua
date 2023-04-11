@@ -86,13 +86,13 @@ function aObj:SetupDefaults()
 	}
 	self.nullHubs = {
 		-- Kalimdor
-		[SZL["Orgrimmar"]]      = true,
-		[SZL["Thunder Bluff"]]  = true,
-		[SZL["Darnassus"]]      = true,
+		[SZL["Orgrimmar"]]         = true,
+		[SZL["Thunder Bluff"]]     = true,
+		[SZL["Darnassus"]]         = true,
 		-- Eastern Kingdoms
-		[SZL["Stormwind City"]] = true,
+		[SZL["Stormwind City"]]    = true,
 		[SZL["City of Ironforge"]] = true,
-		[SZL["Undercity"]]      = true,
+		[SZL["Undercity"]]         = true,
 	}
 	self.nullHubsByID = {}
 	self.sanctums = {}
@@ -235,6 +235,11 @@ function aObj:SetupDefaults()
 	self.sanctuaries[SZL["Haven"]]                     = true -- Zereth Mortis
 	self.sanctuaries[SZL["Exile's Hollow"]]            = true -- Zereth Mortis
 	self.sanctuaries[SZL["Pilgrim's Grace"]]           = true -- Zereth Mortis
+	-- DF
+	-- self.sanctuaries[SZL["Iskaara"]]                   = true -- The Azure Span
+	-- self.sanctuaries[SZL["Eon's Fringe"]]              = true -- Thaldraszus
+	self.sanctuariesByID[2112]                         = true -- Valdrakken, Thaldraszus
+
 	-- Covenant Sanctums (SL) also Sanctuaries
 	self.sanctums[SZL["Heart of the Forest"]]          = true -- Ardenweald [Night Fae] (1565)
 	self.sanctums[SZL["Seat of the Primus"]]           = true -- Maldraxxus [Necrolord] (1698)
