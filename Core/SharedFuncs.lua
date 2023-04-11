@@ -14,15 +14,16 @@ end
 
 local buildInfo = {
 	-- Testing
-	wow_classic_beta    = {"4.0.0",  99999, "Classic Beta"},
-	wow_classic_ptr     = {"3.4.0",  45435, "Classic PTR"},
-	wow_classic_era_ptr = {"1.14.3", 44834, "Classic Era PTR"}, -- a.k.a. Season of Mastery Beta
-	wow_beta            = {"10.0.0", 99999, "Retail Beta"},
-	wow_ptr             = {"9.2.7",  45161, "Retail PTR"},
+	-- wow_classic_beta    = {"3.4.0",  46158, "Classic Beta"},
+	-- wow_beta            = {"10.0.2", 47120, "Retail Beta"}, -- a.k.a. Dragonflight
+	wow_classic_ptr     = {"3.4.1",  48632, "Classic PTR"},
+	-- wow_classic_era_ptr = {"1.14.3", 46575, "Classic Era PTR"}, -- a.k.a. Season of Mastery PTR
+	wow_classic_era_ptr = {"10.0.7", 48966, "Retail PTR 2"}, -- a.k.a. PTR DF 10.0.7
+	wow_ptr             = {"10.1.0", 48898, "Retail PTR"},
 	-- Live
-	wow_classic         = {"3.4.0",  45435, "Classic"}, -- a.k.a. Wrath of the Lich King Classic
-	wow_classic_era     = {"1.14.3", 44834, "Classic Era"},
-	wow                 = {"9.2.7",  45114, "Retail"},
+	wow_classic         = {"3.4.1",  48632, "Classic"}, -- a.k.a. Wrath of the Lich King Classic
+	wow_classic_era     = {"1.14.3", 48611, "Classic Era"},
+	wow                 = {"10.0.7", 48966, "Retail"},
 	-- Currently playing
 	curr                = {_G.GetBuildInfo()},
 }
