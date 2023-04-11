@@ -58,7 +58,7 @@ function aObj:SetupOptions()
 					name = self.L["Global Settings"],
 					desc = self.L["Change the Global settings"],
 					args = {
-						achFilterType = self.isRtl and {
+						achFilterType = not self.isClscERA and {
 							type = 'select',
 							order = -1,
 							name = self.L["Achievement Filter"],

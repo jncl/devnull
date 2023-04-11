@@ -390,7 +390,7 @@ end
 
 function aObj:enableEvents()
 
-	if self.isRtl then
+	if not self.isClscERA then
 		self:LevelDebug(5, "enableEvents:", self.onTaxi, _G.UnitOnTaxi("player"), self.inVehicle, _G.UnitInVehicle("player"))
 	else
 		self:LevelDebug(5, "enableEvents:", self.onTaxi, _G.UnitOnTaxi("player"))
@@ -405,7 +405,7 @@ function aObj:enableEvents()
 		self.onTaxi = true
 	-- in Vehicle
 	elseif not self.inVehicle
-	and self.isRtl
+	and not self.isClscERA
 	and _G.UnitInVehicle("player")
 	then
 		self:LevelDebug(3, "in Vehicle")

@@ -137,29 +137,42 @@ function aObj:SetupDefaults()
 	-- Azuremyst Isle (TBC)
 	self.nullHubs[SZL["The Exodar"]]                   = true -- Draenei starting area (Alliance)
 	-- Outland (TBC)
-	self.nullTowns[SZL["Honor Hold"]]                  = true -- Hellfire Peninsula (Alliance)
-	self.nullTowns[SZL["Thrallmar"]]                   = true -- Hellfire Peninsula (Horde)
 	self.nullTowns[SZL["Area 52"]]                     = true -- Netherstorm
+	self.nullTowns[SZL["Honor Hold"]]                  = true -- Hellfire Peninsula (Alliance)
+	self.nullTowns[SZL["Mudsprocket"]]                 = true -- Dustwallow Marsh (Neutral)
+	self.nullTowns[SZL["Thrallmar"]]                   = true -- Hellfire Peninsula (Horde)
 	self.sanctuaries[SZL["The Stair of Destiny"]]      = true -- The Dark Portal, Blasted Lands
 	self.sanctuariesByID[self.isRtl and 111 or 1955]   = true -- Shattrath City (Terrace of Light/Lower City/Aldor Rise/Scryer's Tier)
+	self.sanctuaries[SZL["Acherus: The Ebon Hold"]]    = true -- Eastern Plaguelands
 	self.checkZones[SZL["Hellfire Peninsula"]]         = true -- (for Honor Hold & Thrallmar)
 	self.checkZones[SZL["Netherstorm"]]                = true -- (for Area 52)
+	-- WotLK
+	self.nullTowns[SZL["Warsong Hold"]]                = true -- Borean Tundra (Horde)
+	self.nullTowns[SZL["Valiance Keep"]]               = true -- Borean Tundra (Alliance)
+	self.nullTowns[SZL["Vengeance Landing"]]           = true -- Howling Fjord (Horde)
+	self.nullTowns[SZL["Valgarde"]]                    = true -- Howling Fjord (Alliance)
+	self.sanctuariesByID[125]                          = true -- Dalaran, Crystalsong Forest
+	self.sanctuaries[SZL["Argent Tournament Grounds"]] = true -- Icecrown
+	self.sanctuaries[SZL["The Frozen Halls"]]          = true -- Icecrown Citadel, Icecrown
+	self.checkZones[SZL["Borean Tundra"]]              = true -- (for Valiance Keep/Warsong Hold)
+	self.checkZones[SZL["Howling Fjord"]]              = true -- (for Valgarde/Vengeance Landing)
+
+	self.checkEvent["UNIT_EXITED_VEHICLE"]             = false -- this is used when in a vehicle
+	self.trackEvent["UNIT_ENTERED_VEHICLE"]            = true -- this is used when in a vehicle
 
 	if self.isClsc then
 		return
 	end
 
-	self.nullTowns[SZL["Mudsprocket"]]                 = true -- Dustwallow Marsh (Neutral)
-	-- Northrend (WotLK)
-	self.nullTowns[SZL["Warsong Hold"]]                = true -- Borean Tundra (Horde)
-	self.nullTowns[SZL["Valiance Keep"]]               = true -- Borean Tundra (Alliance)
-	self.nullTowns[SZL["Vengeance Landing"]]           = true -- Howling Fjord (Horde)
-	self.nullTowns[SZL["Valgarde"]]                    = true -- Howling Fjord (Alliance)
+	-- Cataclysm
 	self.nullAreas[SZL["KTC Headquarters"]]            = true -- Goblin starting area (Cata)
 	self.nullAreas[SZL["Karazhan"]]                    = true -- Deadwind Pass (Cata)
 	self.nullAreas[SZL["Krom'gar Fortress"]]           = true -- Horde Base in Stonetalon Mts (Cata)
+	-- Pandaria
 	self.nullAreas[SZL["The Celestial Court"]]         = true -- Timeless Isle (MoP)
+	-- Legion
 	self.nullAreas[SZL["The Vindicaar"]]               = true -- Argus (Legion)
+	-- BfA
 	self.nullAreas[SZL["Upton Borough"]]               = true -- Boralus Hub (BfA)
 	-- Pandaria (MoP)
 	self.nullHubs[SZL["Shrine of Two Moons"]]          = true -- (Horde)
@@ -181,11 +194,7 @@ function aObj:SetupDefaults()
 	self.nullHubsByID[1355]                            = true
 	-- Mechagon (BfA)
 	self.nullHubsByID[1462]                            = true
-	-- WotLK
-	self.sanctuaries[SZL["Acherus: The Ebon Hold"]]    = true -- Eastern Plaguelands
-	self.sanctuariesByID[125]                          = true -- Dalaran, Crystalsong Forest
-	self.sanctuaries[SZL["Argent Tournament Grounds"]] = true -- Icecrown
-	self.sanctuaries[SZL["The Frozen Halls"]]          = true -- Icecrown Citadel, Icecrown
+
 	-- Cataclysm
 	self.sanctuaries[SZL["Temple of Earth"]]           = true -- Deepholm
 	-- self.sanctuaries[SZL["Malfurion's Breach"]]     = true -- The Molten Front, Firelands ?
@@ -231,9 +240,7 @@ function aObj:SetupDefaults()
 	self.sanctums[SZL["Sinfall"]]                      = true -- Revendreth [Venthyr] (1699)
 	self.sanctumsByID[1707]                            = true -- Bastion [Kyrian] (Elysian Hold/Valiant's Path/Archon's Rise/The Eternal Watch)
 	self.sanctumsByID[1708]                            = true -- Bastion [Kyrian] (Sanctum of Binding)
-	-- Northrend (WotLK)
-	self.checkZones[SZL["Borean Tundra"]]              = true -- (for Valiance Keep/Warsong Hold)
-	self.checkZones[SZL["Howling Fjord"]]              = true -- (for Valgarde/Vengeance Landing)
+
 	-- (Cata)
 	self.checkZones[SZL["Kezan"]]                      = true -- (for KTC Headquarters)
 	self.checkZones[SZL["Timeless Isle"]]              = true

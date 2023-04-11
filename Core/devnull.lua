@@ -212,9 +212,16 @@ function aObj:CheckMode(event, ...)
 	end
 
 	-- get NPC name and remember it, if they have any quests
-	if event == "GOSSIP_SHOW" then
-		if self.isRtl then
-			if _G.GossipFrame_GetTitleButtonCount() > 0 then
+	if event == "GOSSIP_SHOW"
+	or event == "QUEST_GREETING"
+	then
+		if self.isRtl
+		or self.isClsc
+		then
+			if _G.C_GossipInfo.GetNumAvailableQuests() > 0
+			or _G.C_GossipInfo.GetNumActiveQuests() > 0
+			or _G.GossipFrame.gossipOptions
+			then
 				saveNPC(_G.UnitName("Target"))
 			end
 		else
@@ -223,14 +230,6 @@ function aObj:CheckMode(event, ...)
 			then
 				saveNPC(_G.UnitName("Target"))
 			end
-		end
-		return
-	end
-	if event == "QUEST_GREETING" then
-		if _G.GetNumActiveQuests() > 0
-		or _G.GetNumAvailableQuests() > 0
-		then
-			saveNPC(_G.UnitName("Target"))
 		end
 		return
 	end
@@ -243,7 +242,7 @@ function aObj:CheckMode(event, ...)
 
 	local cMAID = _G.C_Map.GetBestMapForUnit("player")
 
-	if aObj.isRtl then
+	if not self.isClscERA then
 		-- if in a vehicle then disable events
 		if event == "UNIT_ENTERED_VEHICLE"
 		and _G.select(1, ...) == " "
@@ -325,7 +324,6 @@ function aObj:CheckMode(event, ...)
 		else
 			self.inGarrison = false
 		end
-
 		--> Instance/Scenario Handler <--
 		local instInfo = {_G.GetInstanceInfo()}
 		self:LevelDebug(4, "inInstance#1: [%s, %s, %s, %s, %s]", self.prdb.inInst, instInfo[2], instInfo[1], instInfo[9], instInfo[8])
@@ -351,7 +349,6 @@ function aObj:CheckMode(event, ...)
 			self.inScenario = false
 			self.prdb.inInst = false
 		end
-
 	end
 
 	-- update message filters
