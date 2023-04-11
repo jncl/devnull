@@ -2,12 +2,15 @@ local aName, aObj = ...
 
 local _G = _G
 
-local LibStub = _G.LibStub
-
 function aObj:SetupOptions()
 
-	local optTables = {
-
+	local iof_otc
+	if not self.isRtl then
+		iof_otc = _G.InterfaceOptionsFrame_OpenToCategory
+	else
+		iof_otc = _G.Settings.OpenToCategory
+	end
+	self.optTables = {
 		General = {
 			type = "group",
 			name = aName,
@@ -172,45 +175,47 @@ function aObj:SetupOptions()
 		},
 	}
 
-	-- option tables list
-	local optNames = {"Mutes", "Profiles"}
-	-- add DB profile options
-	optTables.Profiles = LibStub:GetLibrary("AceDBOptions-3.0"):GetOptionsTable(self.db)
+	self.ACD = _G.LibStub:GetLibrary("AceConfigDialog-3.0")
+	self.ACR = _G.LibStub:GetLibrary("AceConfigRegistry-3.0", true)
 
-	-- register the options tables and add them to the blizzard frame
-	local ACR = LibStub:GetLibrary("AceConfigRegistry-3.0")
-	local ACD = LibStub:GetLibrary("AceConfigDialog-3.0")
-
-	LibStub:GetLibrary("AceConfig-3.0"):RegisterOptionsTable(aName, optTables.General, {aName, "dn"})
-	self.optionsFrame = ACD:AddToBlizOptions(aName, aName)
-
-	-- register the options, add them to the Blizzard Options
-	local optCheck = {}
-	for _, v in _G.ipairs(optNames) do
-		local optTitle = (" "):join(aName, v)
-		ACR:RegisterOptionsTable(optTitle, optTables[v])
-		self.optionsFrame[self.L[v]] = ACD:AddToBlizOptions(optTitle, self.L[v], aName)
-		-- build the table used by the chatCommand function
-		optCheck[v:lower()] = v
+	local function postLoadFunc()
+		local method
+		if not aObj.isRtl then
+			method = "okay"
+		else
+			method = "OnCommit"
+		end
+		-- runs when the player clicks "Okay"
+		aObj.optionsFrames[aObj.L["Mutes"]][method] = function()
+			aObj:getBGNames()
+			aObj:unfilterMGs()
+			aObj:removeMFltrs()
+			aObj:filterMGs()
+			aObj:addMFltrs()
+		end
 	end
-	-- runs when the player clicks "Okay"
-	self.optionsFrame[self.L["Mutes"]].okay = function()
-		self:getBGNames()
-		self:unfilterMGs()
-		self:removeMFltrs()
-		self:filterMGs()
-		self:addMFltrs()
-	end
+
+	self:setupOptions({"Mutes"}, {}, _G.nop, postLoadFunc)
 
 	-- Slash command handler
 	local function chatCommand(input)
 		if not input or input:trim() == "" then
 			-- Open general panel if there are no parameters
-			_G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame)
-			_G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame)
-		elseif optCheck[input:lower()] then
-			_G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame[optCheck[input:lower()]])
-			_G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame[optCheck[input:lower()]])
+			aObj.callbacks:Fire("Options_Selected")
+			if not aObj.isRtl then
+				iof_otc(aObj.optionsFrames[aName])
+				iof_otc(aObj.optionsFrames[aName])
+			else
+				iof_otc(aName)
+			end
+		elseif aObj.optCheck[input:lower()] then
+			aObj.callbacks:Fire("Options_Selected")
+			if not aObj.isRtl then
+				iof_otc(aObj.optionsFrames[aObj.optCheck[input:lower()]])
+				iof_otc(aObj.optionsFrames[aObj.optCheck[input:lower()]])
+			else
+				iof_otc(aName)
+			end
 		elseif input:lower() == "status" then
 			aObj:Print("Hub:", self.inHub, "Taxi:", self.onTaxi)
 			if aObj.isRtl then
@@ -233,23 +238,23 @@ function aObj:SetupOptions()
 			local areaName= _G.MapUtil.FindBestAreaNameAtMouse(uiMapID, posn["x"], posn["y"])
 			aObj:Print("Map Info:", mapinfo["mapID"], mapinfo["name"], mapinfo["mapType"], mapinfo["parentMapID"], posn["x"], posn["y"], areaName)
 		else
-			LibStub:GetLibrary("AceConfigCmd-3.0"):HandleCommand(aName, aName, input)
+			_G.LibStub:GetLibrary("AceConfigCmd-3.0"):HandleCommand(aName, aName, input)
 		end
 	end
 
 	-- Register slash command handlers
-	self:RegisterChatCommand(aName, chatCommand)
+	self:RegisterChatCommand(self.L[aName], chatCommand) -- N.B. use localised name
 	self:RegisterChatCommand("dn", chatCommand)
 
 	-- setup the DB object
-	self.DBObj = LibStub:GetLibrary("LibDataBroker-1.1"):NewDataObject(aName, {
+	self.DBObj = _G.LibStub:GetLibrary("LibDataBroker-1.1"):NewDataObject(aName, {
 		type = "data source",
 		text = aObj:updateDBtext(),
 		icon = [[Interface\Icons\Spell_Holy_Silence]],
 		OnClick = function()
 			-- do twice to overcome Blizzard bug
-			_G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame)
-			_G.InterfaceOptionsFrame_OpenToCategory(aObj.optionsFrame)
+			iof_otc(aObj.optionsFrame)
+			iof_otc(aObj.optionsFrame)
 		end,
 		OnTooltipShow = function(tooltip)
 			tooltip:AddLine(self.L[aName] .. " - " .. self.L[self:updateDBtext(true)])

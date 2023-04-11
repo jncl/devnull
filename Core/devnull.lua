@@ -17,6 +17,9 @@ do
 
 	aObj:checkVersion()
 
+	-- setup callback registry
+	aObj.callbacks = _G.LibStub:GetLibrary("CallbackHandler-1.0"):New(aObj)
+
 end
 
 function aObj:OnInitialize()
