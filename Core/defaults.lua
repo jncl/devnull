@@ -251,11 +251,7 @@ function aObj:SetupDefaults()
 	self.checkZonesByID[1165]                          = true -- Dazar'alor (Horde)
 
 	self.checkEvent["SCENARIO_UPDATE"]                 = true -- this is for scenario check
-	self.checkEvent["UNIT_EXITED_VEHICLE"]             = false -- this is used when in a vehicle
-
 	self.trackEvent["SCENARIO_UPDATE"]                 = true -- this is for scenario check
-	self.trackEvent["UNIT_ENTERED_VEHICLE"]            = true -- this is used when in a vehicle
 	self.trackEvent["PLAYER_ENTERING_WORLD"]           = true -- this is for garrison check
-	-- self.trackEvent["UNIT_EXITED_VEHICLE"]          = false -- this is used when in a vehicle
 
 end
