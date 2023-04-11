@@ -41,8 +41,9 @@ function aObj:SetupDefaults()
 			[self.L["General"]]          = false,
 			[self.L["Trade"]]            = false,
 			[self.L["LocalDefense"]]     = false,
+			[self.L["Services"]]         = false, -- Trade (Services)
 			[self.L["WorldDefense"]]     = false,
-			[self.L["GuildRecruitment"]] = false,
+			-- [self.L["GuildRecruitment"]] = false,
 		},
 		-- stored inInstance setting
 		inInst        = false,
