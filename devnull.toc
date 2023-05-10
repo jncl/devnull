@@ -1,21 +1,26 @@
-﻿## Interface: 100007
+﻿## Interface: 100100
 ## Interface-Classic: 11403
 ## Interface-BCC: 20504
 ## Interface-Wrath: 30401
+
 ## Title: /dev/null
+## IconTexture: Interface\Icons\Spell_Holy_Silence
+
 ## Notes: Mutes various chat related annoyances while in capital cities and instances.
 ## Notes-deDE: Unterdr\195\188ckt diverse st\195\182rende Meldungen - w\195\164hrend man sich in Hauptst\195\164dten oder Instanzen befindet.
 ## Notes-zhTW: 當你在主城或是副本時，關掉各種惱人的聊天對話內容
 ## Author: Jncl
 ## Version: @project-version@
+
 ## DefaultState: Enabled
 ## LoadOnDemand: 0
 ## SavedVariables: devnullDB
+## OptionalDeps: Ace3, LibBabble-SubZone-3.0
 ## Globe: check-classic
+
 ## X-Curse-Project-ID: 14979
 ## X-Credits: Many thanks to Zalkalin for the original code and Tekkub for various changes.
 ## X-Category: Chat/Communication
-## OptionalDeps: Ace3, LibBabble-SubZone-3.0
 
 Libs\_RequiredLibs.xml
 Libs\_OptionalLibs.xml
