@@ -236,9 +236,11 @@ function aObj:SetupDefaults()
 	self.sanctuaries[SZL["Exile's Hollow"]]            = true -- Zereth Mortis
 	self.sanctuaries[SZL["Pilgrim's Grace"]]           = true -- Zereth Mortis
 	-- DF
-	-- self.sanctuaries[SZL["Iskaara"]]                   = true -- The Azure Span
-	-- self.sanctuaries[SZL["Eon's Fringe"]]              = true -- Thaldraszus
+	self.sanctuaries[SZL["Iskaara"]]                   = true -- The Azure Span
+	self.sanctuariesByID[2024]                         = true -- The Filled Bowl, The Azure Span
 	self.sanctuariesByID[2112]                         = true -- Valdrakken, Thaldraszus
+	self.sanctuariesByID[2151]                         = true -- Morqut Village, The Forbidden Reach
+	-- self.sanctuaries[SZL["Eon's Fringe"]]              = true -- Thaldraszus
 
 	-- Covenant Sanctums (SL) also Sanctuaries
 	self.sanctums[SZL["Heart of the Forest"]]          = true -- Ardenweald [Night Fae] (1565)
