@@ -19,6 +19,7 @@
 ## Globe: check-classic
 
 ## X-Curse-Project-ID: 14979
+## X-Wago-ID: mNwQ7WKo
 ## X-Credits: Many thanks to Zalkalin for the original code and Tekkub for various changes.
 ## X-Category: Chat/Communication
 
