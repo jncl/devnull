@@ -21,3 +21,10 @@ All features can be toggled with the slash command /devnull or /dn
 
 If you have found a issue or have a request, please use the [issue tracker](https://github.com/jncl/devnull/issues).
 
+### Downloads
+
+These are available, for ALL game versions, on the following sites:
+[CurseForge](https://www.curseforge.com/wow/addons/devnull)
+[GitHub](https://github.com/jncl/devnull)
+[Wago](https://addons.wago.io/addons/devnull)
+	
