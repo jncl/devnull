@@ -252,13 +252,18 @@ function aObj:SetupOptions()
 		text = aObj:updateDBtext(),
 		icon = [[Interface\Icons\Spell_Holy_Silence]],
 		OnClick = function()
+			aObj.callbacks:Fire("Options_Selected")
+			if not aObj.isRtl then
 			-- do twice to overcome Blizzard bug
-			iof_otc(aObj.optionsFrame)
-			iof_otc(aObj.optionsFrame)
+				iof_otc(aObj.optionsFrames[aName])
+				iof_otc(aObj.optionsFrames[aName])
+			else
+				iof_otc(aName)
+			end
 		end,
 		OnTooltipShow = function(tooltip)
-			tooltip:AddLine(self.L[aName] .. " - " .. self.L[self:updateDBtext(true)])
-			tooltip:AddLine(self.L["Click to open config panel"], 1, 1, 1)
+			tooltip:AddLine(aObj.L[aName] .. " - " .. aObj.L[self:updateDBtext(true)])
+			tooltip:AddLine(aObj.L["Click to open config panel"], 1, 1, 1)
 		end,
 	})
 
