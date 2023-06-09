@@ -2,6 +2,8 @@ local aName, aObj = ...
 
 local _G = _G
 
+-- luacheck: ignore 631 (line is too long)
+
 function aObj:SetupOptions()
 
 	local iof_otc
@@ -254,7 +256,7 @@ function aObj:SetupOptions()
 		OnClick = function()
 			aObj.callbacks:Fire("Options_Selected")
 			if not aObj.isRtl then
-			-- do twice to overcome Blizzard bug
+				-- do twice to overcome Blizzard bug
 				iof_otc(aObj.optionsFrames[aName])
 				iof_otc(aObj.optionsFrames[aName])
 			else

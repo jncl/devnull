@@ -2,6 +2,8 @@ local aName, aObj = ...
 
 local _G = _G
 
+-- luacheck: ignore 631 (line is too long)
+
 function aObj:SetupDefaults()
 
 	self.exitedInst  = false
