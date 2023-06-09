@@ -274,10 +274,10 @@ aObj.Debug2 = _G.nop
 aObj.Debug3 = _G.nop
 --@end-non-debug@]===]
 
---@version-retail@
 -- Addon Compartment (Retail only)
-_G[aName .. "_OnAddonCompartmentClick"] = function(addonName, _, _)
-	aObj.callbacks:Fire("Options_Selected")
-	_G.Settings.OpenToCategory(addonName)
+if _G.WOW_PROJECT_ID == _G.WOW_PROJECT_MAINLINE then
+	_G[aName .. "_OnAddonCompartmentClick"] = function(addonName, _, _)
+		aObj.callbacks:Fire("Options_Selected")
+		_G.Settings.OpenToCategory(addonName)
+	end
 end
---@end-version-retail@
