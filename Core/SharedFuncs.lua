@@ -7,15 +7,14 @@ local buildInfo = {
 	-- Testing
 	-- wow_classic_beta    = {"3.4.0",  46158, "Classic Beta"},
 	-- wow_beta            = {"10.0.2", 47120, "Retail Beta"}, -- a.k.a. Dragonflight
-	wow_classic_ptr     = {"3.4.2",  49871, "Classic PTR"},
-	-- wow_classic_era_ptr = {"1.14.3", 49229, "Classic Era PTR"}, -- a.k.a. Season of Mastery PTR
-	-- wow_classic_era_ptr = {"10.1.5", 49595, "Retail PTR2"}, -- a.k.a. PTR DF 10.1.5
-	wow_ptr_x           = {"10.1.5", 49908, "Retail PTR2"}, -- a.k.a. PTR DF 10.1.5 [wowxptr]
-	wow_ptr             = {"10.1.0", 49570, "Retail PTR"}, -- a.k.a. [wowt]
+	wow_classic_ptr     = {"3.4.2",  50375, "Classic PTR"},
+	wow_classic_era_ptr = {"1.14.4", 50547, "Classic Era PTR"},
+	wow_ptr_x           = {"10.1.5", 50585, "Retail PTRX"}, -- [wowxptr]
+	wow_ptr             = {"10.1.7", 50505, "Retail PTR"},
 	-- Live
-	wow_classic         = {"3.4.1",  49822, "Classic"}, -- a.k.a. Wrath of the Lich King Classic
+	wow_classic         = {"3.4.2",  50375, "Classic"}, -- a.k.a. Wrath of the Lich King Classic
 	wow_classic_era     = {"1.14.3", 49821, "Classic Era"},
-	wow                 = {"10.1.0", 49890, "Retail"},
+	wow                 = {"10.1.5", 50585, "Retail"},
 	-- Currently playing
 	curr                = {_G.GetBuildInfo()},
 }
@@ -46,12 +45,10 @@ function aObj:checkVersion()
 	self.isClscBeta   = agentUID == "wow_classic_beta" and true
 	self.isClscPTR    = agentUID == "wow_classic_ptr" and true
 	self.isClsc       = agentUID == "wow_classic" and true
-	-- self.isClscERAPTR = agentUID == "wow_classic_era_ptr" and true
-	self.isClscERAPTR = false
+	self.isClscERAPTR = agentUID == "wow_classic_era_ptr" and true
 	self.isClscERA    = agentUID == "wow_classic_era" and true
 	self.isRtlBeta    = agentUID == "wow_beta" and true
 	self.isRtlPTR     = agentUID == "wow_ptr" and true
-	-- self.isRtlPTRX    = agentUID == "wow_classic_era_ptr" or "wow_ptr_x" and true
 	self.isRtlPTRX    = agentUID == "wow_ptr_x" and true
 	self.isRtl        = agentUID == "wow" and true
 	--@debug@
@@ -96,7 +93,7 @@ function aObj:checkVersion()
 
 end
 
-function aObj:add2Table(table, value) -- luacheck: ignore self
+function aObj:add2Table(table, value) -- luacheck: ignore 212 (unused argument)
 	--@alpha@
 	_G.assert(table, "Unknown table add2Table\n" .. _G.debugstack(2, 3, 2))
 	_G.assert(value, "Missing value add2Table\n" .. _G.debugstack(2, 3, 2))
@@ -171,28 +168,29 @@ function aObj:setupOptions(optNames, optIgnore, preLoadFunc, postLoadFunc)
 			_G.SettingsPanel.tabsGroup:SelectAtIndex(1)
 			_G.SettingsPanel.tabsGroup:SelectAtIndex(2)
 		end
+		-- prevent function from running again as it has three different triggers
+		categorySelected = _G.nop
 	end
 	self.RegisterCallback(aName, "Options_Selected", function()
-		self.UnregisterCallback(aName, "Options_Selected")
 		categorySelected()
+		self.UnregisterCallback(aName, "Options_Selected")
 	end)
 	if not self.isRtl then
 		self:RawHook("InterfaceOptionsListButton_OnClick", function(bObj, mouseButton)
+			self.hooks.InterfaceOptionsListButton_OnClick(bObj, mouseButton)
 			if bObj.element.name == aName then
 				if not bObj.element.hasChildren then
 					categorySelected()
 				end
-				self.hooks.InterfaceOptionsListButton_OnClick(bObj, mouseButton)
 				self:Unhook("InterfaceOptionsListButton_OnClick")
 				return
 			end
-			self.hooks.InterfaceOptionsListButton_OnClick(bObj, mouseButton)
 		end, true)
 	else
 		local function onCategorySelected(_, category)
 			if category.name == aName then
-				_G.SettingsPanel:GetCategoryList():UnregisterCallback(_G.SettingsCategoryListMixin.Event.OnCategorySelected, aObj)
 				categorySelected()
+				_G.SettingsPanel:GetCategoryList():UnregisterCallback(_G.SettingsCategoryListMixin.Event.OnCategorySelected, aObj)
 			end
 		end
 		_G.SettingsPanel:GetCategoryList():RegisterCallback(_G.SettingsCategoryListMixin.Event.OnCategorySelected, onCategorySelected, self)
@@ -240,7 +238,7 @@ end
 local function printIt(text, frame, r, g, b)
 	(frame or _G.DEFAULT_CHAT_FRAME):AddMessage(text, r, g, b)
 end
-function aObj:CustomPrint(r, g, b, ...) -- luacheck: ignore self
+function aObj:CustomPrint(r, g, b, ...) -- luacheck: ignore 212 (unused argument)
 
 	printIt(_G.WrapTextInColorCode(aName, "ffffff78") .. " " .. makeText(...), nil, r, g, b)
 
