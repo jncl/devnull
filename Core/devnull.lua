@@ -222,6 +222,7 @@ function aObj:CheckMode(event, ...)
 	then
 		if self.isRtl
 		or self.isClsc
+		or self.isClscERAPTR
 		then
 			if _G.C_GossipInfo.GetNumAvailableQuests() > 0
 			or _G.C_GossipInfo.GetNumActiveQuests() > 0
