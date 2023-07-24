@@ -1,17 +1,12 @@
 local aName, aObj = ...
 
 local _G = _G
-
 -- luacheck: ignore 631 (line is too long)
 
 function aObj:SetupOptions()
 
-	local iof_otc
-	if not self.isRtl then
-		iof_otc = _G.InterfaceOptionsFrame_OpenToCategory
-	else
-		iof_otc = _G.Settings.OpenToCategory
-	end
+	local iof_otc = _G.InterfaceOptionsFrame_OpenToCategory or _G.Settings and _G.Settings.OpenToCategory or _G.nop
+
 	self.optTables = {
 		General = {
 			type = "group",
