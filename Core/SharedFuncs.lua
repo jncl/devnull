@@ -52,7 +52,7 @@ function aObj:checkVersion()
 	self.isRtlPTRX    = agentUID == "wow_ptr_x" and true
 	self.isRtl        = agentUID == "wow" and true
 	--@debug@
-	self:Debug("checkVersion#1: [%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s]", self.isClscBeta, self.isClscPTR, self.isClsc, self.isClscERAPTR, self.isClscERA, self.isRtlBeta, self.isRtlPTR, self.isRtlPTRX, self.isRtl, self.isPatch)
+	self:Debug("checkVersion#1: [%s, %s, %s, %s, %s, %s, %s, %s, %s, %s]", self.isClscBeta, self.isClscPTR, self.isClsc, self.isClscERAPTR, self.isClscERA, self.isRtlBeta, self.isRtlPTR, self.isRtlPTRX, self.isRtl, self.isPatch)
 	--@end-debug@
 
 	self.tocVer = getTOCVer(agentUID)
@@ -82,13 +82,13 @@ function aObj:checkVersion()
 	self.isRtlPTR     = self.isRtlPTR or self.isRtlBeta
 	-- indicate we're on Retail if on Retail PTR
 	self.isRtl        = self.isRtl or self.isRtlPTR or self.isRtlPTRX
-	-- handle PTR changes going Live
-	self.isClscPTR    = self.isClscPTR or self.isClsc and (buildInfo.curr[4] == getTOCVer("wow_classic")) and self.isPatch
-	self.isClscERAPTR = self.isClscERAPTR or self.isClscERA and (buildInfo.curr[4] == getTOCVer("wow_classic_era")) and self.isPatch
-	self.isRtlPTR     = self.isRtlPTR or self.isRtl and (buildInfo.curr[4] == getTOCVer("wow_ptr")) and self.isPatch
-	self.isRtlPTRX    = self.isRtlPTRX or self.isRtl and (buildInfo.curr[4] == getTOCVer("wow_ptr_x")) and self.isPatch
+	-- -- handle PTR changes going Live
+	-- self.isClscPTR    = self.isClscPTR or self.isClsc and self.isPatch
+	-- self.isClscERAPTR = self.isClscERAPTR or self.isClscERA and self.isPatch
+	-- self.isRtlPTR     = self.isRtlPTR or self.isRtl and self.isPatch
+	-- self.isRtlPTRX    = self.isRtlPTRX or self.isRtl and self.isPatch
 	--@debug@
-	self:Debug("checkVersion#2: [%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s]", self.isClscBeta, self.isClscPTR, self.isClsc, self.isClscERAPTR, self.isClscERA, self.isRtlBeta, self.isRtlPTR, self.isRtlPTRX, self.isRtl, self.isPatch)
+	self:Debug("checkVersion#2: [%s, %s, %s, %s, %s, %s, %s, %s, %s, %s]", self.isClscBeta, self.isClscPTR, self.isClsc, self.isClscERAPTR, self.isClscERA, self.isRtlBeta, self.isRtlPTR, self.isRtlPTRX, self.isRtl, self.isPatch)
 	--@end-debug@
 
 end
@@ -161,32 +161,16 @@ function aObj:setupOptions(optNames, optIgnore, preLoadFunc, postLoadFunc)
 		if postLoadFunc then
 			postLoadFunc()
 		end
-		if not aObj.isRtl then
-			_G.InterfaceAddOnsList_Update()
-		else
 			-- toggle tabs to force refresh of Categories
 			_G.SettingsPanel.tabsGroup:SelectAtIndex(1)
 			_G.SettingsPanel.tabsGroup:SelectAtIndex(2)
-		end
-		-- prevent function from running again as it has three different triggers
+		-- prevent function from running again as it has two different triggers
 		categorySelected = _G.nop
 	end
 	self.RegisterCallback(aName, "Options_Selected", function()
 		categorySelected()
 		self.UnregisterCallback(aName, "Options_Selected")
 	end)
-	if not self.isRtl then
-		self:RawHook("InterfaceOptionsListButton_OnClick", function(bObj, mouseButton)
-			self.hooks.InterfaceOptionsListButton_OnClick(bObj, mouseButton)
-			if bObj.element.name == aName then
-				if not bObj.element.hasChildren then
-					categorySelected()
-				end
-				self:Unhook("InterfaceOptionsListButton_OnClick")
-				return
-			end
-		end, true)
-	else
 		local function onCategorySelected(_, category)
 			if category.name == aName then
 				categorySelected()
@@ -194,7 +178,6 @@ function aObj:setupOptions(optNames, optIgnore, preLoadFunc, postLoadFunc)
 			end
 		end
 		_G.SettingsPanel:GetCategoryList():RegisterCallback(_G.SettingsCategoryListMixin.Event.OnCategorySelected, onCategorySelected, self)
-	end
 
 end
 
