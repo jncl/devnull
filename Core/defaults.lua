@@ -211,6 +211,7 @@ function aObj:SetupDefaults()
 	-- Legion
 	self.sanctuariesByID[627]                          = true -- Dalaran, Broken Isles (Legion)
 	self.sanctuariesByID[647]                          = true -- Acherus: The Ebon Hold, Broken Isles [DeathKnight Order Hall]
+	self.sanctuaries[SZL["Crypt"]]                     = true -- @Light's Hope Chapel, Eastern Plaguelands
 	self.sanctuaries[SZL["Light's Hope Chapel"]]       = true -- Eastern Plaguelands
 	self.sanctuaries[SZL["Shal'Aran"]]                 = true -- Suramar
 	self.sanctuaries[SZL["Deliverance Point"]]         = true -- Broken Shore
