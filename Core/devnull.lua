@@ -219,22 +219,11 @@ function aObj:CheckMode(event, ...)
 	if event == "GOSSIP_SHOW"
 	or event == "QUEST_GREETING"
 	then
-		if self.isRtl
-		or self.isClsc
-		or self.isClscERAPTR
+		if _G.C_GossipInfo.GetNumAvailableQuests() > 0
+		or _G.C_GossipInfo.GetNumActiveQuests() > 0
+		or _G.GossipFrame.gossipOptions
 		then
-			if _G.C_GossipInfo.GetNumAvailableQuests() > 0
-			or _G.C_GossipInfo.GetNumActiveQuests() > 0
-			or _G.GossipFrame.gossipOptions
-			then
-				saveNPC(_G.UnitName("Target"))
-			end
-		else
-			if _G.select("#", _G.GetGossipAvailableQuests()) > 0
-			or _G.GossipFrame.hasActiveQuests
-			then
-				saveNPC(_G.UnitName("Target"))
-			end
+			saveNPC(_G.UnitName("Target"))
 		end
 		return
 	end
