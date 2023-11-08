@@ -7,14 +7,14 @@ local buildInfo = {
 	-- Testing
 	-- wow_classic_beta    = {"3.4.0",  46158, "Classic Beta"},
 	-- wow_beta            = {"11.0.0", nnnnn, "Retail Beta"}, -- a.k.a. ?
-	wow_classic_ptr     = {"3.4.3",  51666, "Classic PTR"},
+	wow_classic_ptr     = {"3.4.3",  51943, "Classic PTR"},
 	wow_classic_era_ptr = {"1.14.4", 51146, "Classic Era PTR"},
-	wow_ptr_x           = {"10.2.0", 51601, "Retail PTRX"}, -- [wowxptr]
-	wow_ptr             = {"10.1.7", 51485, "Retail PTR"},
+	wow_ptr_x           = {"10.2.0", 52068, "Retail PTRX"}, -- [wowxptr]
+	wow_ptr             = {"10.2.0", 52038, "Retail PTR"},
 	-- Live
-	wow_classic         = {"3.4.3",  51666, "Classic"}, -- a.k.a. Wrath of the Lich King Classic
-	wow_classic_era     = {"1.14.4", 51535, "Classic Era"},
-	wow                 = {"10.1.7", 51536, "Retail"},
+	wow_classic         = {"3.4.3",  51943, "Classic"}, -- a.k.a. Wrath of the Lich King Classic
+	wow_classic_era     = {"1.14.4", 51829, "Classic Era"},
+	wow                 = {"10.2.0", 52068, "Retail"},
 	-- Currently playing
 	curr                = {_G.GetBuildInfo()},
 }
@@ -82,11 +82,11 @@ function aObj:checkVersion()
 	self.isRtlPTR     = self.isRtlPTR or self.isRtlBeta
 	-- indicate we're on Retail if on Retail PTR
 	self.isRtl        = self.isRtl or self.isRtlPTR or self.isRtlPTRX
-	-- -- handle PTR changes going Live
-	-- self.isClscPTR    = self.isClscPTR or self.isClsc and self.isPatch
-	-- self.isClscERAPTR = self.isClscERAPTR or self.isClscERA and self.isPatch
-	-- self.isRtlPTR     = self.isRtlPTR or self.isRtl and self.isPatch
-	-- self.isRtlPTRX    = self.isRtlPTRX or self.isRtl and self.isPatch
+	-- handle PTR changes going Live
+	self.isClscPTR    = self.isClscPTR or self.isClsc and self.isPatch
+	self.isClscERAPTR = self.isClscERAPTR or self.isClscERA and self.isPatch
+	self.isRtlPTR     = self.isRtlPTR or self.isRtl and self.isPatch
+	self.isRtlPTRX    = self.isRtlPTRX or self.isRtl and self.isPatch
 	--@debug@
 	self:Debug("checkVersion#2: [%s, %s, %s, %s, %s, %s, %s, %s, %s, %s]", self.isClscBeta, self.isClscPTR, self.isClsc, self.isClscERAPTR, self.isClscERA, self.isRtlBeta, self.isRtlPTR, self.isRtlPTRX, self.isRtl, self.isPatch)
 	--@end-debug@
