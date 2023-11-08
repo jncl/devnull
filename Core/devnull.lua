@@ -166,13 +166,7 @@ function aObj:OnDisable()
 
 end
 
-local function saveNPC(NPC)
-	if NPC
-	and not aObj.questNPC[NPC] then
-		aObj.questNPC[NPC] = true
-	end
-	aObj:LevelDebug(4, "Saved Gossip/Quest NPC: [%s]", NPC)
-end
+local NPCname
 function aObj:CheckMode(event, ...)
 
 	-- local event = select(1, ...)
@@ -215,22 +209,19 @@ function aObj:CheckMode(event, ...)
 		end)
 	end
 
-	-- get NPC name and remember it, if they have any quests
+	-- clear remembered NPC names
+	_G.wipe(self.questNPC)
+	-- remember NPC name if required
 	if event == "GOSSIP_SHOW"
+	or event == "QUEST_DETAIL"
 	or event == "QUEST_GREETING"
-	then
-		if _G.C_GossipInfo.GetNumAvailableQuests() > 0
-		or _G.C_GossipInfo.GetNumActiveQuests() > 0
-		or _G.GossipFrame.gossipOptions
-		then
-			saveNPC(_G.UnitName("Target"))
-		end
-		return
-	end
-	if event == "QUEST_DETAIL"
 	or event == "QUEST_PROGRESS"
 	then
-		saveNPC(_G.UnitName("Target"))
+		NPCname = _G.UnitName("Target")
+		if NPCname then
+			self.questNPC[NPCname] = true
+			self:LevelDebug(4, "Saved Gossip/Quest NPC: [%s]", NPCname)
+		end
 		return
 	end
 
