@@ -1,9 +1,10 @@
 local _, aObj = ...
 
 local _G = _G
+-- luacheck: ignore 631 (line is too long)
 
 -- Garrison functions
-local bodyguardNames = {}
+local bodyguardNames, info = {}
 function aObj:isGarrison(str) -- luacheck: ignore self
 
 	return str and str:find("Garrison Level") and true
@@ -11,13 +12,7 @@ function aObj:isGarrison(str) -- luacheck: ignore self
 end
 function aObj:getBGNames()
 
-	if not self.isRtl then
-		self.getBGNames = _G.nop
-		return
-	end
-
 	if self.prdb.noBguard then
-		local info
 		-- Tormmok [193]
 		-- Defender Illona (A) [207]
 		-- Aeda Brightdawn (H) [207]
@@ -34,13 +29,14 @@ function aObj:getBGNames()
 
 end
 
+local msg, charFrom, charTo
 -- message filters & groups
 function aObj.msgFilter1(_, event, ...)
 	aObj:LevelDebug(5, "msgFilter1:", event, ...)
 
-	local msg = _G.select(1, ...)
-	local charFrom = _G.select(2, ...)
-	local charTo = _G.select(7, ...)
+	msg = _G.select(1, ...)
+	charFrom = _G.select(2, ...)
+	charTo = _G.select(7, ...)
 	aObj:LevelDebug(3, "mf1:[%s],[%s],[%s]", msg, charFrom, charTo)
 
 	-- allow emotes/says to/from the player/pet
@@ -62,7 +58,7 @@ end
 function aObj.msgFilter2(_, event, ...)
 	aObj:LevelDebug(5, "msgFilter2:", event, ...)
 
-	local charFrom = _G.select(2, ...)
+	charFrom = _G.select(2, ...)
 	aObj:LevelDebug(3, "mf2:[%s]", charFrom)
 
 	-- allow yells from the player
@@ -77,7 +73,7 @@ end
 function aObj.msgFilter3(_, event, ...)
 	aObj:LevelDebug(5, "msgFilter3:", event, ...)
 
-	local msg = _G.select(1, ...)
+	msg = _G.select(1, ...)
 	aObj:LevelDebug(3, "mf3:[%s]", msg)
 
 	-- ignore Duelling messages
@@ -92,7 +88,7 @@ end
 function aObj.msgFilter4(_, event, ...)
 	aObj:LevelDebug(5, "msgFilter4:", event, ...)
 
-	local msg = _G.select(1, ...)
+	msg = _G.select(1, ...)
 	aObj:LevelDebug(3, "mf4:[%s]", msg)
 
 	-- ignore Drunken messages
@@ -111,7 +107,7 @@ end
 function aObj.msgFilter5(_, event, ...)
 	aObj:LevelDebug(5, "msgFilter5:", event, ...)
 
-	local msg = _G.select(1, ...)
+	msg = _G.select(1, ...)
 	aObj:LevelDebug(3, "mf5:[%s]", msg)
 
 	-- ignore discovery messages
@@ -126,8 +122,8 @@ end
 function aObj.msgFilter6(_, event, ...)
 	aObj:LevelDebug(5, "msgFilter6:", event, ...)
 
-	local msg = _G.select(1, ...)
-	local charFrom = _G.select(2, ...)
+	msg = _G.select(1, ...)
+	charFrom = _G.select(2, ...)
 	aObj:LevelDebug(3, "mf6:[%s][%s]", msg, charFrom)
 
 	-- ignore Achievement messages if not from Guild/Party/Raid members
@@ -146,8 +142,8 @@ end
 function aObj.msgFilter7(_, event, ...)
 	aObj:LevelDebug(5, "msgFilter7:", event, ...)
 
-	local msg = _G.select(1, ...)
-	local charFrom = _G.select(2, ...)
+	msg = _G.select(1, ...)
+	charFrom = _G.select(2, ...)
 	aObj:LevelDebug(3, "mf7:[%s][%s]", msg, charFrom)
 
 	-- ignore Bodyguard's chat or Reputation gains
@@ -161,108 +157,6 @@ function aObj.msgFilter7(_, event, ...)
 
 end
 
-function aObj:addMFltrs()
-
-	if _G. InCombatLockdown() then
-		self:add2Table(self.oocTab, {self.addMFltrs, {self}})
-		return
-	end
-
-	if self.inHub then
-		-- add message filters
-		if self.prdb.noEmote then
-			_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_EMOTE", self.msgFilter1)
-			_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_TEXT_EMOTE", self.msgFilter1)
-			_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_EMOTE", self.msgFilter1)
-		end
-		if self.prdb.noPYell then
-			_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", self.msgFilter2)
-		end
-		if self.prdb.noDrunk then
-			_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", self.msgFilter4)
-		end
-		if self.prdb.noDiscovery then
-			_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_BG_SYSTEM_NEUTRAL", self.msgFilter5)
-		end
-	end
-
-	if self.inHub
-	or (self.inGarrison and self.prdb.noGChat)
-	then
-		if self.prdb.noNPC then
-			_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", self.msgFilter1)
-		end
-	end
-
-	if self.prdb.noDuel then
-		_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_SYSTEM", self.msgFilter3)
-	end
-
-	if self.prdb.achFilterType == 2 then
-		_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_ACHIEVEMENT", self.msgFilter6)
-	end
-
-	if self.prdb.noBguard
-	and not self.isClsc
-	then
-		_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", self.msgFilter7)
-		_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_COMBAT_FACTION_CHANGE", self.msgFilter7)
-	end
-
-end
-function aObj:removeMFltrs(upd)
-
-	if _G. InCombatLockdown() then
-		self:add2Table(self.oocTab, {self.removeMFltrs, {self, upd}})
-		return
-	end
-
-	if not self.inHub then
-		-- remove message filters
-		if self.prdb.noEmote then
-			_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_EMOTE", self.msgFilter1)
-			_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_TEXT_EMOTE", self.msgFilter1)
-			_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_MONSTER_EMOTE", self.msgFilter1)
-		end
-
-		if self.prdb.noPYell then
-			_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_YELL", self.msgFilter2)
-		end
-
-		if self.prdb.noDrunk then
-			_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", self.msgFilter4)
-		end
-
-		if self.prdb.noDiscovery then
-			_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_BG_SYSTEM_NEUTRAL", self.msgFilter5)
-		end
-	end
-
-	if not self.inHub
-	and not self.inGarrison
-	and not self.inOrderHall
-	then
-		if self.prdb.noNPC then
-			_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_MONSTER_SAY", self.msgFilter1)
-		end
-	end
-
-	if self.prdb.noDuel then
-		_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_SYSTEM", self.msgFilter3)
-	end
-
-	if self.prdb.achFilterType == 2 then
-		_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_ACHIEVEMENT", self.msgFilter6)
-	end
-
-	if self.prdb.noBguard
-	and not self.isClsc
-	then
-		_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_MONSTER_SAY", self.msgFilter7)
-		_G.ChatFrame_RemoveMessageEventFilter("CHAT_MSG_COMBAT_FACTION_CHANGE", self.msgFilter7)
-	end
-
-end
 function aObj:updateMFltrs()
 	-- called by CheckMode function when events trigger changes
 
@@ -272,7 +166,9 @@ function aObj:updateMFltrs()
 	end
 
 	-- update message filters
-	if self.inHub then
+	if self.modeTab.Hub
+	or self.modeTab.Sanctuary
+	then
 		-- add message filters
 		if self.prdb.noEmote then
 			_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_EMOTE", self.msgFilter1)
@@ -312,8 +208,9 @@ function aObj:updateMFltrs()
 		end
 	end
 
-	if self.inHub
-	or (self.inGarrison and self.prdb.noGChat)
+	if self.modeTab.Hub
+	or self.modeTab.Sanctuary
+	or (self.modeTab.Garrison and self.prdb.noGChat)
 	then
 		if self.prdb.noNPC then
 			_G.ChatFrame_AddMessageEventFilter("CHAT_MSG_MONSTER_SAY", self.msgFilter1)
@@ -388,49 +285,51 @@ function aObj:unfilterMGs()
 
 end
 
-function aObj:enableEvents()
+function aObj:resetModes()
 
-	if not self.isClscERA then
-		self:LevelDebug(5, "enableEvents:", self.onTaxi, _G.UnitOnTaxi("player"), self.inVehicle, _G.UnitInVehicle("player"))
-	else
-		self:LevelDebug(5, "enableEvents:", self.onTaxi, _G.UnitOnTaxi("player"))
-	end
-
-	-- on Taxi
-	if not self.onTaxi
-	and _G.UnitOnTaxi("player")
-	then
-		self:LevelDebug(3, "on Taxi")
-		self:RegisterEvent("PLAYER_CONTROL_GAINED", "CheckMode")
-		self.onTaxi = true
-	-- in Vehicle
-	elseif not self.inVehicle
-	and not self.isClscERA
-	and _G.UnitInVehicle("player")
-	then
-		self:LevelDebug(3, "in Vehicle")
-		self:RegisterEvent("UNIT_EXITED_VEHICLE", "CheckMode")
-		self.inVehicle = true
-	else
-		self:LevelDebug(3, "registering normal events")
-		-- register required events
-		for tEvent, enable in _G.pairs(self.trackEvent) do
-			if enable then
-				self:RegisterEvent(tEvent, "CheckMode")
-			end
-		end
+	for modeName, _ in _G.pairs(self.modeTab) do
+		self:LevelDebug(5, "resetModes#1: [%s, %s, %s]", modeName, self.modeTab[modeName])
+		self.modeTab[modeName] = false
+		self:LevelDebug(5, "resetModes#2: [%s, %s, %s]", modeName, self.modeTab[modeName])
 	end
 
 end
+
+function aObj:CheckAllEvents()
+
+	for evt, _ in _G.pairs(self.events) do
+		self.events[evt].check = true
+	end
+
+end
+
+function aObj:UncheckAllEvents()
+
+	for evt, _ in _G.pairs(self.events) do
+		self.events[evt].check = false
+	end
+
+end
+
+local status
 function aObj:updateDBtext(noShrink)
 
-	local status = self.onTaxi and self.L["Taxi"]
-	or self.inVehicle and self.L["Vehicle"]
-	or self.prdb.inInst and self.L["Instance"]
-	or self.inScenario and self.L["Scenario"]
-	or self.inGarrison and self.L["Garrison"]
-	or self.inHub and self.L["Hub"]
-	or self.L["Off"]
+	self:LevelDebug(4, "updateDBtext: [%s:%s, %s:%s, %s:%s]", self.L["Hub"], _G.tostring(self.modeTab.Hub), self.L["Sanctuary"], _G.tostring(self.modeTab.Sanctuary), self.L["Taxi"], _G.tostring(self.modeTab.Taxi))
+	if self.isRtl then
+		self:LevelDebug(4, "updateDBtext: [%s:%s, %s:%s, %s:%s]", self.L["Vehicle"], _G.tostring(self.modeTab.Vehicle), self.L["Scenario"], _G.tostring(self.modeTab.Scenario), self.L["Instance"], _G.tostring(self.modeTab.Instance))
+		self:LevelDebug(4, "updateDBtext: [%s:%s, %s %s:%s]", self.L["Garrison"], _G.tostring(self.modeTab.Garrison), self.L["Bodyguard"], self.L["mode"], _G.tostring(self.prdb.noBguard))
+	end
+
+	status = self.L["Off"]
+	for modeName, mode in _G.pairs(self.modeTab) do
+		self:LevelDebug(5, "updateDBtext mode Info: [%s, %s, %s]", modeName, mode)
+		if self.modeTab[modeName] then
+			status = self.L[modeName]
+			break
+		end
+	end
+
+	self:LevelDebug(4, "updateDBtext status: [%s]", status)
 
 	if not self.prdb.shrink
 	or noShrink

@@ -7,14 +7,14 @@ local buildInfo = {
 	-- Testing
 	-- wow_classic_beta    = {"3.4.0",  46158, "Classic Beta"},
 	-- wow_beta            = {"11.0.0", nnnnn, "Retail Beta"}, -- a.k.a. ?
-	wow_classic_ptr     = {"3.4.3",  51943, "Classic PTR"},
-	wow_classic_era_ptr = {"1.14.4", 51146, "Classic Era PTR"},
-	wow_ptr_x           = {"10.2.0", 52068, "Retail PTRX"}, -- [wowxptr]
-	wow_ptr             = {"10.2.0", 52038, "Retail PTR"},
+	wow_classic_ptr     = {"3.4.3",  52237, "Classic PTR"},
+	wow_classic_era_ptr = {"1.15.0", 52302, "Classic Era PTR"},
+	wow_ptr_x           = {"10.2.0", 52485, "Retail PTRX"}, -- [wowxptr]
+	wow_ptr             = {"10.2.5", 52554, "Retail PTR"},
 	-- Live
-	wow_classic         = {"3.4.3",  51943, "Classic"}, -- a.k.a. Wrath of the Lich King Classic
-	wow_classic_era     = {"1.14.4", 51829, "Classic Era"},
-	wow                 = {"10.2.0", 52068, "Retail"},
+	wow_classic         = {"3.4.3",  52237, "Classic"}, -- a.k.a. Wrath of the Lich King Classic
+	wow_classic_era     = {"1.15.0", 52409, "Classic Era"},
+	wow                 = {"10.2.0", 52485, "Retail"},
 	-- Currently playing
 	curr                = {_G.GetBuildInfo()},
 }
@@ -52,7 +52,7 @@ function aObj:checkVersion()
 	self.isRtlPTRX    = agentUID == "wow_ptr_x" and true
 	self.isRtl        = agentUID == "wow" and true
 	--@debug@
-	self:Debug("checkVersion#1: [%s, %s, %s, %s, %s, %s, %s, %s, %s, %s]", self.isClscBeta, self.isClscPTR, self.isClsc, self.isClscERAPTR, self.isClscERA, self.isRtlBeta, self.isRtlPTR, self.isRtlPTRX, self.isRtl, self.isPatch)
+	self:Debug("checkVersion#1: [%s, %s, %s, %s, %s, %s, %s, %s, %s]", self.isClscBeta, self.isClscPTR, self.isClsc, self.isClscERAPTR, self.isClscERA, self.isRtlBeta, self.isRtlPTR, self.isRtlPTRX, self.isRtl)
 	--@end-debug@
 
 	self.tocVer = getTOCVer(agentUID)

@@ -214,10 +214,10 @@ function aObj:SetupOptions()
 				iof_otc(aName)
 			end
 		elseif input:lower() == "status" then
-			aObj:Print("Hub:", self.inHub, "Taxi:", self.onTaxi)
+			aObj:Print(aObj.L["Hub"] .. ":", aObj.modeTab.Hub, aObj.L["Sanctuary"] .. ":", aObj.modeTab.Sanctuary, aObj.L["Taxi"] .. ":", aObj.modeTab.Taxi)
 			if aObj.isRtl then
-				aObj:Print("Vehicle:", self.inVehicle, "Scenario:", self.inScenario, "Instance:", self.prdb.inInst)
-				aObj:Print("Garrison:", self.inGarrison, "Bodyguard mode:", self.prdb.noBguard)
+				aObj:Print(aObj.L["Vehicle"] .. ":", aObj.modeTab.Vehicle, aObj.L["Scenario"] .. ":", aObj.modeTab.Scenario, aObj.L["Instance"] .. ":", aObj.modeTab.Instance)
+				aObj:Print(aObj.L["Garrison"] .. ":", aObj.modeTab.Garrison, _G.strjoin(" ", aObj.L["Bodyguard"], aObj.L["mode"] .. ":"), aObj.prdb.noBguard)
 			end
 		elseif input:lower() == "loud" then
 			aObj.debugLevel = 5
@@ -227,13 +227,13 @@ function aObj:SetupOptions()
 			aObj:Print("Debug messages OFF")
 		elseif input:lower() == "locate" then
 			_G.C_Map.GetBestMapForUnit("player")
-			aObj:Print("You Are Here: [", _G.GetRealZoneText(), "][", _G.GetSubZoneText(), "][", _G.C_Map.GetBestMapForUnit("player"), "]")
+			aObj:Print(self.L["You are here"] .. ":", "[", _G.GetRealZoneText(), "] [", _G.GetSubZoneText(), "] [", _G.C_Map.GetBestMapForUnit("player"), "]")
 		elseif input:lower() == "mapinfo" then
 			local uiMapID = _G.C_Map.GetBestMapForUnit("player")
 			local mapinfo = _G.C_Map.GetMapInfo(uiMapID)
 			local posn = _G.C_Map.GetPlayerMapPosition(uiMapID, "player")
 			local areaName= _G.MapUtil.FindBestAreaNameAtMouse(uiMapID, posn["x"], posn["y"])
-			aObj:Print("Map Info:", mapinfo["mapID"], mapinfo["name"], mapinfo["mapType"], mapinfo["parentMapID"], posn["x"], posn["y"], areaName)
+			aObj:Print(self.L["Map Info"] .. ":", mapinfo["mapID"], mapinfo["name"], mapinfo["mapType"], mapinfo["parentMapID"], posn["x"], posn["y"], areaName)
 		else
 			_G.LibStub:GetLibrary("AceConfigCmd-3.0"):HandleCommand(aName, aName, input)
 		end
