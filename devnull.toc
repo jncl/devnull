@@ -1,13 +1,8 @@
-## Interface: 100200
-## Interface-Wrath: 30403
-## Interface-BCC: 20504
-## Interface-Classic: 11500
+## Interface: 11502, 100207, 40400
 
 ## Title: /dev/null
 ## IconTexture: Interface\Icons\Spell_Holy_Silence
-#@version-retail@
 ## AddonCompartmentFunc: devnull_OnAddonCompartmentClick
-#@end-version-retail@
 
 ## Notes: Mutes various chat related annoyances while in capital cities and instances.
 ## Notes-deDE: Unterdr\195\188ckt diverse st\195\182rende Meldungen - w\195\164hrend man sich in Hauptst\195\164dten oder Instanzen befindet.
