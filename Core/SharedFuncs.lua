@@ -1,21 +1,18 @@
+-- luacheck: ignore 212 631 (unused argument|line is too long)
 local aName, aObj = ...
 
 local _G = _G
--- luacheck: ignore 631 (line is too long)
 
 local buildInfo = {
-	-- Testing
-	-- wow_classic_beta    = {"3.4.0",  46158, "Classic Beta"},
-	-- wow_beta            = {"11.0.0", nnnnn, "Retail Beta"}, -- a.k.a. ?
-	wow_classic_ptr     = {"3.4.3",  52237, "Classic PTR"},
-	wow_classic_era_ptr = {"1.15.0", 52302, "Classic Era PTR"},
-	wow_ptr_x           = {"10.2.0", 52485, "Retail PTRX"}, -- [wowxptr]
-	wow_ptr             = {"10.2.5", 52554, "Retail PTR"},
-	-- Live
-	wow_classic         = {"3.4.3",  52237, "Classic"}, -- a.k.a. Wrath of the Lich King Classic
-	wow_classic_era     = {"1.15.0", 52409, "Classic Era"},
-	wow                 = {"10.2.0", 52485, "Retail"},
-	-- Currently playing
+	wow_classic         = {"4.4.0",  54901, "Classic"}, -- a.k.a. Wrath of the Lich King Classic
+	wow_classic_beta    = {"4.4.0",  54737, "Cataclysm Classic Beta"},
+	wow_classic_era     = {"1.15.2", 54902, "Classic Era"}, -- a.k.a. Season of Discovery
+	wow_classic_era_ptr = {"1.15.2", 54067, "Classic Era PTR"},
+	wow_classic_ptr     = {"4.4.0",  54901, "Classic PTR"},
+	-- wow_beta            = {"11.0.0", 56000, "Retail Beta"}, -- a.k.a. The War Within
+	wow_ptr             = {"10.2.7", 54904, "Retail PTR"},
+	wow                 = {"10.2.7", 54904, "Retail"},
+	wow_ptr_x           = {"10.2.6", 53989, "Retail PTRX"},
 	curr                = {_G.GetBuildInfo()},
 }
 
@@ -224,7 +221,7 @@ local function makeString(obj)
 	if _G.type(obj) == "table" then
 		return ("<%s:%s:%s>"):format(_G.tostring(obj), obj.GetObjectType and obj:GetObjectType() or _G.type(obj), obj.GetName and obj:GetName() or "(Anon)")
 	elseif _G.type(obj) ~= "string" then
-	return _G.tostring(obj)
+		return _G.tostring(obj)
 	else
 		return obj
 	end
