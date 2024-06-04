@@ -185,10 +185,8 @@ function aObj:SetupOptions()
 		-- runs when the player clicks "Okay"
 		aObj.optionsFrames[aObj.L["Mutes"]][method] = function()
 			aObj:getBGNames()
-			aObj:unfilterMGs()
-			aObj:removeMFltrs()
-			aObj:filterMGs()
-			aObj:addMFltrs()
+			aObj:updateMGs()
+			aObj:updateMFltrs()
 		end
 	end
 

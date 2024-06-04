@@ -127,8 +127,8 @@ function aObj:OnEnable()
 		end
 	end
 
-	-- remove message groups
-	self:filterMGs()
+	-- update message groups
+	self:updateMGs()
 
 	if self.isRtl then
 		-- get Bodyguard follower names
@@ -181,9 +181,9 @@ function aObj:OnDisable()
 	self:UnhookAll()
 
 	-- re-add message groups
-	self.unfilterMGs()
+	self.updateMGs()
 	-- remove message filters
-	self.removeMFltrs()
+	self.updateMFltrs()
 
 	-- turn channels back on
 	for channel, on in _G.pairs(self.prdb.cf1Channels) do

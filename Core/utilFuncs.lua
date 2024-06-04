@@ -222,56 +222,38 @@ function aObj:updateMFltrs()
 	end
 
 end
-function aObj:filterMGs()
+
+function aObj:updateMGs()
 
 	if _G. InCombatLockdown() then
-		self:add2Table(self.oocTab, {self.filterMGs, {self}})
-		return
-	end
-
-	-- remove message groups
-	if self.prdb.noMYell then
-		_G.ChatFrame_RemoveMessageGroup(_G. ChatFrame1, "MONSTER_YELL")
-	end
-
-	if self.prdb.noTradeskill then
-		_G.ChatFrame_RemoveMessageGroup(_G. ChatFrame1, "TRADESKILLS")
-	end
-
-	if self.prdb.noPetInfo then
-		_G.ChatFrame_RemoveMessageGroup(_G. ChatFrame1, "PET_INFO")
-	end
-
-	if self.prdb.achFilterType == 1 then
-		_G.ChatFrame_RemoveMessageGroup(_G. ChatFrame1, "ACHIEVEMENT")
-		_G.ChatFrame_RemoveMessageGroup(_G. ChatFrame1, "GUILD_ACHIEVEMENT")
-	end
-
-end
-function aObj:unfilterMGs()
-
-	if _G. InCombatLockdown() then
-		self:add2Table(self.oocTab, {self.unfilterMGs, {self}})
+		self:add2Table(self.oocTab, {self.updateMGs, {self}})
 		return
 	end
 
 	-- re-add message groups if they were originally enabled
-	if not self.prdb.noMYell
-	and self.mGs["MONSTER_YELL"]
-	then
-		_G.ChatFrame_AddMessageGroup(_G. ChatFrame1, "MONSTER_YELL")
+	-- otherwise remove message groups
+	if not self.prdb.noMYell then
+		if self.mGs["MONSTER_YELL"] then
+			_G.ChatFrame_AddMessageGroup(_G. ChatFrame1, "MONSTER_YELL")
+		end
+	else
+		_G.ChatFrame_RemoveMessageGroup(_G. ChatFrame1, "MONSTER_YELL")
 	end
 
-	if not self.prdb.noTradeskill
-	and self.mGs["TRADESKILLS"]
-	then
-		_G.ChatFrame_AddMessageGroup(_G. ChatFrame1, "TRADESKILLS")
+	if not self.prdb.noTradeskill then
+		if self.mGs["TRADESKILLS"] then
+			_G.ChatFrame_AddMessageGroup(_G. ChatFrame1, "TRADESKILLS")
+		end
+	else
+		_G.ChatFrame_RemoveMessageGroup(_G. ChatFrame1, "TRADESKILLS")
 	end
 
-	if not self.prdb.noPetInfo
-	and self.mGs["PET_INFO"]
-	then
-		_G.ChatFrame_AddMessageGroup(_G. ChatFrame1, "PET_INFO")
+	if not self.prdb.noPetInfo then
+		if self.mGs["PET_INFO"] then
+			_G.ChatFrame_AddMessageGroup(_G. ChatFrame1, "PET_INFO")
+		end
+	else
+		_G.ChatFrame_RemoveMessageGroup(_G. ChatFrame1, "PET_INFO")
 	end
 
 	if self.prdb.achFilterType == 0 then
@@ -281,6 +263,9 @@ function aObj:unfilterMGs()
 		if self.mGs["GUILD_ACHIEVEMENT"] then
 			_G.ChatFrame_AddMessageGroup(_G. ChatFrame1, "GUILD_ACHIEVEMENT")
 		end
+	elseif self.prdb.achFilterType == 1 then
+		_G.ChatFrame_RemoveMessageGroup(_G. ChatFrame1, "ACHIEVEMENT")
+		_G.ChatFrame_RemoveMessageGroup(_G. ChatFrame1, "GUILD_ACHIEVEMENT")
 	end
 
 end
