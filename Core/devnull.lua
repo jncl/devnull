@@ -3,25 +3,12 @@ local aName, aObj = ...
 local _G = _G
 -- luacheck: ignore 631 (line is too long)
 
-local cMAID
-
 do
-	-- check to see if required libraries are loaded
-	assert(_G.LibStub, aName .. " requires LibStub")
-	local lTab = {"AceAddon-3.0", "AceConfig-3.0", "AceConfigCmd-3.0", "AceConfigDialog-3.0", "AceConfigRegistry-3.0", "AceConsole-3.0", "AceDB-3.0", "AceDBOptions-3.0", "AceEvent-3.0", "AceGUI-3.0", "AceHook-3.0", "AceLocale-3.0", "CallbackHandler-1.0", "LibBabble-SubZone-3.0", "LibDataBroker-1.1"}
-	local hasError
-	for _, lib in _G.ipairs(lTab) do
-		hasError = not assert(_G.LibStub:GetLibrary(lib, true), aName .. " requires " .. lib)
+	if aObj:checkLibraries({"LibBabble-SubZone-3.0"}) then
+		aObj:createAddOn()
+	else
+		return
 	end
-	if hasError then return end
-
-	-- create the addon
-	_G.LibStub:GetLibrary("AceAddon-3.0"):NewAddon(aObj, aName, "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
-
-	aObj:checkVersion()
-
-	-- setup callback registry
-	aObj.callbacks = _G.LibStub:GetLibrary("CallbackHandler-1.0"):New(aObj)
 
 end
 
