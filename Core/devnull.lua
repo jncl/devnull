@@ -387,7 +387,7 @@ local function checkSanctuary()
 	return aObj.modeTab.Sanctuary
 end
 --> Hub Handler <--
-local subZoneText, realZoneText
+local subZoneText, realZoneText, cMAID
 local function checkHub()
 	subZoneText, realZoneText = _G.GetSubZoneText(), _G.GetRealZoneText()
 	aObj:LevelDebug(4, "Hub Handler", aObj.nullHubs[realZoneText], aObj.nullHubsByID[cMAID], aObj.nullTowns[subZoneText]--[[, aObj.nullTownsByID[cMAID]--]], aObj.nullAreas[subZoneText])
