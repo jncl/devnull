@@ -1,7 +1,7 @@
+-- luacheck: ignore 631 (line is too long)
 local aName, aObj = ...
 
 local _G = _G
--- luacheck: ignore 631 (line is too long)
 
 do
 	if aObj:checkLibraries({"LibBabble-SubZone-3.0"}) then

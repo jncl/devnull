@@ -1,11 +1,11 @@
+-- luacheck: ignore 212 631 (unused argument|line is too long)
 local _, aObj = ...
 
 local _G = _G
--- luacheck: ignore 631 (line is too long)
 
 -- Garrison functions
 local bodyguardNames, info = {}
-function aObj:isGarrison(str) -- luacheck: ignore self
+function aObj:isGarrison(str)
 
 	return str and str:find("Garrison Level") and true
 
