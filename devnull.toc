@@ -1,4 +1,4 @@
-## Interface: 11502, 100207, 40400
+## Interface: 11502, 110002, 40400
 
 ## Title: /dev/null
 ## IconTexture: Interface\Icons\Spell_Holy_Silence
