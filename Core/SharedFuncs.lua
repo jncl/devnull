@@ -1,18 +1,17 @@
--- luacheck: ignore 212 631 (unused argument|line is too long)
 local aName, aObj = ...
 
 local _G = _G
 
 local buildInfo = {
-	wow_classic         = {"4.4.0",  55262, "Classic"}, -- a.k.a. Wrath of the Lich King Classic
-	-- wow_classic_beta    = {"4.4.0",  54737, "Cataclysm Classic Beta"},
-	wow_classic_era     = {"1.15.2", 55140, "Classic Era"}, -- a.k.a. Season of Discovery
-	wow_classic_era_ptr = {"1.15.3", 55391, "Classic Era PTR"},
-	wow_classic_ptr     = {"4.4.0",  55262, "Classic PTR"},
-	-- wow_beta            = {"11.0.0", 56000, "Retail Beta"}, -- a.k.a. The War Within
-	wow_ptr             = {"10.2.7", 55261, "Retail PTR"},
-	wow                 = {"10.2.7", 55261, "Retail"},
-	wow_ptr_x           = {"11.0.0", 55419, "Retail PTRX"}, -- a.k.a. The War Within
+	wow_classic         = {"4.4.0",  56489, "Classic"}, -- a.k.a. Cataclysm Classic
+	-- wow_classic_beta    = {"4.4.0",  54737, "Classic Beta"},
+	wow_classic_era     = {"1.15.3", 56626, "Classic Era"}, -- a.k.a. Season of Discovery
+	wow_classic_era_ptr = {"1.15.4", 56573, "Classic Era PTR"},
+	wow_classic_ptr     = {"4.4.1",  56574, "Classic PTR"},
+	-- wow_beta            = {"11.0.2", 56263, "Retail Beta"}, -- a.k.a. The War Within
+	wow_ptr             = {"11.0.2", 56647, "Retail PTR"},
+	wow                 = {"11.0.2", 56647, "Retail"},
+	wow_ptr_x           = {"11.0.5", 56646, "Retail PTRX"},
 	curr                = {_G.GetBuildInfo()},
 }
 
@@ -129,15 +128,16 @@ function aObj:createAddOn(makeGlobal)
 
 end
 
-function aObj:add2Table(table, value)
+function aObj:add2Table(tab, val)
 	--@debug@
-	_G.assert(table, "Unknown table add2Table\n" .. _G.debugstack(2, 3, 2))
-	_G.assert(value, "Missing value add2Table\n" .. _G.debugstack(2, 3, 2))
+	_G.assert(tab, "Unknown table add2Table\n" .. _G.debugstack(2, 3, 2))
+	_G.assert(val, "Missing value add2Table\n" .. _G.debugstack(2, 3, 2))
 	--@end-debug@
 
-	table[#table + 1] = value
+	tab[#tab + 1] = val
 
 end
+
 function aObj:setupOptions(optNames, optIgnore, preLoadFunc, postLoadFunc)
 	local _
 	local db = self.db.profile
