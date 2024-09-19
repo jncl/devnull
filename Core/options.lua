@@ -5,8 +5,6 @@ local _G = _G
 
 function aObj:SetupOptions()
 
-	local iof_otc = _G.InterfaceOptionsFrame_OpenToCategory or _G.Settings and _G.Settings.OpenToCategory or _G.nop
-
 	self.optTables = {
 		General = {
 			type = "group",
@@ -20,7 +18,7 @@ function aObj:SetupOptions()
 				desc = {
 					type = "description",
 					order = 1,
-					name = self.L["shhhh"] .." - "..(_G.GetAddOnMetadata(aName, "X-Curse-Packaged-Version") or _G.GetAddOnMetadata(aName, "Version") or "").."\n",
+					name = self.L["shhhh"] .." - "..(_G.C_AddOns.GetAddOnMetadata(aName, "X-Curse-Packaged-Version") or _G.C_AddOns.GetAddOnMetadata(aName, "Version") or "").."\n",
 				},
 				longdesc = {
 					type = "description",
@@ -197,20 +195,10 @@ function aObj:SetupOptions()
 		if not input or input:trim() == "" then
 			-- Open general panel if there are no parameters
 			aObj.callbacks:Fire("Options_Selected")
-			if not aObj.isRtl then
-				iof_otc(aObj.optionsFrames[aName])
-				iof_otc(aObj.optionsFrames[aName])
-			else
-				iof_otc(aName)
-			end
+			_G.Settings.OpenToCategory(aObj.optionsFrames[aName])
 		elseif aObj.optCheck[input:lower()] then
 			aObj.callbacks:Fire("Options_Selected")
-			if not aObj.isRtl then
-				iof_otc(aObj.optionsFrames[aObj.optCheck[input:lower()]])
-				iof_otc(aObj.optionsFrames[aObj.optCheck[input:lower()]])
-			else
-				iof_otc(aName)
-			end
+			_G.Settings.OpenToCategory(aObj.optionsFrames[aObj.optCheck[input:lower()]])
 		elseif input:lower() == "status" then
 			aObj:Print(aObj.L["Hub"] .. ":", aObj.modeTab.Hub, aObj.L["Sanctuary"] .. ":", aObj.modeTab.Sanctuary, aObj.L["Taxi"] .. ":", aObj.modeTab.Taxi)
 			if aObj.isRtl then
@@ -248,13 +236,7 @@ function aObj:SetupOptions()
 		icon = [[Interface\Icons\Spell_Holy_Silence]],
 		OnClick = function()
 			aObj.callbacks:Fire("Options_Selected")
-			if not aObj.isRtl then
-				-- do twice to overcome Blizzard bug
-				iof_otc(aObj.optionsFrames[aName])
-				iof_otc(aObj.optionsFrames[aName])
-			else
-				iof_otc(aName)
-			end
+			_G.Settings.OpenToCategory(aObj.optionsFrames[aName])
 		end,
 		OnTooltipShow = function(tooltip)
 			tooltip:AddLine(aObj.L[aName] .. " - " .. aObj.L[self:updateDBtext(true)])
