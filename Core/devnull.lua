@@ -9,7 +9,6 @@ do
 	else
 		return
 	end
-
 end
 
 function aObj:OnInitialize()
@@ -69,10 +68,10 @@ function aObj:OnInitialize()
 	-- handle InCombat issues
 	self.oocTab = {}
 	self:RegisterEvent("PLAYER_REGEN_ENABLED", function()
-		for _, v in _G.pairs(self.oocTab) do
-			v[1](_G.unpack(v[2]))
+		for _, entry in _G.ipairs(self.oocTab) do
+			entry[1](_G.unpack(entry[2]))
 		end
-		_G.wipe(self.oocTab)
+		self.oocTab = {}
 	end)
 
 end
@@ -182,7 +181,6 @@ function aObj:OnDisable()
 end
 
 --> Flying Handler <--
--- local cdCnt, cData
 local function checkTaxi(event, _)
 	aObj:LevelDebug(4, "checkTaxi", event, _G.UnitOnTaxi("player"), _G.UnitIsCharmed("player"), _G.UnitIsPossessed("player"))
 	-- if on Taxi then disable events
@@ -210,36 +208,46 @@ local function checkTaxi(event, _)
 	return aObj.modeTab.Taxi
 end
 --> Vehicle Handler <--
-local function checkVehicle(event, ...)
-	aObj:LevelDebug(4, "checkVehicle", event, ...)
-	-- if in a vehicle then disable events
-	if event == "UNIT_ENTERED_VEHICLE"
-	or _G.UnitInVehicle("player")
-	then
-		aObj:resetModes()
-		aObj.modeTab.Vehicle = true
-		aObj:UncheckAllEvents()
-		aObj.events["UNIT_EXITED_VEHICLE"].check = true
-		if aObj.prdb.chatback then
-			aObj:Print(_G.strjoin(" ", aObj.L["Vehicle"], aObj.L["mode"], aObj.L["enabled"]))
+local checkVehicle = _G.nop
+if not aObj.isClscERA then
+	function checkVehicle(event, ...)
+		aObj:LevelDebug(4, "checkVehicle", event, ...)
+		-- if in a vehicle then disable events
+		if event == "UNIT_ENTERED_VEHICLE"
+		or _G.UnitInVehicle("player")
+		then
+			aObj:resetModes()
+			aObj.modeTab.Vehicle = true
+			aObj:UncheckAllEvents()
+			aObj.events["UNIT_EXITED_VEHICLE"].check = true
+			if aObj.prdb.chatback then
+				aObj:Print(_G.strjoin(" ", aObj.L["Vehicle"], aObj.L["mode"], aObj.L["enabled"]))
+			end
+		-- if exited from vehicle then enable events
+		elseif event == "UNIT_EXITED_VEHICLE"
+		and not _G.UnitInVehicle("player")
+		then
+			aObj.modeTab.Vehicle = false
+			aObj:CheckAllEvents()
+			aObj.events[event].check = false
+			if aObj.prdb.chatback then
+				aObj:Print(_G.strjoin(" ", aObj.L["Vehicle"], aObj.L["mode"], aObj.L["disabled"]))
+			end
 		end
-	-- if exited from vehicle then enable events
-	elseif event == "UNIT_EXITED_VEHICLE"
-	and not _G.UnitInVehicle("player")
-	then
-		aObj.modeTab.Vehicle = false
-		aObj:CheckAllEvents()
-		aObj.events[event].check = false
-		if aObj.prdb.chatback then
-			aObj:Print(_G.strjoin(" ", aObj.L["Vehicle"], aObj.L["mode"], aObj.L["disabled"]))
-		end
+		return aObj.modeTab.Vehicle
 	end
-	return aObj.modeTab.Vehicle
 end
 --> NPC Handler <--
 local NPCname
-local function checkNPC(event, _)
-	aObj:LevelDebug(4, "checkNPC", event)
+local function checkNPC(event, ...)
+	aObj:LevelDebug(4, "checkNPC", event, ...)
+	--@debug@
+	if event == "CHAT_MSG_MONSTER_SAY" then
+		local args = {...}
+		aObj:LevelDebug(4, "checkNPC", event, _G.CountTable(args))
+		_G.Spew("checkNPC", args)
+	end
+	--@end-debug@
 	-- clear remembered NPC names
 	_G.wipe(aObj.questNPC)
 	-- remember NPC name if required
@@ -256,104 +264,109 @@ local function checkNPC(event, _)
 		return true
 	end
 end
---> Garrison Handler <--
-local function checkGarrison()
-	aObj:LevelDebug(4, "Garrison Handler", _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_6_0_Garrison), _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_7_0_Garrison), aObj.garrisons[_G.GetRealZoneText()], _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_9_0_Garrison))
-	if _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_6_0_Garrison) -- Garrison (WoD)
-	or _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_7_0_Garrison) -- Order Hall (Legion)
-	or aObj.garrisons[_G.GetRealZoneText()] -- ?? (BfA)
-	or _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_9_0_Garrison) -- Sanctum (Shadowlands)
-	then
-		if not aObj.modeTab.Garrison then
-			aObj:resetModes()
-			aObj.modeTab.Garrison = true
-			if aObj.prdb.chatback then
-				aObj:Print(_G.strjoin(" ", aObj.L["Garrison"], aObj.L["mode"], aObj.L["enabled"]))
-			end
-		end
-	else
-		if aObj.modeTab.Garrison then
-			aObj.modeTab.Garrison = false
-			if aObj.prdb.chatback then
-				aObj:Print(_G.strjoin(" ", aObj.L["Garrison"], aObj.L["mode"], aObj.L["disabled"]))
-			end
-		end
-	end
-	return aObj.modeTab.Garrison
-end
 --> Instance/Scenario Handler <--
-local instInfo
-local function checkIorS()
-	instInfo = {_G.GetInstanceInfo()}
-	aObj:LevelDebug(4, "checkIorS: [%s, %s, %s, %s, %s]", aObj.modeTab.Instance, instInfo[2], instInfo[1], instInfo[9], instInfo[8])
-	aObj:LevelDebug(4, "Instance/Scenario Handler", instInfo[2] ~= "none", aObj:isGarrison(instInfo[1]), aObj.modeTab.Instance, _G.C_Scenario.IsInScenario())
-	if instInfo[2] ~= "none"
-	and not aObj:isGarrison(instInfo[1])
-	then
-		if instInfo[2] == "scenario"
-		or (instInfo[2] == "party" and instInfo[1]:find("Boost Experience"))
+local checkIorS, instInfo = _G.nop
+if not aObj.isClscERA then
+	function checkIorS()
+		instInfo = {_G.GetInstanceInfo()}
+		aObj:LevelDebug(4, "checkIorS: [%s, %s, %s, %s, %s]", aObj.modeTab.Instance, instInfo[2], instInfo[1], instInfo[9], instInfo[8])
+		aObj:LevelDebug(4, "Instance/Scenario Handler", instInfo[2] ~= "none", aObj:isGarrison(instInfo[1]), aObj.modeTab.Instance, _G.C_Scenario and _G.C_Scenario.IsInScenario() or "n/a")
+		if instInfo[2] ~= "none"
+		and not aObj:isGarrison(instInfo[1])
 		then
-			if not aObj.modeTab.Scenario then
-				aObj:resetModes()
-				aObj.modeTab.Scenario = true
-				if aObj.prdb.chatback then
-					aObj:Print(_G.strjoin(" ", aObj.L["Scenario"], aObj.L["mode"], aObj.L["enabled"]))
+			if instInfo[2] == "scenario"
+			or (instInfo[2] == "party" and instInfo[1]:find("Boost Experience"))
+			then
+				if not aObj.modeTab.Scenario then
+					aObj:resetModes()
+					aObj.modeTab.Scenario = true
+					if aObj.prdb.chatback then
+						aObj:Print(_G.strjoin(" ", aObj.L["Scenario"], aObj.L["mode"], aObj.L["enabled"]))
+					end
+				end
+			else
+				if not aObj.modeTab.Instance then
+					aObj:resetModes()
+					aObj.modeTab.Instance = true
+					aObj.events["SCENARIO_UPDATE"].check = false
+					aObj.events["ZONE_CHANGED"].check = false
+					aObj.events["ZONE_CHANGED_INDOORS"].check = false
+					aObj.events["ZONE_CHANGED_NEW_AREA"].check = false
+					if aObj.prdb.chatback then
+						aObj:Print(_G.strjoin(" ", aObj.L["Instance"], aObj.L["mode"], aObj.L["enabled"]))
+					end
+					if aObj.prdb.noIChat then
+						for _, channel in _G.pairs{aObj.L["General"], aObj.L["LocalDefense"], aObj.L["WorldDefense"]} do
+							if aObj.prdb.cf1Channels[channel] then
+								-- use hooked function so as not to change existing value
+								aObj.hooks.ChatFrame_RemoveChannel(_G.ChatFrame1, channel)
+								aObj:LevelDebug(2, "Removed CF1 Channel: [%s]", channel)
+							end
+						end
+					end
 				end
 			end
 		else
-			if not aObj.modeTab.Instance then
-				aObj:resetModes()
-				aObj.modeTab.Instance = true
-				aObj.events["SCENARIO_UPDATE"].check = false
-				aObj.events["ZONE_CHANGED"].check = false
-				aObj.events["ZONE_CHANGED_INDOORS"].check = false
-				aObj.events["ZONE_CHANGED_NEW_AREA"].check = false
+			if aObj.modeTab.Scenario then
+				aObj.modeTab.Scenario = false
 				if aObj.prdb.chatback then
-					aObj:Print(_G.strjoin(" ", aObj.L["Instance"], aObj.L["mode"], aObj.L["enabled"]))
+					aObj:Print(_G.strjoin(" ", aObj.L["Scenario"], aObj.L["mode"], aObj.L["disabled"]))
+				end
+			elseif aObj.modeTab.Instance then
+				aObj.modeTab.Instance = false
+				aObj.events["SCENARIO_UPDATE"].check = true
+				aObj.events["ZONE_CHANGED"].check = true
+				aObj.events["ZONE_CHANGED_INDOORS"].check = true
+				aObj.events["ZONE_CHANGED_NEW_AREA"].check = true
+				if aObj.prdb.chatback then
+					aObj:Print(_G.strjoin(" ", aObj.L["Instance"], aObj.L["mode"], aObj.L["disabled"]))
 				end
 				if aObj.prdb.noIChat then
 					for _, channel in _G.pairs{aObj.L["General"], aObj.L["LocalDefense"], aObj.L["WorldDefense"]} do
 						if aObj.prdb.cf1Channels[channel] then
 							-- use hooked function so as not to change existing value
-							aObj.hooks.ChatFrame_RemoveChannel(_G.ChatFrame1, channel)
-							aObj:LevelDebug(2, "Removed CF1 Channel: [%s]", channel)
+							aObj.hooks.ChatFrame_AddChannel(_G.ChatFrame1, channel)
+							aObj:LevelDebug(2, "Added CF1 Channel: [%s]", channel)
 						end
 					end
 				end
 			end
 		end
-	else
-		if aObj.modeTab.Scenario then
-			aObj.modeTab.Scenario = false
-			if aObj.prdb.chatback then
-				aObj:Print(_G.strjoin(" ", aObj.L["Scenario"], aObj.L["mode"], aObj.L["disabled"]))
+		return aObj.modeTab.Scenario or aObj.modeTab.Instance
+	end
+end
+--> Garrison Handler <--
+local checkGarrison = _G.nop
+if aObj.isRtl then
+	function checkGarrison()
+		aObj:LevelDebug(4, "Garrison Handler", _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_6_0_Garrison), _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_7_0_Garrison), aObj.garrisons[_G.GetRealZoneText()], _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_9_0_Garrison))
+		if _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_6_0_Garrison) -- Garrison (WoD)
+		or _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_7_0_Garrison) -- Order Hall (Legion)
+		or aObj.garrisons[_G.GetRealZoneText()] -- ?? (BfA)
+		or _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_9_0_Garrison) -- Sanctum (Shadowlands)
+		then
+			if not aObj.modeTab.Garrison then
+				aObj:resetModes()
+				aObj.modeTab.Garrison = true
+				if aObj.prdb.chatback then
+					aObj:Print(_G.strjoin(" ", aObj.L["Garrison"], aObj.L["mode"], aObj.L["enabled"]))
+				end
 			end
-		elseif aObj.modeTab.Instance then
-			aObj.modeTab.Instance = false
-			aObj.events["SCENARIO_UPDATE"].check = true
-			aObj.events["ZONE_CHANGED"].check = true
-			aObj.events["ZONE_CHANGED_INDOORS"].check = true
-			aObj.events["ZONE_CHANGED_NEW_AREA"].check = true
-			if aObj.prdb.chatback then
-				aObj:Print(_G.strjoin(" ", aObj.L["Instance"], aObj.L["mode"], aObj.L["disabled"]))
-			end
-			if aObj.prdb.noIChat then
-				for _, channel in _G.pairs{aObj.L["General"], aObj.L["LocalDefense"], aObj.L["WorldDefense"]} do
-					if aObj.prdb.cf1Channels[channel] then
-						-- use hooked function so as not to change existing value
-						aObj.hooks.ChatFrame_AddChannel(_G.ChatFrame1, channel)
-						aObj:LevelDebug(2, "Added CF1 Channel: [%s]", channel)
-					end
+		else
+			if aObj.modeTab.Garrison then
+				aObj.modeTab.Garrison = false
+				if aObj.prdb.chatback then
+					aObj:Print(_G.strjoin(" ", aObj.L["Garrison"], aObj.L["mode"], aObj.L["disabled"]))
 				end
 			end
 		end
+		return aObj.modeTab.Garrison
 	end
-	return aObj.modeTab.Scenario or aObj.modeTab.Instance
 end
 --> Sanctuary Handler <--
 local pvpType
 local function checkSanctuary()
-	pvpType = _G.select(1, _G.GetZonePVPInfo())
+	pvpType = _G.select(1, _G.C_PvP.GetZonePVPInfo())
 	aObj:LevelDebug(4, "Sanctuary Handler", pvpType)
 	if pvpType == "sanctuary" then
 		if not aObj.modeTab.Sanctuary then
@@ -402,31 +415,15 @@ local function checkHub()
 	return aObj.modeTab.Hub
 end
 
-local modeTypes={checkSanctuary, checkHub}
-if aObj.isRtl then
-	_G.table.insert(modeTypes, 1, checkIorS)
-	_G.table.insert(modeTypes, 2, checkGarrison)
-end
-local modeDetected
+local modeTypes, modeDetected = {checkIorS, checkGarrison, checkSanctuary, checkHub}
 function aObj:CheckMode(event, ...)
 
 	self:LevelDebug(2, "CheckMode: [%s, %s, %s]", event, self.events[event] and self.events[event].check or "nil", ... or "nil")
 
-	-- if WorldMapFrame currently open defer check until it is closed ??????
-	-- if _G.WorldMapFrame:IsShown() then
-	-- 	if not self:IsHooked(_G.WorldMapFrame, "OnHide") then
-	-- 		self:SecureHookScript(_G.WorldMapFrame, "OnHide", function(_)
-	-- 			self:CheckMode("WorldMap closed")
-	-- 			self:Unhook(_G.WorldMapFrame, "OnHide")
-	-- 		end)
-	-- 	end
-	-- 	return
-	-- end
-
 	cMAID = _G.C_Map.GetBestMapForUnit("player")
 
 	-- are we on a Taxi, in a Vehicle or talking to an NPC?
-	for _, func in _G.ipairs{checkTaxi, not self.isClscERA and checkVehicle, checkNPC} do
+	for _, func in _G.ipairs{checkTaxi, checkVehicle, checkNPC} do
 		if func then
 			modeDetected = func(event, ...)
 			if modeDetected then
@@ -436,7 +433,14 @@ function aObj:CheckMode(event, ...)
 	end
 
 	if not modeDetected then
-		self:LevelDebug(3, "You Are Here: [%s, %s:%s, %s, %s, %d]", _G.GetZoneText() or "<Anon>", _G.GetRealZoneText() or "<Anon>", _G.GetSubZoneText() or "<Anon>", _G.GetMinimapZoneText() or "<Anon>", _G.select(1, _G.GetZonePVPInfo()), _G.C_Map.GetBestMapForUnit("player"))
+		self:LevelDebug(3, "You Are Here: [%s, %s:%s, %s, %s, %d]",
+			_G.GetZoneText() or "<Anon>",
+			_G.GetRealZoneText() or "<Anon>",
+			_G.GetSubZoneText() or "<Anon>",
+			_G.GetMinimapZoneText() or "<Anon>",
+			_G.select(1, _G.C_PvP.GetZonePVPInfo()),
+			_G.C_Map.GetBestMapForUnit("player")
+		)
 		--> Event Handler <--
 		for _, func in _G.ipairs(modeTypes) do
 			modeDetected = func()
