@@ -29,26 +29,32 @@ function aObj:getBGNames()
 
 end
 
-local msg, charFrom, charTo
+local args, msg, charFrom, charTo
 -- message filters & groups
 function aObj.msgFilter1(_, event, ...)
 	aObj:LevelDebug(5, "msgFilter1:", event, ...)
 
-	msg = _G.select(1, ...)
-	charFrom = _G.select(2, ...)
-	charTo = _G.select(7, ...)
-	aObj:LevelDebug(3, "mf1:[%s],[%s],[%s]", msg, charFrom, charTo)
+	-- returns: text, playerName, languageName, channelName, playerName2, specialFlags, zoneChannelID, channelIndex, channelBaseName, languageID, lineID, guid, bnSenderID, isMobile, isSubtitle, hideSenderInLetterbox, supressRaidIcons
+	args = {...}
+
+	msg = args[1]
+	charFrom = args[2]
+	charTo = args[5]
+	aObj:LevelDebug(3, "mf1: [%s],[%s],[%s]", msg, charFrom, charTo)
 
 	-- allow emotes/says to/from the player/pet
-	if msg:find(aObj.player)
+	if charTo == aObj.player
 	or charFrom == aObj.player
+	or msg:find(aObj.player)
 	or (msg:find(aObj.L["[Yy]ou"])
 	and charTo == aObj.player
 	or charTo == aObj.pet)
-	or charFrom == aObj.NPC
 	or aObj.questNPC[charFrom]
 	then
 		aObj:LevelDebug(3, "Emote/Say to/from player/pet")
+		if not aObj.questNPC[charFrom] then
+			aObj.questNPC[charFrom] = true
+		end
 		return false, ...
 	else
 		return true
