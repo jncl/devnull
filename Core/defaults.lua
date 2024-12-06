@@ -134,9 +134,6 @@ function aObj:SetupDefaults()
 
 	self.events["UNIT_ENTERED_VEHICLE"] = {check = true} -- this is used for vehicle check
 	self.events["UNIT_EXITED_VEHICLE"] = {check = false} -- this is used for vehicle check
-	-- self.checkEvent["UNIT_EXITED_VEHICLE"]             = false -- this is used for vehicle check
-	-- self.trackEvent["UNIT_ENTERED_VEHICLE"]            = true  -- this is used for vehicle check
-	-- self.trackEvent["UNIT_EXITED_VEHICLE"]             = true  -- this is used for vehicle check
 
 	-- Eversong Woods (TBC)
 	self.nullHubs[SZL["Silvermoon City"]]              = true -- Blood Elf starting area (Horde)
@@ -163,9 +160,6 @@ function aObj:SetupDefaults()
 
 	self.events["SCENARIO_UPDATE"] = {check = true}  -- this is for scenario check
 	self.events["PLAYER_ENTERING_WORLD"] = {check = true} -- this is for garrison check
-	-- self.checkEvent["SCENARIO_UPDATE"]                 = true -- this is for scenario check
-	-- self.trackEvent["SCENARIO_UPDATE"]                 = true -- this is for scenario check
-	-- self.trackEvent["PLAYER_ENTERING_WORLD"]           = true -- this is for garrison check
 
 	-- Cata
 	self.checkZones[SZL["Kezan"]]                      = true -- (for KTC Headquarters)
