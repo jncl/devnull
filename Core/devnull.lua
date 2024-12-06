@@ -11,10 +11,8 @@ do
 end
 
 function aObj:OnInitialize()
-	--@debug@
-	self:Print("Debugging is enabled")
-	self:LevelDebug(1, "Debugging is enabled")
-	--@end-debug@
+
+	self:LevelDebug(1, "debugging is enabled")
 
 	self:LevelDebug(5, "OnInitialize")
 
