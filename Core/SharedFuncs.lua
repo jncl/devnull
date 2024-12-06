@@ -71,15 +71,15 @@ function aObj:checkWoWVersion()
 	self.isRtlPTR     = self.isRtlPTR or self.isRtlBeta
 	self.isRtl        = self.isRtl or self.isRtlPTR or self.isRtlPTRX
 
-	self.isPatch = not compareBuildInfo("curr", agentUID, true)
+	self.isPatch = not compareBuildInfo(agentUID, "curr", true)
 	if self.isPatch then
 		if self.isRtl then
-			self.isRtlPTR = compareBuildInfo("wow_ptr",agentUID, false)
-			self.isRtlPTRX = compareBuildInfo("wow_ptr_x", agentUID, false)
+			self.isRtlPTR = compareBuildInfo(agentUID, "wow_ptr",false)
+			self.isRtlPTRX = compareBuildInfo(agentUID, "wow_ptr_x", false)
 		elseif self.isClsc then
-			self.isClscPTR = compareBuildInfo("wow_classic_ptr", agentUID, false)
+			self.isClscPTR = compareBuildInfo(agentUID, "wow_classic_ptr", false)
 		elseif self.isClscERA then
-			self.isClscERAPTR = compareBuildInfo("wow_classic_era_ptr", agentUID, false)
+			self.isClscERAPTR = compareBuildInfo(agentUID, "wow_classic_era_ptr", false)
 		end
 	end
 
@@ -89,14 +89,14 @@ function aObj:checkWoWVersion()
 
 	--@debug@
 	self:Printf("%s, %d, %d, %s, %d, %s, %d, %s", buildInfo[agentUID][1], buildInfo[agentUID][2], self.tocVer, buildInfo.curr[1], buildInfo.curr[2], buildInfo.curr[3], buildInfo.curr[4] , agentUID)
-	local vType = _G.strjoin(" ", buildInfo[agentUID][3], "version", self.isPatch and "(Patched)" or "")
-	_G.DEFAULT_CHAT_FRAME:AddMessage(_G.strjoin(" ", aName, ": Detected that we're running on a", vType), 0.75, 0.5, 0.25, nil, true)
-	self:Debug(_G.strjoin(" ", "detected", vType))
+	local vType = _G.strjoin(" ", agentUID, self.isPatch and "(Patched)" or "")
+	_G.DEFAULT_CHAT_FRAME:AddMessage(_G.strjoin(" ", aName, ": Game version is:", buildInfo[agentUID][3]), 0.75, 0.5, 0.25, nil, true)
+	-- _G.DEFAULT_CHAT_FRAME:AddMessage(_G.strjoin(" ", aName, ": Game version is:", vType), 0.75, 0.5, 0.25, nil, true)
 	--@end-debug@
 
 end
 
-function aObj:checkLibraries(extraLibs)
+function aObj.checkLibraries(_, extraLibs)
 
 	if not _G.assert(_G.LibStub, aName .. " requires LibStub") then return false end
 
@@ -114,7 +114,7 @@ function aObj:checkLibraries(extraLibs)
 
 end
 
-function aObj:createAddOn(makeGlobal)
+function aObj.createAddOn(_, makeGlobal)
 	_G.LibStub:GetLibrary("AceAddon-3.0"):NewAddon(aObj, aName, "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
 	-- add to Global namespace if required
 	if makeGlobal then
@@ -128,13 +128,19 @@ function aObj:createAddOn(makeGlobal)
 
 end
 
-function aObj:add2Table(tab, val)
+function aObj.add2Table(_, tab, val)
 	--@debug@
 	_G.assert(tab, "Unknown table add2Table\n" .. _G.debugstack(2, 3, 2))
 	_G.assert(val, "Missing value add2Table\n" .. _G.debugstack(2, 3, 2))
 	--@end-debug@
 
 	tab[#tab + 1] = val
+
+end
+
+function aObj.makeBoolean(_, var)
+
+	return not not var
 
 end
 
@@ -255,7 +261,7 @@ end
 local function printIt(text, frame, r, g, b)
 	(frame or _G.DEFAULT_CHAT_FRAME):AddMessage(text, r, g, b)
 end
-function aObj:CustomPrint(r, g, b, ...)
+function aObj.CustomPrint(_, r, g, b, ...)
 
 	printIt(_G.strjoin(" ", _G.WrapTextInColorCode(aName, "ffffff78"), makeText(...)), nil, r, g, b)
 
