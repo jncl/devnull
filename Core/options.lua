@@ -194,10 +194,10 @@ function aObj:SetupOptions()
 		if not input or input:trim() == "" then
 			-- Open general panel if there are no parameters
 			aObj.callbacks:Fire("Options_Selected")
-			_G.Settings.OpenToCategory(aObj.optionsFrames[aName])
+			_G.Settings.OpenToCategory(aObj.L[aName])
 		elseif aObj.optCheck[input:lower()] then
 			aObj.callbacks:Fire("Options_Selected")
-			_G.Settings.OpenToCategory(aObj.optionsFrames[aObj.optCheck[input:lower()]])
+			_G.Settings.OpenToCategory(aObj.L[aName], aObj.optCheck[input:lower()])
 		elseif input:lower() == "status" then
 			aObj:Print(aObj.L["Hub"] .. ":", aObj.modeTab.Hub, aObj.L["Sanctuary"] .. ":", aObj.modeTab.Sanctuary, aObj.L["Taxi"] .. ":", aObj.modeTab.Taxi)
 			if aObj.isRtl then
@@ -235,7 +235,7 @@ function aObj:SetupOptions()
 		icon = [[Interface\Icons\Spell_Holy_Silence]],
 		OnClick = function()
 			aObj.callbacks:Fire("Options_Selected")
-			_G.Settings.OpenToCategory(aObj.optionsFrames[aName])
+			_G.Settings.OpenToCategory(aName, aObj.L[aName])
 		end,
 		OnTooltipShow = function(tooltip)
 			tooltip:AddLine(aObj.L[aName] .. " - " .. aObj.L[self:updateDBtext(true)])
