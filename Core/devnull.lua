@@ -113,7 +113,7 @@ function aObj:OnEnable()
 	-- update message groups
 	self:updateMGs()
 
-	if self.isRtl then
+	if self.isMnln then
 		-- get Bodyguard follower names
 		self:getBGNames()
 	else
@@ -334,7 +334,7 @@ if not aObj.isClscERA then
 end
 --> Garrison Handler <--
 local checkGarrison = _G.nop
-if aObj.isRtl then
+if aObj.isMnln then
 	function checkGarrison()
 		aObj:LevelDebug(4, "Garrison Handler", _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_6_0_Garrison), _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_7_0_Garrison), aObj.garrisons[_G.GetRealZoneText()], _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_9_0_Garrison))
 		if _G.C_Garrison.IsPlayerInGarrison(_G.Enum.GarrisonType.Type_6_0_Garrison) -- Garrison (WoD)

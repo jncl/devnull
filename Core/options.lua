@@ -100,7 +100,7 @@ function aObj:SetupOptions()
 							order = 1,
 							name = self.L["These settings are used in Cities, Towns and Sanctuaries"] .. "\n\n",
 						},
-						noDiscovery = self.isRtl and {
+						noDiscovery = self.isMnln and {
 							type = 'toggle',
 							name = self.L["Discoveries"],
 							desc = self.L["Mute Discovery info."],
@@ -127,7 +127,7 @@ function aObj:SetupOptions()
 						},
 					},
 				},
-				instance = self.isRtl and {
+				instance = self.isMnln and {
 					type = "group",
 					order = 3,
 					name = self.L["Instance Settings"],
@@ -141,7 +141,7 @@ function aObj:SetupOptions()
 						},
 					},
 				} or nil,
-				garrison = self.isRtl and {
+				garrison = self.isMnln and {
 					type = "group",
 					order = 4,
 					name = self.L["Garrison Settings"],
@@ -174,7 +174,7 @@ function aObj:SetupOptions()
 
 	local function postLoadFunc()
 		local method
-		if not aObj.isRtl then
+		if not aObj.isMnln then
 			method = "okay"
 		else
 			method = "OnCommit"
@@ -200,7 +200,7 @@ function aObj:SetupOptions()
 			_G.Settings.OpenToCategory(aObj.L[aName], aObj.optCheck[input:lower()])
 		elseif input:lower() == "status" then
 			aObj:Print(aObj.L["Hub"] .. ":", aObj.modeTab.Hub, aObj.L["Sanctuary"] .. ":", aObj.modeTab.Sanctuary, aObj.L["Taxi"] .. ":", aObj.modeTab.Taxi)
-			if aObj.isRtl then
+			if aObj.isMnln then
 				aObj:Print(aObj.L["Vehicle"] .. ":", aObj.modeTab.Vehicle, aObj.L["Scenario"] .. ":", aObj.modeTab.Scenario, aObj.L["Instance"] .. ":", aObj.modeTab.Instance)
 				aObj:Print(aObj.L["Garrison"] .. ":", aObj.modeTab.Garrison, _G.strjoin(" ", aObj.L["Bodyguard"], aObj.L["mode"] .. ":"), aObj.prdb.noBguard)
 			end
