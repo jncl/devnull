@@ -21,8 +21,8 @@
 ## X-Credits: Many thanks to Zalkalin for the original code and Tekkub for various changes.
 ## X-Category: Chat/Communication
 
-Libs\_RequiredLibs.xml
-Libs\_OptionalLibs.xml
+Libs\_Required.xml
+Libs\_Optional.xml
 
 Locales\_Locales.xml
 
