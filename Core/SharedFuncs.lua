@@ -3,40 +3,39 @@ local aName, aObj = ...
 local _G = _G
 
 local buildInfo = {
-	-- wow_classic_beta    = {"4.4.0",  54737, "Cataclysm Classic Beta"},
-	-- wow_beta            = {"11.0.2", 56263, "The War Within Beta"},
-	wow_classic_ptr     = {"4.4.1",  57141, "PTR (Cataclysm Classic)"},
-	wow_classic_era_ptr = {"1.15.5", 57807, "PTR (Classic Era)"},
-	wow_ptr             = {"11.0.7", 57788, "PTR (TWW 11.0.7"},
-	wow_ptr_x           = {"11.0.5", 57171, "PTR (TWW 11.0.5)"},
-	wow_classic_era     = {"1.15.5", 57917, "World of Warcraft Classic"},
-	wow_classic         = {"4.4.1",  57564, "Cataclysm Classic"},
-	wow                 = {"11.0.5", 57689, "World of Warcraft"},
-	curr                = {_G.GetBuildInfo()},
+	wow_classic_beta    = {"MOP Classic Beta",          "5.5.0",  61411},
+	wow_beta            = {"The War Within Beta",       "11.0.2", 56313},
+	wow_classic_ptr     = {"PTR (Cataclysm Classic)",   "4.4.2",  59185},
+	wow_classic_era_ptr = {"PTR (Classic Era)",         "1.15.7", 60141},
+	wow_ptr             = {"PTR (TWW 11.1.7)",          "11.1.7", 61406},
+	wow_ptr_x           = {"PTR (TWW 11.1.0)",          "11.1.0", 59347},
+	wow_classic_era     = {"World of Warcraft Classic", "1.15.7", 61257},
+	wow_classic         = {"Cataclysm Classic",         "4.4.2",  60895},
+	wow                 = {"World of Warcraft",         "11.1.5", 61265},
+	curr                = {"curr", _G.GetBuildInfo()},
 }
 
 local function getTOCVer(ver)
-	local n1, n2, n3 = _G.string.match(buildInfo[ver][1], "(%d+).(%d+).(%d)")
+	local n1, n2, n3 = _G.string.match(buildInfo[ver][2], "(%d+).(%d+).(%d)")
 	return n1 * 10000 + n2 * 100 + n3
 end
 local function compareBuildInfo(ver1, ver2, exact)
 	if exact then
 		--@debug@
-		aObj:Debug("cBI#1: [%s, %s, %d, %d, %d, %d]", ver1, ver2, getTOCVer(ver1), getTOCVer(ver2), _G.tonumber(buildInfo[ver1][2]), _G.tonumber(buildInfo[ver2][2]))
+		aObj:Debug("cBI#1: [%s, %s, %d, %d, %d, %d]", ver1, ver2, getTOCVer(ver1), getTOCVer(ver2), _G.tonumber(buildInfo[ver1][3]), _G.tonumber(buildInfo[ver2][3]))
 		--@end-debug@
-		return (getTOCVer(ver1) == getTOCVer(ver2) and _G.tonumber(buildInfo[ver1][2]) == _G.tonumber(buildInfo[ver2][2]))
+		return (getTOCVer(ver1) == getTOCVer(ver2) and _G.tonumber(buildInfo[ver1][3]) == _G.tonumber(buildInfo[ver2][3]))
 	else
 		--@debug@
-		aObj:Debug("cBI#2: [%s, %s, %d, %d, %d, %d]", ver1, ver2, getTOCVer(ver1), getTOCVer(ver2), _G.tonumber(buildInfo[ver1][2]), _G.tonumber(buildInfo[ver2][2]))
+		aObj:Debug("cBI#2: [%s, %s, %d, %d, %d, %d]", ver1, ver2, getTOCVer(ver1), getTOCVer(ver2), _G.tonumber(buildInfo[ver1][3]), _G.tonumber(buildInfo[ver2][3]))
 		--@end-debug@
-		return (getTOCVer(ver1) >= getTOCVer(ver2) and _G.tonumber(buildInfo[ver1][2]) >= _G.tonumber(buildInfo[ver2][2]))
+		return (getTOCVer(ver1) >= getTOCVer(ver2) and _G.tonumber(buildInfo[ver1][3]) >= _G.tonumber(buildInfo[ver2][3]))
 	end
 end
 function aObj:checkWoWVersion()
 
 	local agentUID = _G.C_CVar.GetCVar("agentUID")
 	-- handle different country versions, e.g. wow_enus
-	-- WOW_PROJECT_BURNING_CRUSADE_CLASSIC [Unused ?]
 	if not buildInfo[agentUID] then
 		if _G.WOW_PROJECT_ID == _G.WOW_PROJECT_MAINLINE then
 			agentUID = "wow"
@@ -116,17 +115,36 @@ function aObj.checkLibraries(_, extraLibs)
 
 end
 
-function aObj.createAddOn(_, makeGlobal)
-	_G.LibStub:GetLibrary("AceAddon-3.0"):NewAddon(aObj, aName, "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
+function aObj:createAddOn(makeGlobal)
+	_G.LibStub:GetLibrary("AceAddon-3.0"):NewAddon(self, aName, "AceConsole-3.0", "AceEvent-3.0", "AceHook-3.0")
 	-- add to Global namespace if required
 	if makeGlobal then
-		_G[aName] = aObj
+		_G[aName] = self
 	end
 
 	-- setup callback registry
-	aObj.callbacks = _G.LibStub:GetLibrary("CallbackHandler-1.0", true):New(aObj)
+	self.callbacks = _G.LibStub:GetLibrary("CallbackHandler-1.0", true):New(self)
 
-	aObj:checkWoWVersion()
+	self:checkWoWVersion()
+
+	if self.isMnln then
+		-- metatable added to track AddOn skin usage of renamed variable
+		local mt = {}
+		mt.__index = function(table, key)
+			if key == "isRtl" then
+				--@debug@
+				_G.assert(false, "Using old variable (isRtl)\n" .. _G.debugstack(2, 3, 2))
+				--@end-debug@
+				return _G.rawget(table, "isMnln")
+			else
+				return _G.rawget(table, key)
+			end
+		end
+		-- protect the metatable
+		mt.__metatable = true
+
+		_G.setmetatable(self, mt)
+	end
 
 end
 
@@ -147,6 +165,7 @@ function aObj.makeBoolean(_, var)
 end
 
 function aObj:setupOptions(optNames, optIgnore, preLoadFunc, postLoadFunc)
+
 	local _
 	local db = self.db.profile
 	local dflts = self.db.defaults.profile
@@ -227,7 +246,11 @@ end
 
 local function makeString(obj)
 	if _G.type(obj) == "table" then
-		return ("<%s:%s:%s>"):format(_G.tostring(obj), obj.GetObjectType and obj:GetObjectType() or _G.type(obj), obj.GetName and obj:GetName() or "(Anon)")
+		if obj.IsForbidden then
+			return ("<%s:%s:%s>"):format(_G.tostring(obj), not obj:IsForbidden() and obj.GetObjectType and obj:GetObjectType() or _G.type(obj), not obj:IsForbidden() and obj.GetDebugName and obj:GetDebugName() or "(Forbidden)")
+		else
+			return ("<%s:%s:%s>"):format(_G.tostring(obj), obj.GetObjectType and obj:GetObjectType() or _G.type(obj), obj.GetDebugName and obj:GetDebugName() or "(Anon)")
+		end
 	elseif _G.type(obj) ~= "string" then
 		return _G.tostring(obj)
 	else
@@ -252,7 +275,7 @@ local function makeText(fStr, ...)
 		end
 		output = _G.strjoin(" ", fStr:format(_G.unpack(tmpTab)))
 	else
-		tmpTab[1] = fStr and _G.type(fStr) == "table" and makeString(fStr) or fStr or ""
+		tmpTab[1] = fStr and makeString(fStr) or ""
 		for _, str in _G.ipairs{...} do
 			tmpTab[#tmpTab + 1] = makeString(str)
 		end
