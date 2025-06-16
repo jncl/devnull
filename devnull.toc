@@ -1,14 +1,15 @@
-## Interface: 110005, 40401, 11505
+## Interface: 110105, 40402, 11507
 
 ## Title: /dev/null
+## Author: Jncl
+## Version: @project-version@
+
 ## IconTexture: Interface\Icons\Spell_Holy_Silence
 ## AddonCompartmentFunc: devnull_OnAddonCompartmentClick
 
 ## Notes: Mutes various chat related annoyances while in capital cities and instances.
 ## Notes-deDE: Unterdr\195\188ckt diverse st\195\182rende Meldungen - w\195\164hrend man sich in Hauptst\195\164dten oder Instanzen befindet.
 ## Notes-zhTW: 當你在主城或是副本時，關掉各種惱人的聊天對話內容
-## Author: Jncl
-## Version: @project-version@
 
 ## DefaultState: Enabled
 ## LoadOnDemand: 0
@@ -16,10 +17,24 @@
 ## OptionalDeps: Ace3, LibBabble-SubZone-3.0
 ## Globe: check-classic
 
+## X-Category: Chat/Communication
+## X-Credits: Many thanks to Zalkalin for the original code and Tekkub for various changes.
 ## X-Curse-Project-ID: 14979
 ## X-Wago-ID: mNwQ7WKo
-## X-Credits: Many thanks to Zalkalin for the original code and Tekkub for various changes.
-## X-Category: Chat/Communication
+## X-Website: https://www.curseforge.com/wow/addons/devnull
+
+
+## Category-enUS: Chat
+## Category-deDE: Chat
+## Category-esES: Chat
+## Category-esMX: Chat
+## Category-frFR: Discussion
+## Category-itIT: Chat
+## Category-koKR: 대화
+## Category-ptBR: Bate-papo
+## Category-ruRU: Чат
+## Category-zhCN: 聊天
+## Category-zhTW: 對話
 
 Libs\_Required.xml
 Libs\_Optional.xml
