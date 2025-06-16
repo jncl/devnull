@@ -4,7 +4,7 @@ local _G = _G
 
 -- Garrison functions
 local bodyguardNames, info = {}
-function aObj:isGarrison(str)
+function aObj.isGarrison(_, str)
 
 	return str and str:find("Garrison Level") and true
 
