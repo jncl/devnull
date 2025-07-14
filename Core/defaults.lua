@@ -19,9 +19,6 @@ function aObj:SetupDefaults()
 	self.pet     = _G.UnitName("pet")
 	self.faction = _G.UnitFactionGroup("player")
 
-	-- get Locale
-	self.L = _G.LibStub:GetLibrary("AceLocale-3.0"):GetLocale(aName)
-
 	local defaults = { profile = {
 		achFilterType = 1,
 		chatback      = true,

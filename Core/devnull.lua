@@ -16,6 +16,13 @@ function aObj:OnInitialize()
 
 	self:LevelDebug(5, "OnInitialize")
 
+	-- get Locale strings
+	self.L = _G.LibStub:GetLibrary("AceLocale-3.0"):GetLocale(aName)
+
+	--@debug@
+	self:checkLocaleStrings()
+	--@end-debug@
+
 	-- setup default values in table
 	self:SetupDefaults()
 
@@ -152,6 +159,13 @@ function aObj:OnEnable()
 	self.db.RegisterCallback(self, "OnProfileReset", reloadAddon)
 
 	self:CheckMode("init")
+
+	--@debug@
+	-- Register PLAYER_LOGOUT to save LocaleStrings
+	self:RegisterEvent("PLAYER_LOGOUT", function()
+		_G[aName .. "LocaleStrings"] = self.localeStrings
+	end)
+	--@end-debug@
 
 end
 

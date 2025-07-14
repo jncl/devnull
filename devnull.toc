@@ -14,6 +14,9 @@
 ## DefaultState: Enabled
 ## LoadOnDemand: 0
 ## SavedVariables: devnullDB
+#@debug@
+## SavedVariables: devnullLocaleStrings
+#@end-debug@
 ## OptionalDeps: Ace3, LibBabble-SubZone-3.0
 ## Globe: check-classic
 
@@ -40,5 +43,8 @@ Libs\_Required.xml
 Libs\_Optional.xml
 
 Locales\_Locales.xml
+#@debug@
+Locales\_Locales_debug.xml
+#@end-debug@
 
 Core\_Core.xml

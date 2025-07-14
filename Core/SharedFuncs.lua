@@ -102,9 +102,7 @@ function aObj.checkLibraries(_, extraLibs)
 	if not _G.assert(_G.LibStub, aName .. " requires LibStub") then return false end
 
 	local lTab = {"AceAddon-3.0", "AceConfig-3.0", "AceConfigCmd-3.0", "AceConfigDialog-3.0", "AceConfigRegistry-3.0", "AceConsole-3.0", "AceDB-3.0", "AceDBOptions-3.0", "AceEvent-3.0", "AceGUI-3.0", "AceHook-3.0", "AceLocale-3.0", "CallbackHandler-1.0", "LibDataBroker-1.1"}
-	for _, lib in _G.pairs(extraLibs) do
-		lTab[#lTab + 1] = lib
-	end
+	_G.tAppendAll(lTab, extraLibs)
 
 	local hasError
 	for _, lib in _G.pairs(lTab) do
@@ -311,6 +309,29 @@ end
 function aObj:Debug3(...)
 	-- used by showCmds function
 	printIt("dbg3: " .. makeText(...), self.debugFrame)
+
+end
+
+function aObj:checkLocaleStrings()
+
+	self.localeStrings = _G[aName .. "LocaleStrings"] or {}
+	local missingLocaleMessage = false
+	_G.setmetatable(_G.LibStub:GetLibrary("AceLocale-3.0").apps[aName], {
+		__index = function(t, k)
+			-- ensure error only reported once
+			_G.rawset(t, k, k)
+			-- report if not in Master localisations table
+			if not aObj.locale_enUS[k] then
+				_G.print(aName, _G.WrapTextInColorCode(" >> Locale entry missing: ", "ffff0000"),  k)
+				if not missingLocaleMessage then
+					_G.SetBasicMessageDialogText(aName .. ": Missing Locale entry, please add to Locales/enUS_Locale_Strings.lua and then import them")
+					missingLocaleMessage = true
+				end
+				aObj.localeStrings[k] = true
+			end
+			return k
+		end
+	})
 
 end
 --@end-debug@
