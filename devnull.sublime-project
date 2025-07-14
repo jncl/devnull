@@ -2,7 +2,15 @@
 	"folders":
 	[
 		{
-			"path": "."
+			"path": ".",
+            "folder_exclude_patterns": [
+            	".github/",
+            	"Libs/",
+             	// "Locales/",
+           ],
+			"file_exclude_patterns": [
+				// ".*",
+			],
 		}
 	]
 }
