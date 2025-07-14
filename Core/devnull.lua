@@ -201,7 +201,7 @@ local function checkTaxi(event, _)
 		aObj:UncheckAllEvents()
 		aObj.events["PLAYER_CONTROL_GAINED"].check = true
 		if aObj.prdb.chatback then
-			aObj:Print(_G.strjoin(" ", aObj.L["Taxi"], aObj.L["mode"], aObj.L["enabled"]))
+			aObj:Print(aObj.L["Taxi mode enabled"])
 		end
 	-- if finished Taxi ride then enable events
 	elseif event == "PLAYER_CONTROL_GAINED"
@@ -211,7 +211,7 @@ local function checkTaxi(event, _)
 		aObj:CheckAllEvents()
 		aObj.events[event].check = false
 		if aObj.prdb.chatback then
-			aObj:Print(_G.strjoin(" ", aObj.L["Taxi"], aObj.L["mode"], aObj.L["disabled"]))
+			aObj:Print(aObj.L["Taxi mode disabled"])
 		end
 	end
 	return aObj.modeTab.Taxi
@@ -230,7 +230,7 @@ if not aObj.isClscERA then
 			aObj:UncheckAllEvents()
 			aObj.events["UNIT_EXITED_VEHICLE"].check = true
 			if aObj.prdb.chatback then
-				aObj:Print(_G.strjoin(" ", aObj.L["Vehicle"], aObj.L["mode"], aObj.L["enabled"]))
+				aObj:Print(aObj.L["Vehicle mode enabled"])
 			end
 		-- if exited from vehicle then enable events
 		elseif event == "UNIT_EXITED_VEHICLE"
@@ -240,7 +240,7 @@ if not aObj.isClscERA then
 			aObj:CheckAllEvents()
 			aObj.events[event].check = false
 			if aObj.prdb.chatback then
-				aObj:Print(_G.strjoin(" ", aObj.L["Vehicle"], aObj.L["mode"], aObj.L["disabled"]))
+				aObj:Print(aObj.L["Vehicle mode disabled"])
 			end
 		end
 		return aObj.modeTab.Vehicle
@@ -290,7 +290,7 @@ if not aObj.isClscERA then
 					aObj:resetModes()
 					aObj.modeTab.Scenario = true
 					if aObj.prdb.chatback then
-						aObj:Print(_G.strjoin(" ", aObj.L["Scenario"], aObj.L["mode"], aObj.L["enabled"]))
+						aObj:Print(aObj.L["Scenario mode enabled"])
 					end
 				end
 			else
@@ -302,7 +302,7 @@ if not aObj.isClscERA then
 					aObj.events["ZONE_CHANGED_INDOORS"].check = false
 					aObj.events["ZONE_CHANGED_NEW_AREA"].check = false
 					if aObj.prdb.chatback then
-						aObj:Print(_G.strjoin(" ", aObj.L["Instance"], aObj.L["mode"], aObj.L["enabled"]))
+						aObj:Print(aObj.L["Instance mode enabled"])
 					end
 					if aObj.prdb.noIChat then
 						for _, channel in _G.pairs{aObj.L["General"], aObj.L["LocalDefense"], aObj.L["WorldDefense"]} do
@@ -319,7 +319,7 @@ if not aObj.isClscERA then
 			if aObj.modeTab.Scenario then
 				aObj.modeTab.Scenario = false
 				if aObj.prdb.chatback then
-					aObj:Print(_G.strjoin(" ", aObj.L["Scenario"], aObj.L["mode"], aObj.L["disabled"]))
+					aObj:Print(aObj.L["Scenario mode disabled"])
 				end
 			elseif aObj.modeTab.Instance then
 				aObj.modeTab.Instance = false
@@ -328,7 +328,7 @@ if not aObj.isClscERA then
 				aObj.events["ZONE_CHANGED_INDOORS"].check = true
 				aObj.events["ZONE_CHANGED_NEW_AREA"].check = true
 				if aObj.prdb.chatback then
-					aObj:Print(_G.strjoin(" ", aObj.L["Instance"], aObj.L["mode"], aObj.L["disabled"]))
+					aObj:Print(aObj.L["Instance mode disabled"])
 				end
 				if aObj.prdb.noIChat then
 					for _, channel in _G.pairs{aObj.L["General"], aObj.L["LocalDefense"], aObj.L["WorldDefense"]} do
@@ -358,14 +358,14 @@ if aObj.isMnln then
 				aObj:resetModes()
 				aObj.modeTab.Garrison = true
 				if aObj.prdb.chatback then
-					aObj:Print(_G.strjoin(" ", aObj.L["Garrison"], aObj.L["mode"], aObj.L["enabled"]))
+					aObj:Print(aObj.L["Garrison mode enabled"])
 				end
 			end
 		else
 			if aObj.modeTab.Garrison then
 				aObj.modeTab.Garrison = false
 				if aObj.prdb.chatback then
-					aObj:Print(_G.strjoin(" ", aObj.L["Garrison"], aObj.L["mode"], aObj.L["disabled"]))
+					aObj:Print(aObj.L["Garrison mode disabled"])
 				end
 			end
 		end
@@ -382,14 +382,14 @@ local function checkSanctuary()
 			aObj:resetModes()
 			aObj.modeTab.Sanctuary = true
 			if aObj.prdb.chatback then
-				aObj:Print(_G.strjoin(" ", aObj.L["Sanctuary"], aObj.L["mode"], aObj.L["enabled"]))
+				aObj:Print(aObj.L["Sanctuary mode enabled"])
 			end
 		end
 	else
 		if aObj.modeTab.Sanctuary then
 			aObj.modeTab.Sanctuary = false
 			if aObj.prdb.chatback then
-				aObj:Print(_G.strjoin(" ", aObj.L["Sanctuary"], aObj.L["mode"], aObj.L["disabled"]))
+				aObj:Print(aObj.L["Sanctuary mode disabled"])
 			end
 		end
 	end
@@ -410,14 +410,14 @@ local function checkHub()
 			aObj:resetModes()
 			aObj.modeTab.Hub = true
 			if aObj.prdb.chatback then
-				aObj:Print(_G.strjoin(" ", aObj.L["Hub"], aObj.L["mode"], aObj.L["enabled"]))
+				aObj:Print(aObj.L["Hub mode enabled"])
 			end
 		end
 	else
 		if aObj.modeTab.Hub then
 			aObj.modeTab.Hub = false
 			if aObj.prdb.chatback then
-				aObj:Print(_G.strjoin(" ", aObj.L["Hub"], aObj.L["mode"], aObj.L["disabled"]))
+				aObj:Print(aObj.L["Hub mode disabled"])
 			end
 		end
 	end
