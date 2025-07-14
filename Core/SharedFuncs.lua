@@ -290,6 +290,46 @@ function aObj.CustomPrint(_, r, g, b, ...)
 
 end
 
+function aObj:handleProfileChanges()
+
+	_G.StaticPopupDialogs[aName .. "_Reload_UI"] = {
+		text = aObj.L["Confirm reload of UI to activate profile changes"],
+		button1 = _G.OKAY,
+		button2 = _G.CANCEL,
+		OnAccept = function(_)
+			_G.C_UI.Reload()
+		end,
+		OnCancel = function(_, _, reason)
+			if reason == "timeout"
+			or reason == "clicked"
+			then
+				aObj:CustomPrint(1, 1, 0, aObj.L["The profile"] .. " '" .. aObj.db:GetCurrentProfile() .. "' " .. aObj.L["will be activated next time you Login or Reload the UI"])
+				_G.UIErrorsFrame:AddMessage(aObj.L["The profile"] .. " '" .. aObj.db:GetCurrentProfile() .. "' " .. aObj.L["will be activated next time you Login or Reload the UI"], 1, 1, 0)
+			end
+		end,
+		timeout = 0,
+		whileDead = 1,
+		exclusive = 1,
+		hideOnEscape = 1
+	}
+	local function reloadAddon()
+		-- setup defaults for new profile
+		if aName == "Skinner" then
+			aObj:checkAndRun("SetupDefaults", "opt", false, true)
+		else
+			aObj:SetupDefaults()
+		end
+		-- store shortcut
+		aObj.prdb = aObj.db.profile
+		-- prompt for reload
+		_G.StaticPopup_Show(aName .. "_Reload_UI")
+	end
+	self.db:RegisterCallback("OnProfileChanged", reloadAddon)
+	self.db:RegisterCallback("OnProfileCopied", reloadAddon)
+	self.db:RegisterCallback("OnProfileReset", reloadAddon)
+
+end
+
 --@debug@
 aObj.debugFrame = _G.ChatFrame10
 function aObj:Debug(...)

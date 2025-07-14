@@ -127,36 +127,7 @@ function aObj:OnEnable()
 		self.getBGNames = _G.nop
 	end
 
-	-- handle profile changes
-	_G.StaticPopupDialogs[aName .. "_Reload_UI"] = {
-		text = self.L["Confirm reload of UI to activate profile changes"],
-		button1 = _G.OKAY,
-		button2 = _G.CANCEL,
-		OnAccept = function()
-			_G.ReloadUI()
-		end,
-		OnCancel = function(_, _, reason)
-			if reason == "timeout"
-			or reason == "clicked"
-			then
-				aObj.CustomPrint(1, 1, 0, "The profile '" .. aObj.db:GetCurrentProfile() .. "' will be activated next time you Login or Reload the UI")
-			end
-		end,
-		timeout = 0,
-		whileDead = 1,
-		exclusive = 1,
-		hideOnEscape = 1
-	}
-	local function reloadAddon(callback)
-		aObj:LevelDebug(5, "ReloadAddon:[%s]", callback)
-		-- store shortcut
-		aObj.prdb = aObj.db.profile
-		-- prompt for reload
-		_G.StaticPopup_Show(aName .. "_Reload_UI")
-	end
-	self.db.RegisterCallback(self, "OnProfileChanged", reloadAddon)
-	self.db.RegisterCallback(self, "OnProfileCopied", reloadAddon)
-	self.db.RegisterCallback(self, "OnProfileReset", reloadAddon)
+	self:handleProfileChanges()
 
 	self:CheckMode("init")
 
