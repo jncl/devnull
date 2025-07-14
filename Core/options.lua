@@ -214,13 +214,13 @@ function aObj:SetupOptions()
 			aObj:Print("Debug messages OFF")
 		elseif input:lower() == "locate" then
 			_G.C_Map.GetBestMapForUnit("player")
-			aObj:Print(self.L["You are here"] .. ":", "[", _G.GetRealZoneText(), "] [", _G.GetSubZoneText(), "] [", _G.C_Map.GetBestMapForUnit("player"), "]")
+			aObj:Print(aObj.L["You are here"] .. ":", "[", _G.GetRealZoneText(), "] [", _G.GetSubZoneText(), "] [", _G.C_Map.GetBestMapForUnit("player"), "]")
 		elseif input:lower() == "mapinfo" then
 			local uiMapID = _G.C_Map.GetBestMapForUnit("player")
 			local mapinfo = _G.C_Map.GetMapInfo(uiMapID)
 			local posn = _G.C_Map.GetPlayerMapPosition(uiMapID, "player")
 			local areaName= _G.MapUtil.FindBestAreaNameAtMouse(uiMapID, posn["x"], posn["y"])
-			aObj:Print(self.L["Map Info"] .. ":", mapinfo["mapID"], mapinfo["name"], mapinfo["mapType"], mapinfo["parentMapID"], posn["x"], posn["y"], areaName)
+			aObj:Print(aObj.L["Map Info"] .. ":", mapinfo["mapID"], mapinfo["name"], mapinfo["mapType"], mapinfo["parentMapID"], posn["x"], posn["y"], areaName)
 		else
 			_G.LibStub:GetLibrary("AceConfigCmd-3.0"):HandleCommand(aName, aName, input)
 		end
