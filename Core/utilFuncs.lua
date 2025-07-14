@@ -285,10 +285,10 @@ function aObj:resetModes()
 
 end
 
-function aObj:CheckAllEvents()
+function aObj:ResetAllEvents()
 
 	for evt, _ in _G.pairs(self.events) do
-		self.events[evt].check = true
+		self.events[evt].check = self.events[evt].default
 	end
 
 end

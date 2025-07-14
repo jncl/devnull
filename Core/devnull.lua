@@ -194,12 +194,12 @@ local function checkTaxi(event, _)
 	aObj:LevelDebug(4, "checkTaxi", event, _G.UnitOnTaxi("player"), _G.UnitIsCharmed("player"), _G.UnitIsPossessed("player"))
 	-- if on Taxi then disable events
 	if event == "PLAYER_CONTROL_LOST"
-	or _G.UnitOnTaxi("player")
+	and _G.UnitOnTaxi("player")
 	then
-		aObj:resetModes()
-		aObj.modeTab.Taxi = true
 		aObj:UncheckAllEvents()
 		aObj.events["PLAYER_CONTROL_GAINED"].check = true
+		aObj:resetModes()
+		aObj.modeTab.Taxi = true
 		if aObj.prdb.chatback then
 			aObj:Print(aObj.L["Taxi mode enabled"])
 		end
@@ -207,9 +207,8 @@ local function checkTaxi(event, _)
 	elseif event == "PLAYER_CONTROL_GAINED"
 	and not _G.UnitOnTaxi("player")
 	then
+		aObj:ResetAllEvents()
 		aObj.modeTab.Taxi = false
-		aObj:CheckAllEvents()
-		aObj.events[event].check = false
 		if aObj.prdb.chatback then
 			aObj:Print(aObj.L["Taxi mode disabled"])
 		end
@@ -225,10 +224,10 @@ if not aObj.isClscERA then
 		if event == "UNIT_ENTERED_VEHICLE"
 		or _G.UnitInVehicle("player")
 		then
-			aObj:resetModes()
-			aObj.modeTab.Vehicle = true
 			aObj:UncheckAllEvents()
 			aObj.events["UNIT_EXITED_VEHICLE"].check = true
+			aObj:resetModes()
+			aObj.modeTab.Vehicle = true
 			if aObj.prdb.chatback then
 				aObj:Print(aObj.L["Vehicle mode enabled"])
 			end
@@ -236,9 +235,8 @@ if not aObj.isClscERA then
 		elseif event == "UNIT_EXITED_VEHICLE"
 		and not _G.UnitInVehicle("player")
 		then
+			aObj:ResetAllEvents()
 			aObj.modeTab.Vehicle = false
-			aObj:CheckAllEvents()
-			aObj.events[event].check = false
 			if aObj.prdb.chatback then
 				aObj:Print(aObj.L["Vehicle mode disabled"])
 			end
@@ -295,12 +293,12 @@ if not aObj.isClscERA then
 				end
 			else
 				if not aObj.modeTab.Instance then
-					aObj:resetModes()
-					aObj.modeTab.Instance = true
 					aObj.events["SCENARIO_UPDATE"].check = false
 					aObj.events["ZONE_CHANGED"].check = false
 					aObj.events["ZONE_CHANGED_INDOORS"].check = false
 					aObj.events["ZONE_CHANGED_NEW_AREA"].check = false
+					aObj:resetModes()
+					aObj.modeTab.Instance = true
 					if aObj.prdb.chatback then
 						aObj:Print(aObj.L["Instance mode enabled"])
 					end
@@ -322,11 +320,11 @@ if not aObj.isClscERA then
 					aObj:Print(aObj.L["Scenario mode disabled"])
 				end
 			elseif aObj.modeTab.Instance then
-				aObj.modeTab.Instance = false
 				aObj.events["SCENARIO_UPDATE"].check = true
 				aObj.events["ZONE_CHANGED"].check = true
 				aObj.events["ZONE_CHANGED_INDOORS"].check = true
 				aObj.events["ZONE_CHANGED_NEW_AREA"].check = true
+				aObj.modeTab.Instance = false
 				if aObj.prdb.chatback then
 					aObj:Print(aObj.L["Instance mode disabled"])
 				end
