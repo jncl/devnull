@@ -6,3 +6,5 @@ Legend:
 	x			- indicates nothing to change
 	¶ is Alt+7	- indicates localisation changes required
 	I/O			- Issue(Bug)/Other change
+
+¶	Import enUS_Locale_Strings.lua into Localisations, replacing existing entries
