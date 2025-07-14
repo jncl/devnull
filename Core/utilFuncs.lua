@@ -304,10 +304,12 @@ end
 local status
 function aObj:updateDBtext(noShrink)
 
-	self:LevelDebug(4, "updateDBtext: [%s:%s, %s:%s, %s:%s]", self.L["Hub"], _G.tostring(self.modeTab.Hub), self.L["Sanctuary"], _G.tostring(self.modeTab.Sanctuary), self.L["Taxi"], _G.tostring(self.modeTab.Taxi))
-	if self.isMnln then
+	self:LevelDebug(4, "updateDBtext: [%s:%s, %s:%s, %s:%s, %s:%s]", self.L["Hub"], _G.tostring(self.modeTab.Hub), self.L["Sanctuary"], _G.tostring(self.modeTab.Sanctuary), self.L["Pet Battle"], _G.tostring(self.modeTab.PetBattle), self.L["Taxi"], _G.tostring(self.modeTab.Taxi))
+	if not self.isClscERA then
 		self:LevelDebug(4, "updateDBtext: [%s:%s, %s:%s, %s:%s]", self.L["Vehicle"], _G.tostring(self.modeTab.Vehicle), self.L["Scenario"], _G.tostring(self.modeTab.Scenario), self.L["Instance"], _G.tostring(self.modeTab.Instance))
-		self:LevelDebug(4, "updateDBtext: [%s:%s, %s %s:%s]", self.L["Garrison"], _G.tostring(self.modeTab.Garrison), self.L["Bodyguard"], self.L["mode"], _G.tostring(self.prdb.noBguard))
+	end
+	if self.isMnln then
+		self:LevelDebug(4, "updateDBtext: [%s:%s, %s %s:%s]", self.L["Garrison"], _G.tostring(self.modeTab.Garrison), self.L["Bodyguard"], _G.tostring(self.prdb.noBguard))
 	end
 
 	status = self.L["Off"]

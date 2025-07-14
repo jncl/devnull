@@ -162,7 +162,34 @@ function aObj:OnDisable()
 
 end
 
---> Flying Handler <--
+--> Pet Battle Handler <--
+local checkPetBattle = _G.nop
+if not aObj.isClscERA then
+	function checkPetBattle(event, _)
+		aObj:LevelDebug(4, "checkPetBattle", event, _G.C_PetBattles.GetBattleState())
+		-- if started a Pet Battle then disable events
+		if event == "PET_BATTLE_OPENING_DONE"
+		then
+			aObj:UncheckAllEvents()
+			aObj.events["PET_BATTLE_CLOSE"].check = true
+			aObj:resetModes()
+			aObj.modeTab.PetBattle = true
+			if aObj.prdb.chatback then
+				aObj:Print(aObj.L["Pet Battle mode enabled"])
+			end
+		-- if finished Pet battle then enable events
+		elseif event == "PET_BATTLE_CLOSE"
+		then
+			aObj:ResetAllEvents()
+			aObj.modeTab.PetBattle = false
+			if aObj.prdb.chatback then
+				aObj:Print(aObj.L["Pet Battle mode disabled"])
+			end
+		end
+		return aObj.modeTab.PetBattle
+	end
+end
+--> Taxi Handler <--
 local function checkTaxi(event, _)
 	aObj:LevelDebug(4, "checkTaxi", event, _G.UnitOnTaxi("player"), _G.UnitIsCharmed("player"), _G.UnitIsPossessed("player"))
 	-- if on Taxi then disable events
@@ -404,8 +431,8 @@ function aObj:CheckMode(event, ...)
 
 	cMAID = _G.C_Map.GetBestMapForUnit("player")
 
-	-- are we on a Taxi, in a Vehicle or talking to an NPC?
-	for _, func in _G.ipairs{checkTaxi, checkVehicle, checkNPC} do
+	-- are we fighting a Pet Battle, on a Taxi, in a Vehicle or talking to an NPC?
+	for _, func in _G.ipairs{checkPetBattle, checkTaxi, checkVehicle, checkNPC} do
 		if func then
 			modeDetected = func(event, ...)
 			if modeDetected then

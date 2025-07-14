@@ -199,10 +199,12 @@ function aObj:SetupOptions()
 			aObj.callbacks:Fire("Options_Selected")
 			_G.Settings.OpenToCategory(aObj.L[aName], aObj.optCheck[input:lower()])
 		elseif input:lower() == "status" then
-			aObj:Print(aObj.L["Hub"] .. ":", aObj.modeTab.Hub, aObj.L["Sanctuary"] .. ":", aObj.modeTab.Sanctuary, aObj.L["Taxi"] .. ":", aObj.modeTab.Taxi)
-			if aObj.isMnln then
+			aObj:Print(aObj.L["Hub"] .. ":", aObj.modeTab.Hub, aObj.L["Sanctuary"] .. ":", aObj.modeTab.Sanctuary, aObj.L["Pet Battle"] .. ":", aObj.modeTab.PetBattle, aObj.L["Taxi"] .. ":", aObj.modeTab.Taxi)
+			if not aObj.isClscERA then
 				aObj:Print(aObj.L["Vehicle"] .. ":", aObj.modeTab.Vehicle, aObj.L["Scenario"] .. ":", aObj.modeTab.Scenario, aObj.L["Instance"] .. ":", aObj.modeTab.Instance)
-				aObj:Print(aObj.L["Garrison"] .. ":", aObj.modeTab.Garrison, _G.strjoin(" ", aObj.L["Bodyguard"], aObj.L["mode"] .. ":"), aObj.prdb.noBguard)
+			end
+			if aObj.isMnln then
+				aObj:Print(aObj.L["Garrison"] .. ":", aObj.modeTab.Garrison, aObj.L["Bodyguard"] .. ":", aObj.prdb.noBguard)
 			end
 		elseif input:lower() == "loud" then
 			aObj.debugLevel = 5

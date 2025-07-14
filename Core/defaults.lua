@@ -12,6 +12,7 @@ function aObj:SetupDefaults()
 		["Scenario"]  = false,
 		["Taxi"]      = false,
 		["Vehicle"]   = false,
+		["PetBattle"]  = false,
 	}
 
 	-- store player and pet names & player faction
@@ -149,6 +150,8 @@ function aObj:SetupDefaults()
 	self.nullTowns[SZL["Valgarde"]]                    = true -- Howling Fjord (Alliance)
 	self.checkZones[SZL["Borean Tundra"]]              = true -- (for Valiance Keep/Warsong Hold)
 	self.checkZones[SZL["Howling Fjord"]]              = true -- (for Valgarde/Vengeance Landing)
+	self.events["PET_BATTLE_OPENING_DONE"] 		= {check = true,  default=true}  -- this is used for pet battle check
+	self.events["PET_BATTLE_CLOSE"] 			= {check = false, default=false} -- this is used for pet battle check
 
 	if self.isClsc then
 		return
