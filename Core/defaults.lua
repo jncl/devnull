@@ -90,7 +90,6 @@ function aObj:SetupDefaults()
 	}
 	self.nullHubs = {
 		-- Kalimdor
-		[SZL["Orgrimmar"]]         				= true,
 		[SZL["Darnassus"]]         				= true,
 		-- Eastern Kingdoms
 		[SZL["City of Ironforge"]] 				= true,
@@ -98,6 +97,8 @@ function aObj:SetupDefaults()
 	}
 	self.nullHubsByID = {
 		[84]                       				= true, -- Stormwind City, Eastern Kingdoms (Alliance)
+		[85]                       				= true, -- Orgrimmar, Kalimdor (Horde)
+		[86]                       				= true, -- Orgrimmar, Kalimdor (Horde)
 		[88]                       				= true, -- Thunder Bluff, Kalimdor (Horde)
 	}
 	self.garrisons = {}
