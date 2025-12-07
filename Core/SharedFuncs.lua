@@ -45,8 +45,9 @@ function aObj:checkWoWVersion()
 			agentUID = "wow_classic"
 		end
 	end
+
 	--@debug@
-	self:Debug("checkVersion#1: [%s, %d, %d, %s, %d, %s, %d]", agentUID, _G.WOW_PROJECT_ID, _G.LE_EXPANSION_LEVEL_CURRENT, _G.GetBuildInfo())
+	self:Debug("checkVersion #1: [%s, %d, %d, %s, %d, %s, %d]", agentUID, _G.WOW_PROJECT_ID, _G.LE_EXPANSION_LEVEL_CURRENT, _G.GetBuildInfo())
 	--@end-debug@
 
 	-- check to see which WoW version we are running on
@@ -55,20 +56,21 @@ function aObj:checkWoWVersion()
 	self.isClsc       = agentUID == "wow_classic" and true
 	self.isClscERAPTR = agentUID == "wow_classic_era_ptr" and true
 	self.isClscERA    = agentUID == "wow_classic_era" and true
-	self.isMnlnBeta    = agentUID == "wow_beta" and true
-	self.isMnlnPTR     = agentUID == "wow_ptr" and true
-	self.isMnlnPTRX    = agentUID == "wow_ptr_x" and true
-	self.isMnln        = agentUID == "wow" and true
+	self.isMnlnBeta   = agentUID == "wow_beta" and true
+	self.isMnlnPTR    = agentUID == "wow_ptr" and true
+	self.isMnlnPTRX   = agentUID == "wow_ptr_x" and true
+	self.isMnln       = agentUID == "wow" and true
+
 	--@debug@
-	self:Debug("checkVersion#2: [%s, %s, %s, %s, %s, %s, %s, %s, %s]", self.isClscBeta, self.isClscPTR, self.isClsc, self.isClscERAPTR, self.isClscERA, self.isMnlnBeta, self.isMnlnPTR, self.isMnlnPTRX, self.isMnln)
+	self:Debug("checkVersion #2: [%s, %s, %s, %s, %s, %s, %s, %s, %s]", self.isClscBeta, self.isClscPTR, self.isClsc, self.isClscERAPTR, self.isClscERA, self.isMnlnBeta, self.isMnlnPTR, self.isMnlnPTRX, self.isMnln)
 	--@end-debug@
 
 	-- handle PTR and Beta versions
 	self.isClscPTR    = self.isClscPTR or self.isClscBeta
 	self.isClsc       = self.isClsc or self.isClscPTR
 	self.isClscERA    = self.isClscERA  or self.isClscERAPTR
-	self.isMnlnPTR     = self.isMnlnPTR or self.isMnlnBeta
-	self.isMnln        = self.isMnln or self.isMnlnPTR or self.isMnlnPTRX
+	self.isMnlnPTR    = self.isMnlnPTR or self.isMnlnBeta
+	self.isMnln       = self.isMnln or self.isMnlnPTR or self.isMnlnPTRX
 
 	self.isPatch = not compareBuildInfo(agentUID, "curr", true)
 	if self.isPatch then
@@ -83,11 +85,10 @@ function aObj:checkWoWVersion()
 	end
 
 	--@debug@
-	self:Debug("checkVersion#3: [%s, %s, %s, %s, %s, %s, %s, %s, %s, %s]", self.isClscBeta, self.isClscPTR, self.isClsc, self.isClscERAPTR, self.isClscERA, self.isMnlnBeta, self.isMnlnPTR, self.isMnlnPTRX, self.isMnln, self.isPatch)
-	--@end-debug@
+	self:Debug("checkVersion #3: [%s, %s, %s, %s, %s, %s, %s, %s, %s, %s]", self.isClscBeta, self.isClscPTR, self.isClsc, self.isClscERAPTR, self.isClscERA, self.isMnlnBeta, self.isMnlnPTR, self.isMnlnPTRX, self.isMnln, self.isPatch)
 
-	--@debug@
 	self:Printf("%s, %d, %s, %d, %s, %d, %s", buildInfo[agentUID][2], buildInfo[agentUID][3], buildInfo.curr[2], buildInfo.curr[3], buildInfo.curr[4], buildInfo.curr[5] , agentUID)
+
 	_G.DEFAULT_CHAT_FRAME:AddMessage(_G.strjoin(": ", aName , "Game version is", buildInfo[agentUID][1]), 0.75, 0.5, 0.25, nil, true)
 	--@end-debug@
 
