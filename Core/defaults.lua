@@ -70,9 +70,8 @@ function aObj:SetupDefaults()
 	-- pointer to LibBabble-SubZone-3.0 library
 	local SZL = _G.LibStub:GetLibrary("LibBabble-SubZone-3.0"):GetLookupTable()
 
-	-- Map IDs can be found here: http://wowpedia.org/MapID
-	-- These have been changed in BfA and a transitional list can be found here:
-	-- AddOns/Blizzard_Deprecated/UIMapIDToWorldMapAreaID.lua
+	-- Map IDs can be found here: https://warcraft.wiki.gg/wiki/UiMapID
+	-- or here: https://wago.tools/db2/UiMap
 	self.nullTowns = {
 		-- Kalimdor
 		[SZL["Everlook"]]          				= true,
@@ -88,19 +87,7 @@ function aObj:SetupDefaults()
 		[SZL["The Salty Sailor Tavern"]] 		= true, -- in Booty Bay
 		[SZL["Foothold Citadel"]]        		= true, -- in Theramore Isle
 	}
-	self.nullHubs = {
-		-- Kalimdor
-		[SZL["Darnassus"]]         				= true,
-		-- Eastern Kingdoms
-		[SZL["City of Ironforge"]] 				= true,
-		[SZL["Undercity"]]         				= true,
-	}
-	self.nullHubsByID = {
-		[84]                       				= true, -- Stormwind City, Eastern Kingdoms (Alliance)
-		[85]                       				= true, -- Orgrimmar, Kalimdor (Horde)
-		[86]                       				= true, -- Orgrimmar, Kalimdor (Horde)
-		[88]                       				= true, -- Thunder Bluff, Kalimdor (Horde)
-	}
+	self.nullHubs = {}
 	self.garrisons = {}
 	self.events = {
 		["GOSSIP_SHOW"]           				= {check = true,  default=true},  -- this is for NPC name check
@@ -116,9 +103,26 @@ function aObj:SetupDefaults()
 	}
 
 	if self.isClscERA then
+		self.nullHubsByID = {
+			[1453]                 				= true, -- Stormwind City, Eastern Kingdoms (Alliance)
+			[1454]                 				= true, -- Orgrimmar, Kalimdor (Horde)
+			[1455]                 				= true, -- Ironforge, Eastern Kingdoms (Alliance)
+			[1456]                 				= true, -- Thunder Bluff, Kalimdor (Horde)
+			[1457]                 				= true, -- Darnassus, Kalimdor (Alliance)
+			[1458]                 				= true, -- Undercity, Eastern Kingdoms (Alliance)
+		}
 		return
 	end
 
+	self.nullHubsByID = {
+		[84]                   					= true, -- Stormwind City, Eastern Kingdoms (Alliance)
+		[85]                   					= true, -- Orgrimmar, Kalimdor (Horde)
+		[86]                   					= true, -- Orgrimmar, Kalimdor (Horde)
+		[87]                   					= true, -- Ironforge, Eastern Kingdoms (Alliance)
+		[88]                   					= true, -- Thunder Bluff, Kalimdor (Horde)
+		[89]                   					= true, -- Darnassus, Kalimdor (Alliance)
+		[90]                   					= true, -- Undercity, Eastern Kingdoms (Horde)
+	}
 	self.events["UNIT_ENTERED_VEHICLE"] 		= {check = true,  default=true}  -- this is used for vehicle check
 	self.events["UNIT_EXITED_VEHICLE"] 			= {check = false, default=false} -- this is used for vehicle check
 	self.events["PET_BATTLE_OPENING_DONE"] 		= {check = true,  default=true}  -- this is used for pet battle check
