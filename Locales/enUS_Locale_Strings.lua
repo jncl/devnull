@@ -71,6 +71,7 @@ aObj.locale_enUS =
     ["PetBattle"] = true,
     ["Player Yells"] = true,
     ["Print chat message when toggling mute."] = true,
+    ["Profiles"] = true,
     ["Reputation with"] = true,
     ["Sanctuary mode disabled"] = true,
     ["Sanctuary mode enabled"] = true,
