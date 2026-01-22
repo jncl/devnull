@@ -96,7 +96,9 @@ function aObj:OnEnable()
 		self.prdb.cf1Channels[cwc[i]] = true
 	end
 	-- hook to add channel
-	if not aObj.isMnln then
+	if not aObj.isMnln
+	and not aObj.isClscBCA
+	then
 		self:RawHook("ChatFrame_AddChannel", function(chatFrame, channel)
 			self.hooks.ChatFrame_AddChannel(chatFrame, channel)
 			if chatFrame:GetID() == 1 then
@@ -110,7 +112,9 @@ function aObj:OnEnable()
 		end, true)
 	end
 	-- hook to remove channel
-	if not aObj.isMnln then
+	if not aObj.isMnln
+	and not aObj.isClscBCA
+	then
 		self:RawHook("ChatFrame_RemoveChannel", function(chatFrame, channel)
 			self.hooks.ChatFrame_RemoveChannel(chatFrame, channel)
 			if chatFrame:GetID() == 1 then
@@ -324,7 +328,9 @@ if not aObj.isClscERA then
 						for _, channel in _G.pairs{aObj.L["General"], aObj.L["LocalDefense"], aObj.L["WorldDefense"]} do
 							if aObj.prdb.cf1Channels[channel] then
 								-- use hooked function so as not to change existing value
-								if not aObj.isMnln then
+								if not aObj.isMnln
+								and not aObj.isClscBCA
+								then
 									aObj.hooks.ChatFrame_RemoveChannel(_G.ChatFrame1, channel)
 								else
 									aObj.hooks[_G.ChatFrame1].RemoveChannel(_G.ChatFrame1, channel)
@@ -354,7 +360,9 @@ if not aObj.isClscERA then
 					for _, channel in _G.pairs{aObj.L["General"], aObj.L["LocalDefense"], aObj.L["WorldDefense"]} do
 						if aObj.prdb.cf1Channels[channel] then
 							-- use hooked function so as not to change existing value
-							if not aObj.isMnln then
+							if not aObj.isMnln
+							and not aObj.isClscBCA
+							then
 								aObj.hooks.ChatFrame_AddChannel(_G.ChatFrame1, channel)
 							else
 								aObj.hooks[_G.ChatFrame1].AddChannel(_G.ChatFrame1, channel)
