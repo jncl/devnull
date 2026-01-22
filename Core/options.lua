@@ -237,7 +237,7 @@ function aObj:SetupOptions()
 		icon = [[Interface\Icons\Spell_Holy_Silence]],
 		OnClick = function()
 			aObj.callbacks:Fire("Options_Selected")
-			_G.Settings.OpenToCategory(aName, aObj.L[aName])
+			_G.Settings.OpenToCategory(aObj.L[aName])
 		end,
 		OnTooltipShow = function(tooltip)
 			tooltip:AddLine(aObj.L[aName] .. " - " .. aObj.L[self:updateDBtext(true)])
