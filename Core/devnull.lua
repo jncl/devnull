@@ -196,17 +196,13 @@ if not aObj.isClscERA then
 			aObj.events["PET_BATTLE_CLOSE"].check = true
 			aObj:resetModes()
 			aObj.modeTab.PetBattle = true
-			if aObj.prdb.chatback then
-				aObj:Print(aObj.L["Pet Battle mode enabled"])
-			end
+			aObj:print2Chat("Pet Battle mode enabled")
 		-- if finished Pet battle then enable events
 		elseif event == "PET_BATTLE_CLOSE"
 		then
 			aObj:ResetAllEvents()
 			aObj.modeTab.PetBattle = false
-			if aObj.prdb.chatback then
-				aObj:Print(aObj.L["Pet Battle mode disabled"])
-			end
+			aObj:print2Chat("Pet Battle mode disabled")
 		end
 		return aObj.modeTab.PetBattle
 	end
@@ -222,18 +218,14 @@ local function checkTaxi(event, _)
 		aObj.events["PLAYER_CONTROL_GAINED"].check = true
 		aObj:resetModes()
 		aObj.modeTab.Taxi = true
-		if aObj.prdb.chatback then
-			aObj:Print(aObj.L["Taxi mode enabled"])
-		end
+		aObj:print2Chat("Taxi mode enabled")
 	-- if finished Taxi ride then enable events
 	elseif event == "PLAYER_CONTROL_GAINED"
 	and not _G.UnitOnTaxi("player")
 	then
 		aObj:ResetAllEvents()
 		aObj.modeTab.Taxi = false
-		if aObj.prdb.chatback then
-			aObj:Print(aObj.L["Taxi mode disabled"])
-		end
+		aObj:print2Chat("Taxi mode disabled")
 	end
 	return aObj.modeTab.Taxi
 end
@@ -250,18 +242,14 @@ if not aObj.isClscERA then
 			aObj.events["UNIT_EXITED_VEHICLE"].check = true
 			aObj:resetModes()
 			aObj.modeTab.Vehicle = true
-			if aObj.prdb.chatback then
-				aObj:Print(aObj.L["Vehicle mode enabled"])
-			end
+			aObj:print2Chat("Vehicle mode enabled")
 		-- if exited from vehicle then enable events
 		elseif event == "UNIT_EXITED_VEHICLE"
 		and not _G.UnitInVehicle("player")
 		then
 			aObj:ResetAllEvents()
 			aObj.modeTab.Vehicle = false
-			if aObj.prdb.chatback then
-				aObj:Print(aObj.L["Vehicle mode disabled"])
-			end
+			aObj:print2Chat("Vehicle mode disabled")
 		end
 		return aObj.modeTab.Vehicle
 	end
@@ -274,7 +262,7 @@ local function checkNPC(event, ...)
 	if event == "CHAT_MSG_MONSTER_SAY" then
 		local args = {...}
 		aObj:LevelDebug(4, "checkNPC", event, _G.CountTable(args))
-		_G.Spew("checkNPC", args)
+		-- _G.Spew("checkNPC", args)
 	end
 	--@end-debug@
 	-- clear remembered NPC names
@@ -285,12 +273,14 @@ local function checkNPC(event, ...)
 	or event == "QUEST_GREETING"
 	or event == "QUEST_PROGRESS"
 	then
-		NPCname = _G.UnitName("Target")
-		if NPCname then
-			aObj.questNPC[NPCname] = true
-			aObj:LevelDebug(4, "Saved Gossip/Quest NPC: [%s]", NPCname)
+		if _G.canaccessvalue(_G.UnitName("Target")) then
+			NPCname = _G.UnitName("Target")
+			if NPCname then
+				aObj.questNPC[NPCname] = true
+				aObj:LevelDebug(4, "Saved Gossip/Quest NPC: [%s]", NPCname)
+			end
+			return true
 		end
-		return true
 	end
 end
 --> Instance/Scenario Handler <--
@@ -309,9 +299,7 @@ if not aObj.isClscERA then
 				if not aObj.modeTab.Scenario then
 					aObj:resetModes()
 					aObj.modeTab.Scenario = true
-					if aObj.prdb.chatback then
-						aObj:Print(aObj.L["Scenario mode enabled"])
-					end
+					aObj:print2Chat("Scenario mode enabled")
 				end
 			else
 				if not aObj.modeTab.Instance then
@@ -321,9 +309,7 @@ if not aObj.isClscERA then
 					aObj.events["ZONE_CHANGED_NEW_AREA"].check = false
 					aObj:resetModes()
 					aObj.modeTab.Instance = true
-					if aObj.prdb.chatback then
-						aObj:Print(aObj.L["Instance mode enabled"])
-					end
+					aObj:print2Chat("Instance mode enabled")
 					if aObj.prdb.noIChat then
 						for _, channel in _G.pairs{aObj.L["General"], aObj.L["LocalDefense"], aObj.L["WorldDefense"]} do
 							if aObj.prdb.cf1Channels[channel] then
@@ -344,18 +330,14 @@ if not aObj.isClscERA then
 		else
 			if aObj.modeTab.Scenario then
 				aObj.modeTab.Scenario = false
-				if aObj.prdb.chatback then
-					aObj:Print(aObj.L["Scenario mode disabled"])
-				end
+				aObj:print2Chat("Scenario mode disabled")
 			elseif aObj.modeTab.Instance then
 				aObj.events["SCENARIO_UPDATE"].check = true
 				aObj.events["ZONE_CHANGED"].check = true
 				aObj.events["ZONE_CHANGED_INDOORS"].check = true
 				aObj.events["ZONE_CHANGED_NEW_AREA"].check = true
 				aObj.modeTab.Instance = false
-				if aObj.prdb.chatback then
-					aObj:Print(aObj.L["Instance mode disabled"])
-				end
+				aObj:print2Chat("Instance mode disabled")
 				if aObj.prdb.noIChat then
 					for _, channel in _G.pairs{aObj.L["General"], aObj.L["LocalDefense"], aObj.L["WorldDefense"]} do
 						if aObj.prdb.cf1Channels[channel] then
@@ -389,16 +371,12 @@ if aObj.isMnln then
 			if not aObj.modeTab.Garrison then
 				aObj:resetModes()
 				aObj.modeTab.Garrison = true
-				if aObj.prdb.chatback then
-					aObj:Print(aObj.L["Garrison mode enabled"])
-				end
+				aObj:print2Chat("Garrison mode enabled")
 			end
 		else
 			if aObj.modeTab.Garrison then
 				aObj.modeTab.Garrison = false
-				if aObj.prdb.chatback then
-					aObj:Print(aObj.L["Garrison mode disabled"])
-				end
+				aObj:print2Chat("Garrison mode disabled")
 			end
 		end
 		return aObj.modeTab.Garrison
@@ -413,16 +391,12 @@ local function checkSanctuary()
 		if not aObj.modeTab.Sanctuary then
 			aObj:resetModes()
 			aObj.modeTab.Sanctuary = true
-			if aObj.prdb.chatback then
-				aObj:Print(aObj.L["Sanctuary mode enabled"])
-			end
+			aObj:print2Chat("Sanctuary mode enabled")
 		end
 	else
 		if aObj.modeTab.Sanctuary then
 			aObj.modeTab.Sanctuary = false
-			if aObj.prdb.chatback then
-				aObj:Print(aObj.L["Sanctuary mode disabled"])
-			end
+			aObj:print2Chat("Sanctuary mode disabled")
 		end
 	end
 	return aObj.modeTab.Sanctuary
@@ -441,16 +415,12 @@ local function checkHub()
 		if not aObj.modeTab.Hub then
 			aObj:resetModes()
 			aObj.modeTab.Hub = true
-			if aObj.prdb.chatback then
-				aObj:Print(aObj.L["Hub mode enabled"])
-			end
+			aObj:print2Chat("Hub mode enabled")
 		end
 	else
 		if aObj.modeTab.Hub then
 			aObj.modeTab.Hub = false
-			if aObj.prdb.chatback then
-				aObj:Print(aObj.L["Hub mode disabled"])
-			end
+			aObj:print2Chat("Hub mode disabled")
 		end
 	end
 	return aObj.modeTab.Hub

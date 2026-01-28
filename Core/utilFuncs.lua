@@ -1,6 +1,14 @@
-local _, aObj = ...
+local aName, aObj = ...
 
 local _G = _G
+
+function aObj:print2Chat(text)
+
+	if self.prdb.chatback then
+		self.Print(aObj.L[aName], aObj.L[text])
+	end
+
+end
 
 -- Garrison functions
 local bodyguardNames, info = {}
