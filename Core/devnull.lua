@@ -19,6 +19,9 @@ function aObj:OnInitialize()
 	-- get Locale strings
 	self.L = _G.LibStub:GetLibrary("AceLocale-3.0"):GetLocale(aName)
 
+	-- pointer to LibDBIcon-1.0 library
+	self.DBIcon = _G.LibStub:GetLibrary("LibDBIcon-1.0")
+
 	--@debug@
 	self:checkLocaleStrings()
 	--@end-debug@
@@ -77,6 +80,9 @@ function aObj:OnInitialize()
 		end
 		self.oocTab = {}
 	end)
+
+	-- Setup AddOn Compartment Icon
+	self:setupACI()
 
 end
 

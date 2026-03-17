@@ -5,7 +5,6 @@
 ## Version: @project-version@
 
 ## IconTexture: Interface\Icons\Spell_Holy_Silence
-## AddonCompartmentFunc: devnull_OnAddonCompartmentClick
 
 ## Notes: Mutes various chat related annoyances while in capital cities and instances.
 ## Notes-deDE: Unterdr\195\188ckt diverse st\195\182rende Meldungen - w\195\164hrend man sich in Hauptst\195\164dten oder Instanzen befindet.

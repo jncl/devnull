@@ -4,20 +4,24 @@ local _G = _G
 
 function aObj:SetupOptions()
 
+	local db = self.db.profile
+
+	local aVersion = _G.C_AddOns.GetAddOnMetadata(aName, "Version") or ""
+
 	self.optTables = {
 		General = {
 			type = "group",
 			name = aName,
-			get = function(info) return self.prdb[info[#info]] end,
+			get = function(info) return db[info[#info]] end,
 			set = function(info, value)
-				self.prdb[info[#info]] = value
+				db[info[#info]] = value
 				if info[#info] == "shrink" then aObj.DBObj.text = aObj:updateDBtext() end
 			end,
 			args = {
 				desc = {
 					type = "description",
 					order = 1,
-					name = self.L["shhhh"] .." - "..(_G.C_AddOns.GetAddOnMetadata(aName, "X-Curse-Packaged-Version") or _G.C_AddOns.GetAddOnMetadata(aName, "Version") or "").."\n",
+					name = _G.strjoin(" ", self.L["shhhh"], "-", aVersion, "\n"),
 				},
 				longdesc = {
 					type = "description",
@@ -36,6 +40,29 @@ function aObj:SetupOptions()
 					name = self.L["Shrink label"],
 					desc = self.L["Abbreviate the Data Broker label."],
 				},
+				minimapicon = {
+					type = "toggle",
+					order = 4,
+					name = self.L["Minimap icon"],
+					get = function(info) return not db[info[1]].hide end,
+					set = function(info, value)
+						db[info[1]].hide = not value
+						if value then self.DBIcon:Show(aName) else self.DBIcon:Hide(aName) end
+					end,
+					hidden = function() return not self.DBIcon end,
+				},
+				compartmenticon = self.isMnln and {
+					type = "toggle",
+					order = 5,
+					width = "double",
+					name = self.L["Addon Compartment icon"],
+					get = function(_) return self.DBIcon:IsButtonInCompartment(aName) end,
+					set = function(info, value)
+						db[info[1]] = value
+						self:setupACI()
+					end,
+					hidden = function() return not self.DBIcon end,
+				} or nil,
 			},
 		},
 		Mutes = {
@@ -244,5 +271,6 @@ function aObj:SetupOptions()
 			tooltip:AddLine(aObj.L["Click to open config panel"], 1, 1, 1)
 		end,
 	})
+	self.DBIcon:Register(aName, self.DBObj, db.minimapicon, [[Interface\Icons\Spell_Holy_Silence]])
 
 end

@@ -21,21 +21,23 @@ function aObj:SetupDefaults()
 	self.faction = _G.UnitFactionGroup("player")
 
 	local defaults = { profile = {
-		achFilterType = 1,
-		chatback      = true,
-		shrink        = false,
-		noBguard      = true,
-		noDiscovery   = true,
-		noDrunk       = true,
-		noDuel        = true,
-		noEmote       = true,
-		noGChat       = true,
-		noIChat       = true,
-		noMYell       = true,
-		noNPC         = true,
-		noPetInfo     = true,
-		noPYell       = true,
-		noTradeskill  = true,
+		achFilterType	= 1,
+		chatback     	= true,
+		shrink       	= false,
+		minimapicon     = {hide = false, minimapPos = 240, radius = 80},
+		compartmenticon = self.isMnln and false or nil,
+		noBguard     	= true,
+		noDiscovery  	= true,
+		noDrunk      	= true,
+		noDuel       	= true,
+		noEmote      	= true,
+		noGChat      	= true,
+		noIChat      	= true,
+		noMYell      	= true,
+		noNPC        	= true,
+		noPetInfo    	= true,
+		noPYell      	= true,
+		noTradeskill 	= true,
 		-- ChatFrame1 channel settings
 		cf1Channels = {
 			[self.L["General"]]      = false, -- (All Versions)
@@ -47,6 +49,7 @@ function aObj:SetupDefaults()
 			-- ShadowlandsBetaDiscussion -- (Retail)
 			-- ShadowlandsPTRDiscussion -- (Retail)
 			-- DragonflightTestDiscussion -- (Retail)
+			-- MidnightTestDiscussion -- (Retail)
 			-- ChromieTime (Retail)
 			[self.L["Services"]]     = false, -- (Retail)
 			[self.L["WorldDefense"]] = false, -- (??)
