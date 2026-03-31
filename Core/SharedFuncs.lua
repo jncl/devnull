@@ -155,14 +155,23 @@ function aObj:createAddOn(makeGlobal)
 
 end
 
-function aObj.add2Table(_, tab, val)
+function aObj.add2Table(_, tab, val, key)
 	--@debug@
 	_G.assert(tab, "Unknown table add2Table\n" .. _G.debugstack(2, 3, 2))
 	_G.assert(val, "Missing value add2Table\n" .. _G.debugstack(2, 3, 2))
 	--@end-debug@
 
-	tab[#tab + 1] = val
+	tab[key or #tab + 1] = val
 
+end
+
+local tLen
+function aObj.check4EmptyTable(table)
+	tLen = 0
+	for _, _ in _G.pairs(table) do
+		tLen = tLen + 1
+	end
+	return tLen == 0 and true or false
 end
 
 function aObj.makeBoolean(_, var)
@@ -394,13 +403,12 @@ aObj.Debug3 = _G.nop
 aObj.setupACI = _G.nop
 if _G.WOW_PROJECT_ID == _G.WOW_PROJECT_MAINLINE then
 	function aObj:setupACI()
-		aObj:Debug("setupACI#1: [%s, %s]", self.prdb.compartmenticon, self.DBIcon:IsButtonInCompartment(aName))
-		if self.prdb.compartmenticon then
+
+		if self.prdb.CompartmentIcon then
 			self.DBIcon:AddButtonToCompartment(aName)
 		else
 			self.DBIcon:RemoveButtonFromCompartment(aName)
 		end
-		aObj:Debug("setupACI#2: [%s, %s]", self.prdb.compartmenticon, self.DBIcon:IsButtonInCompartment(aName))
 
 	end
 end
