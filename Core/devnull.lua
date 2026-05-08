@@ -104,6 +104,8 @@ function aObj:OnEnable()
 	-- hook to add channel
 	if not aObj.isMnln
 	and not aObj.isClscBCA
+	and not aObj.isClscPTR
+	and not aObj.isClscERAPTR
 	then
 		self:RawHook("ChatFrame_AddChannel", function(chatFrame, channel)
 			self.hooks.ChatFrame_AddChannel(chatFrame, channel)
@@ -120,6 +122,8 @@ function aObj:OnEnable()
 	-- hook to remove channel
 	if not aObj.isMnln
 	and not aObj.isClscBCA
+	and not aObj.isClscPTR
+	and not aObj.isClscERAPTR
 	then
 		self:RawHook("ChatFrame_RemoveChannel", function(chatFrame, channel)
 			self.hooks.ChatFrame_RemoveChannel(chatFrame, channel)
@@ -324,6 +328,7 @@ if not aObj.isClscERA then
 								-- use hooked function so as not to change existing value
 								if not aObj.isMnln
 								and not aObj.isClscBCA
+								and not aObj.isClscPTR
 								then
 									aObj.hooks.ChatFrame_RemoveChannel(_G.ChatFrame1, channel)
 								else
@@ -352,6 +357,7 @@ if not aObj.isClscERA then
 							-- use hooked function so as not to change existing value
 							if not aObj.isMnln
 							and not aObj.isClscBCA
+							and not aObj.isClscPTR
 							then
 								aObj.hooks.ChatFrame_AddChannel(_G.ChatFrame1, channel)
 							else
