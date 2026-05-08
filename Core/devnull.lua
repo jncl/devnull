@@ -279,7 +279,9 @@ local function checkNPC(event, ...)
 	or event == "QUEST_GREETING"
 	or event == "QUEST_PROGRESS"
 	then
-		if _G.canaccessvalue(_G.UnitName("Target")) then
+		if _G.canaccessvalue
+		and _G.canaccessvalue(_G.UnitName("Target"))
+		then
 			NPCname = _G.UnitName("Target")
 			if NPCname then
 				aObj.questNPC[NPCname] = true
