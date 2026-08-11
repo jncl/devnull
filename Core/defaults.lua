@@ -59,14 +59,6 @@ function aObj:SetupDefaults()
 	self.db = _G.LibStub:GetLibrary("AceDB-3.0"):New(aName .. "DB", defaults, "Default")
 	self.prdb = self.db.profile
 
-	-- message groups to filter
-	self.mGs = {
-		["MONSTER_YELL"]      = false,
-		["TRADESKILLS"]       = false,
-		["PET_INFO"]          = false,
-		["ACHIEVEMENT"]       = false,
-		["GUILD_ACHIEVEMENT"] = false,
-	}
 	-- remember quest NPC's
 	self.questNPC = {}
 

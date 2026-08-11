@@ -94,6 +94,11 @@ function aObj:SetupOptions()
 								[2] = self.L["All except Guild/Party/Raid"]
 							},
 						} or nil,
+						noDrunk = {
+							type = 'toggle',
+							name = self.L["Drunks"],
+							desc = self.L["Mute Drunken info."],
+						},
 						noDuel = {
 							type = 'toggle',
 							name = self.L["Duels"],
@@ -132,11 +137,6 @@ function aObj:SetupOptions()
 							name = self.L["Discoveries"],
 							desc = self.L["Mute Discovery info."],
 						} or nil,
-						noDrunk = {
-							type = 'toggle',
-							name = self.L["Drunks"],
-							desc = self.L["Mute Drunken info."],
-						},
 						noEmote = {
 							type = 'toggle',
 							name = self.L["Emotes"],
@@ -209,8 +209,8 @@ function aObj:SetupOptions()
 		-- runs when the player clicks "Okay"
 		aObj.optionsFrames[aObj.L["Mutes"]][method] = function()
 			aObj:getBGNames()
-			aObj:updateMGs()
-			aObj:updateMFltrs()
+			aObj:updateMsgGrps()
+			aObj:updateMsgFltrs()
 		end
 	end
 

@@ -3,8 +3,10 @@
 
 <Script file="SharedFuncs.lua"/>
 <Script file="UtilFuncs.lua"/>
-<Script file="devnull.lua"/>
 <Script file="Defaults.lua"/>
 <Script file="Options.lua"/>
+<Script file="MessageFuncs.lua"/>
+<Script file="CheckFuncs.lua"/>
+<Script file="devnull.lua"/>
 
 </Ui>
