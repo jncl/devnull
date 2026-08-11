@@ -72,15 +72,6 @@ function aObj:OnInitialize()
 		self.prdb.noOrderHall = nil
 	end
 
-	-- handle InCombat issues
-	self.oocTab = {}
-	self:RegisterEvent("PLAYER_REGEN_ENABLED", function()
-		for _, entry in _G.ipairs(self.oocTab) do
-			entry[1](_G.unpack(entry[2]))
-		end
-		self.oocTab = {}
-	end)
-
 	-- Setup AddOn Compartment Icon
 	self:setupACI()
 
@@ -88,6 +79,8 @@ end
 
 function aObj:OnEnable()
 	self:LevelDebug(5, "OnEnable")
+
+	self:handleOOCEvent()
 
 	-- register events
 	for evt, _ in _G.pairs(self.events) do

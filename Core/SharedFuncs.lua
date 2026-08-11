@@ -361,6 +361,19 @@ function aObj:handleProfileChanges()
 
 end
 
+-- handle OutofCombat Event
+function aObj:handleOOCEvent()
+
+	self.oocTab = {}
+	_G.EventRegistry:RegisterFrameEventAndCallback("PLAYER_REGEN_ENABLED", function()
+		for _, entry in _G.ipairs(self.oocTab) do
+			entry[1](_G.unpack(entry[2]))
+		end
+		_G.wipe(self.oocTab)
+	end)
+
+end
+
 --@debug@
 aObj.debugFrame = _G.ChatFrame10
 function aObj:Debug(...)
