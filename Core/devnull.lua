@@ -95,41 +95,15 @@ function aObj:OnEnable()
 		self.prdb.cf1Channels[cwc[i]] = true
 	end
 	-- hook to add channel
-	if not aObj.isMnln
-	and not aObj.isClscBCA
-	and not aObj.isClscPTR
-	and not aObj.isClscERAPTR
-	then
-		self:RawHook("ChatFrame_AddChannel", function(chatFrame, channel)
-			self.hooks.ChatFrame_AddChannel(chatFrame, channel)
-			if chatFrame:GetID() == 1 then
-				self.prdb.cf1Channels[channel] = true
-			end
-		end, true)
-	else
-		self:RawHook(_G.ChatFrame1, "AddChannel", function(this, channel)
-			self.hooks[this].AddChannel(this, channel)
-			self.prdb.cf1Channels[channel] = true
-		end, true)
-	end
+	self:RawHook(_G.ChatFrame1, "AddChannel", function(this, channel)
+		self.hooks[this].AddChannel(this, channel)
+		self.prdb.cf1Channels[channel] = true
+	end, true)
 	-- hook to remove channel
-	if not aObj.isMnln
-	and not aObj.isClscBCA
-	and not aObj.isClscPTR
-	and not aObj.isClscERAPTR
-	then
-		self:RawHook("ChatFrame_RemoveChannel", function(chatFrame, channel)
-			self.hooks.ChatFrame_RemoveChannel(chatFrame, channel)
-			if chatFrame:GetID() == 1 then
-				self.prdb.cf1Channels[channel] = false
-			end
-		end, true)
-	else
-		self:RawHook(_G.ChatFrame1, "RemoveChannel", function(this, channel)
-			self.hooks[this].RemoveChannel(this, channel)
-			self.prdb.cf1Channels[channel] = false
-		end, true)
-	end
+	self:RawHook(_G.ChatFrame1, "RemoveChannel", function(this, channel)
+		self.hooks[this].RemoveChannel(this, channel)
+		self.prdb.cf1Channels[channel] = false
+	end, true)
 
 	-- get existing Message Group settings
 	for mGroup, opt in _G.pairs(self.mGroups) do
@@ -179,11 +153,7 @@ function aObj:OnDisable()
 	-- turn channels back on
 	for channel, on in _G.pairs(self.prdb.cf1Channels) do
 		if on then
-			if not aObj.isMnln then
-				_G.ChatFrame_AddChannel(_G.ChatFrame1, channel)
-			else
-				_G.ChatFrame1.AddChannel(channel)
-			end
+			_G.ChatFrame1.AddChannel(channel)
 		end
 	end
 

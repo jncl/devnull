@@ -43,14 +43,13 @@ function aObj:SetupDefaults()
 			[self.L["General"]]      = false, -- (All Versions)
 			[self.L["Trade"]]        = false, -- (All Versions)
 			[self.L["LocalDefense"]] = false, -- (All Versions)
-			-- LookingForGroup -- (Classic)
-			-- GuildRecruitment -- (Classic)
+			-- LookingForGroup                -- (Classic)
+			-- GuildRecruitment               -- (Classic)
 			[self.L["NewcomerChat"]] = false, -- (Retail)
-			-- ShadowlandsBetaDiscussion -- (Retail)
-			-- ShadowlandsPTRDiscussion -- (Retail)
-			-- DragonflightTestDiscussion -- (Retail)
-			-- MidnightTestDiscussion -- (Retail)
-			-- ChromieTime (Retail)
+			-- ShadowlandsBetaDiscussion      -- (Retail)
+			-- ShadowlandsPTRDiscussion       -- (Retail)
+			-- MidnightTestDiscussion         -- (Retail)
+			-- ChromieTime                    -- (Retail)
 			[self.L["Services"]]     = false, -- (Retail)
 			[self.L["WorldDefense"]] = false, -- (??)
 		},
@@ -97,7 +96,9 @@ function aObj:SetupDefaults()
 		["ZONE_CHANGED_NEW_AREA"] 				= {check = true,  default=true},  -- used to handle changes of area
 	}
 
-	if self.isClscERA then
+	if self.isClscERA
+	or self.isClscBCA
+	then
 		self.nullHubsByID = {
 			[1453]                 				= true, -- Stormwind City, Eastern Kingdoms (Alliance)
 			[1454]                 				= true, -- Orgrimmar, Kalimdor (Horde)
@@ -106,18 +107,22 @@ function aObj:SetupDefaults()
 			[1457]                 				= true, -- Darnassus, Kalimdor (Alliance)
 			[1458]                 				= true, -- Undercity, Eastern Kingdoms (Alliance)
 		}
+	else
+		self.nullHubsByID = {
+			[84]                   				= true, -- Stormwind City, Eastern Kingdoms (Alliance)
+			[85]                   				= true, -- Orgrimmar, Kalimdor (Horde)
+			[86]                   				= true, -- Orgrimmar, Kalimdor (Horde)
+			[87]                   				= true, -- Ironforge, Eastern Kingdoms (Alliance)
+			[88]                   				= true, -- Thunder Bluff, Kalimdor (Horde)
+			[89]                   				= true, -- Darnassus, Kalimdor (Alliance)
+			[90]                   				= true, -- Undercity, Eastern Kingdoms (Horde)
+		}
+	end
+
+	if self.isClscERA then
 		return
 	end
 
-	self.nullHubsByID = {
-		[84]                   					= true, -- Stormwind City, Eastern Kingdoms (Alliance)
-		[85]                   					= true, -- Orgrimmar, Kalimdor (Horde)
-		[86]                   					= true, -- Orgrimmar, Kalimdor (Horde)
-		[87]                   					= true, -- Ironforge, Eastern Kingdoms (Alliance)
-		[88]                   					= true, -- Thunder Bluff, Kalimdor (Horde)
-		[89]                   					= true, -- Darnassus, Kalimdor (Alliance)
-		[90]                   					= true, -- Undercity, Eastern Kingdoms (Horde)
-	}
 	self.events["UNIT_ENTERED_VEHICLE"] 		= {check = true,  default=true}  -- this is used for vehicle check
 	self.events["UNIT_EXITED_VEHICLE"] 			= {check = false, default=false} -- this is used for vehicle check
 	self.events["PET_BATTLE_OPENING_DONE"] 		= {check = true,  default=true}  -- this is used for pet battle check
@@ -131,6 +136,11 @@ function aObj:SetupDefaults()
 	self.nullTowns[SZL["Honor Hold"]]         	= true -- Hellfire Peninsula (Alliance)
 	self.nullTowns[SZL["Mudsprocket"]]        	= true -- Dustwallow Marsh (Neutral)
 	self.nullTowns[SZL["Thrallmar"]]          	= true -- Hellfire Peninsula (Horde)
+
+	if self.isClscBCA then
+		return
+	end
+
 	-- Wrath
 	self.nullTowns[SZL["Warsong Hold"]]       	= true -- Borean Tundra (Horde)
 	self.nullTowns[SZL["Valiance Keep"]]      	= true -- Borean Tundra (Alliance)
@@ -169,7 +179,13 @@ function aObj:SetupDefaults()
 	self.garrisons[SZL["Wind's Redemption"]]	= true -- Boralus (Alliance)
 	self.garrisons[SZL["The Banshee's Wail"]]	= true -- Zuldazar (Horde)
 	-- SL
+	self.nullHubsByID[1670]                     = true -- Oribos
 	-- DF
+	self.nullHubsByID[2112]                     = true -- Valdrakken
 	-- TWW
+	self.nullHubsByID[2339]                     = true -- Dornogal
+	-- Midnight
+	self.nullHubsByID[2393]                     = true -- Silvermoon City
+	-- TLT
 
 end
