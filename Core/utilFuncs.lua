@@ -11,7 +11,8 @@ function aObj:print2Chat(text)
 end
 
 -- Garrison functions
-local bodyguardNames, info = {}
+aObj.bodyguardNames = {}
+local info
 function aObj.isGarrison(_, str)
 
 	return str and str:find("Garrison Level") and true
@@ -19,18 +20,19 @@ function aObj.isGarrison(_, str)
 end
 function aObj:getBGNames()
 
+	-- Followers with Bodyguard trait:
+	-- Tormmok (193)
+	-- Defender Illona [A] / Aeda Brightdawn [H] (207)
+	-- Delvar Ironfist [A] / Vivianne [H] (216)
+	-- Talonpriest Ishael (218)
+	-- Leorajh (219)
 	if self.prdb.noBguard then
-		-- Tormmok [193]
-		-- Defender Illona (A) [207]
-		-- Aeda Brightdawn (H) [207]
-		-- Delvar Ironfist (A) [216]
-		-- Vivianne (H) [216]
-		-- Talonpriest Ishaal [218]
-		-- Leorajh [219]
 		for _, id in _G.pairs{193, 207, 216, 218, 219} do
 			info = _G.C_Garrison.GetFollowerInfo(id)
-			bodyguardNames[info.name] = true
-			aObj:LevelDebug(5, "Bodyguard:", info.name)
+			if info then
+				aObj.bodyguardNames[info.name] = true
+				aObj:LevelDebug(5, "Follower:", id, info.name)
+			end
 		end
 	end
 

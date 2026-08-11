@@ -147,8 +147,8 @@ local function msgFilter4(_, event, ...)
 		if aObj.prdb.noGChat then
 			return true
 		elseif aObj.prdb.noBguard
-		and bodyguardNames[charFrom]
-		or bodyguardNames[msg:match(aObj.L["Reputation with"] .. "%s(.*)%s" .. aObj.L["increased by"])]
+		and aObj.bodyguardNames[charFrom]
+		or aObj.bodyguardNames[msg:match(aObj.L["Reputation with"] .. "%s(.*)%s" .. aObj.L["increased by"])]
 		then
 			return true
 		end
