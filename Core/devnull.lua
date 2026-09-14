@@ -140,11 +140,6 @@ end
 function aObj:OnDisable()
 	self:LevelDebug(5, "OnDisable")
 
-	-- unregister events
-	self:UnregisterAllEvents()
-	-- unhook functions
-	self:UnhookAll()
-
 	-- re-add message groups
 	self.updateMsgGrps()
 	-- remove message filters
@@ -156,5 +151,13 @@ function aObj:OnDisable()
 			_G.ChatFrame1.AddChannel(channel)
 		end
 	end
+
+	self:UnregisterChatCommand(self.L[aName])
+	self:UnregisterChatCommand("dn")
+	self.UnregisterAllCallbacks(self)
+	self:UnregisterAllEvents()
+	self:UnhookAll()
+
+	self = nil
 
 end
