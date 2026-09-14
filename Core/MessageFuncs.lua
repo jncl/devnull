@@ -39,10 +39,10 @@ aObj.mFilters = {
 	},
 	["Garrison"] = {
 		["noGChat"]       = {
-			["mf4]"] = {"CHAT_MSG_MONSTER_SAY", "CHAT_MSG_MONSTER_WHISPER"}
+			["mf4"] = {"CHAT_MSG_MONSTER_SAY", "CHAT_MSG_MONSTER_WHISPER"}
 		},
 		["noBguard"]      = {
-			["mf4]"] = {"CHAT_MSG_MONSTER_SAY"}
+			["mf4"] = {"CHAT_MSG_MONSTER_SAY"}
 		},
 	},
 }
